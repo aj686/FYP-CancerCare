@@ -11,8 +11,8 @@ class HomeController extends Controller
         return Inertia::render("Homepage");
     }
 
-    public function cancer() {
-        return Inertia::render("Cancer");
+    public function cancerInformation() {
+        return Inertia::render("CancerInformation");
     }
 
     public function getInvolved() {
@@ -21,14 +21,6 @@ class HomeController extends Controller
 
     public function ourResearch() {
         return Inertia::render("OurResearch");
-    }
-
-    public function event() {
-        return Inertia::render("Event");
-    }
-
-    public function shop() {
-        return Inertia::render("Shop");
     }
 
     public function about() {

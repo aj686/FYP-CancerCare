@@ -32,13 +32,8 @@ export default function OurResearch() {
                     </NavLink>
                 </li>
                 <li>
-                    <NavLink href="/event" className="text-black">
-                        Event
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink href="/shop" className="text-black">
-                        Shop
+                    <NavLink href="/product" className="text-black">
+                        Shop with Us
                     </NavLink>
                 </li>
                 <li>

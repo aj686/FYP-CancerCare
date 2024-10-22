@@ -4,10 +4,10 @@ import Navbar from '@/Components/Navbar'; // Import your Navbar component
 import NavLink from '@/Components/NavLink'; // Import NavLink component
 import PrimaryButton from '@/Components/PrimaryButton';
 import 'flowbite';
-import Card from '@/Components/My Components/Card';
-import CardCancer from '@/Components/My Components/CardCancer';
-import FlexTwoSideCancer from '@/Components/My Components/FlexTwoSideCancer';
-import CardResearch from '@/Components/My Components/CardResearch';
+import Card from '@/Components/My Components/Homepage/Card';
+import CardCancer from '@/Components/My Components/Homepage/CardCancer';
+import FlexTwoSideCancer from '@/Components/My Components/Homepage/FlexTwoSideCancer';
+import CardResearch from '@/Components/My Components/Homepage/CardResearch';
 
 export default function Homepage() {
     return (
@@ -36,13 +36,8 @@ export default function Homepage() {
                     </NavLink>
                 </li>
                 <li>
-                    <NavLink href="/event" className="text-black">
-                        Event
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink href="/shop" className="text-black">
-                        Shop
+                    <NavLink href="/product" className="text-black">
+                        Shop with Us
                     </NavLink>
                 </li>
                 <li>
@@ -67,13 +62,13 @@ export default function Homepage() {
                 </li>
             </Navbar>
 
-            <section className="bg-center bg-no-repeat bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/conference.jpg')] bg-gray-700 bg-blend-multiply">
+            <section className="bg-center bg-no-repeat bg-cover bg-[url('https://img.freepik.com/free-photo/child-suffering-from-cancer_23-2149501388.jpg?t=st=1726590400~exp=1726594000~hmac=1e2097c5774a6f8fe97b9005842dd287f8a9467fc3f6ffe3e13282549213db73&w=996')] bg-gray-700 bg-blend-multiply h-screen">
                 <div className="px-4 mx-auto max-w-screen-xl text-center py-24 lg:py-56">
-                    <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl">We invest in the world’s potential</h1>
-                    <p class="mb-8 text-lg font-normal text-gray-300 lg:text-xl sm:px-16 lg:px-48">Here at Flowbite we focus on markets where technology, innovation, and capital can unlock long-term value and drive economic growth.</p>
+                    <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl">Together, We Fight Cancer, Uniting for a cure</h1>
+                    <p class="mb-8 text-lg font-normal text-gray-300 lg:text-xl sm:px-16 lg:px-48">We focus on advancing cancer research and treatment, harnessing the power of innovation to improve lives and create a healthier future for all.</p>
                     <div class="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0">
                         <a href="#" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
-                            Get started
+                            Find your cancer now
                             <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
                             </svg>
@@ -160,10 +155,10 @@ export default function Homepage() {
                                 <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">Resources</h2>
                                 <ul class="text-gray-600 dark:text-gray-400">
                                     <li class="mb-4">
-                                        <a href="https://flowbite.com" class="hover:underline">Flowbite</a>
+                                        <a href="" class="hover:underline">National Malaysia Cancer</a>
                                     </li>
                                     <li>
-                                        <a href="https://tailwindcss.com/" class="hover:underline">Tailwind CSS</a>
+                                        <a href="" class="hover:underline">Cancer Research Malaysia</a>
                                     </li>
                                 </ul>
                             </div>
@@ -193,7 +188,7 @@ export default function Homepage() {
                     </div>
                     <hr class="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8" />
                     <div class="sm:flex sm:items-center sm:justify-between">
-                        <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2022 <a href="https://flowbite.com" class="hover:underline">Flowbite™</a>. All Rights Reserved.
+                        <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2022 <a href="https://flowbite.com" class="hover:underline">CancerCare Connect™</a>. All Rights Reserved.
                         </span>
                         <div class="flex mt-4 space-x-6 sm:justify-center sm:mt-0">
                             <a href="#" class="text-gray-500 hover:text-gray-900 dark:hover:text-white">

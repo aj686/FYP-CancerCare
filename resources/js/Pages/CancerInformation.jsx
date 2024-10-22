@@ -4,16 +4,12 @@ import Navbar from '@/Components/Navbar'; // Import your Navbar component
 import NavLink from '@/Components/NavLink'; // Import NavLink component
 import PrimaryButton from '@/Components/PrimaryButton';
 import 'flowbite';
-import Card from '@/Components/My Components/Homepage/Card';
-import CardCancer from '@/Components/My Components/Homepage/CardCancer';
-import FlexTwoSideCancer from '@/Components/My Components/Homepage/FlexTwoSideCancer';
-import CardResearch from '@/Components/My Components/Homepage/CardResearch';
-import EventList from '@/Components/My Components/Involved/EventLists';
+import CardDetailCancer from '@/Components/My Components/AboutCancer/CardDetailCancer';
 
-export default function GetInvolved() {
+export default function CancerInformation() {
     return (
         <>
-            <Head title="Get Invovled" />
+            <Head title="Cancer" />
             <Navbar>
                 {/* Pass NavLink components as children to Navbar */}
                 <li>
@@ -63,36 +59,143 @@ export default function GetInvolved() {
                 </li>
             </Navbar>
 
-            <section className="bg-center bg-no-repeat bg-cover bg-[url('https://img.freepik.com/free-photo/curvy-pink-streamer-closeup_23-2148050293.jpg?t=st=1726639737~exp=1726643337~hmac=52c3d94107ae4236b83203f757da5bd81a33dcb6d74227b9a2011e98c9a87687&w=996')] bg-gray-700 bg-blend-multiply h-screen">
+            <section className="bg-center bg-no-repeat bg-cover bg-[url('https://img.freepik.com/free-photo/3d-render-medical-background-with-floating-abstract-virus-cells_1048-14145.jpg?t=st=1726592033~exp=1726595633~hmac=0ce854184cd9570b489caa33d99609f5625bcc01ba092f09d83f5948f706ffb4&w=900')] bg-gray-700 bg-blend-multiply h-screen">
                 <div className="px-4 mx-auto max-w-screen-xl text-center py-24 lg:py-56">
-                    <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl">We are defeating cancer as a team.</h1>
-                    <p class="mb-8 text-lg font-normal text-gray-300 lg:text-xl sm:px-16 lg:px-48">There are numerous methods of clicking and typing to support CancerCare Connect and get involved. Together, we're making a difference – and you can, too.</p>
+                    <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl">Cancer Information</h1>
+                    <p class="mb-8 text-lg font-normal text-gray-300 lg:text-xl sm:px-16 lg:px-48">If you or a loved one is facing cancer, you can receive free information, assistance and guidance.</p>
                     <div class="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0">
-                        <a href="#" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
-                            Join Event
+                        <a href="#" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center mx-3 text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
+                            About Cancer  
+                            <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center mx-3 text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
+                            Cancer Types  
+                            <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center mx-3 text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
+                            Treatment 
+                            <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center mx-3 text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
+                            Prevention 
+                            <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center mx-3 text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
+                            Early Detection 
+                            <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center mx-3 text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
+                            Recovery 
+                            <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center mx-3 text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
+                            Diagnosis   
                             <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
                             </svg>
                         </a>
                         {/* <a href="#" class="inline-flex justify-center hover:text-gray-900 items-center py-3 px-5 sm:ms-4 text-base font-medium text-center text-white rounded-lg border border-white hover:bg-gray-100 focus:ring-4 focus:ring-gray-400">
-                            Learn more
+                            Look More
                         </a>   */}
                     </div>
                 </div>
             </section>
 
-            {/* Event Listing Section */}
-            {/* CardResearch Component -> need to add prop for dynamics - educate, encourage and empower */}
-            <div className="bg-white">
-                <div className="px-4 mx-auto max-w-screen-xl py-16 lg:py-10 flex flex-col">
-                    <div className="flex justify-center flex-col items-center mb-10">
-                        <div className="text-4xl font-bold mb-2 text-center">Support an Event Now</div>
-                        <div className="text-2xl text-center">Volunteer your time at one of our fundraising events to help us celebrate life and take meaningful action in the fight against cancer.</div>
-                    </div>
-                    <EventList />
-                    <EventList />
-                    <EventList />
-                    <EventList />
+            {/* Cancer Information   Section */}
+            {/* CardDetailCancer Component -> need to add prop for dynamics - educate, encourage and empower */}
+            <div className='bg-white p-4 flex flex-col my-20'>
+                <div className='flex justify-center flex-col items-center mb-10'>
+                    <div className='text-4xl font-bold mb-2'>About Cancer</div>
+                    {/* <div className='text-2xl'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et</div> */}
+                </div>
+                <div className='container mx-auto text-white flex justify-between'> 
+                    <CardDetailCancer />
+                    <CardDetailCancer />
+                    <CardDetailCancer />
+                </div>
+            </div>
+
+            <div className='bg-white p-4 flex flex-col my-20'>
+                <div className='flex justify-center flex-col items-center mb-10'>
+                    <div className='text-4xl font-bold mb-2'>Cancer Type</div>
+                    {/* <div className='text-2xl'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et</div> */}
+                </div>
+                <div className='container mx-auto text-white flex justify-between'> 
+                    <CardDetailCancer />
+                    <CardDetailCancer />
+                    <CardDetailCancer />
+                </div>
+            </div>
+
+            <div className='bg-white p-4 flex flex-col my-20'>
+                <div className='flex justify-center flex-col items-center mb-10'>
+                    <div className='text-4xl font-bold mb-2'>Treatment</div>
+                    {/* <div className='text-2xl'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et</div> */}
+                </div>
+                <div className='container mx-auto text-white flex justify-between'> 
+                    <CardDetailCancer />
+                    <CardDetailCancer />
+                    <CardDetailCancer />
+                </div>
+            </div>
+
+            <div className='bg-white p-4 flex flex-col my-20'>
+                <div className='flex justify-center flex-col items-center mb-10'>
+                    <div className='text-4xl font-bold mb-2'>Prevention</div>
+                    {/* <div className='text-2xl'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et</div> */}
+                </div>
+                <div className='container mx-auto text-white flex justify-between'> 
+                    <CardDetailCancer />
+                    <CardDetailCancer />
+                    <CardDetailCancer />
+                </div>
+            </div>
+
+            <div className='bg-white p-4 flex flex-col my-20'>
+                <div className='flex justify-center flex-col items-center mb-10'>
+                    <div className='text-4xl font-bold mb-2'>Early Detection</div>
+                    {/* <div className='text-2xl'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et</div> */}
+                </div>
+                <div className='container mx-auto text-white flex justify-between'> 
+                    <CardDetailCancer />
+                    <CardDetailCancer />
+                    <CardDetailCancer />
+                </div>
+            </div>
+
+            <div className='bg-white p-4 flex flex-col my-20'>
+                <div className='flex justify-center flex-col items-center mb-10'>
+                    <div className='text-4xl font-bold mb-2'>Recovery</div>
+                    {/* <div className='text-2xl'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et</div> */}
+                </div>
+                <div className='container mx-auto text-white flex justify-between'> 
+                    <CardDetailCancer />
+                    <CardDetailCancer />
+                    <CardDetailCancer />
+                </div>
+            </div>
+
+            <div className='bg-white p-4 flex flex-col my-20'>
+                <div className='flex justify-center flex-col items-center mb-10'>
+                    <div className='text-4xl font-bold mb-2'>Diagnosis</div>
+                    {/* <div className='text-2xl'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et</div> */}
+                </div>
+                <div className='container mx-auto text-white flex justify-between'> 
+                    <CardDetailCancer />
+                    <CardDetailCancer />
+                    <CardDetailCancer />
                 </div>
             </div>
 
@@ -166,7 +269,8 @@ export default function GetInvolved() {
                     </div>
                 </div>
             </footer>
-            
+
+         
         </>
     );
 }
