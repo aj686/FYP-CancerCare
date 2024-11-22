@@ -64,43 +64,43 @@ export default function CancerInformation() {
                     <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl">Cancer Information</h1>
                     <p class="mb-8 text-lg font-normal text-gray-300 lg:text-xl sm:px-16 lg:px-48">If you or a loved one is facing cancer, you can receive free information, assistance and guidance.</p>
                     <div class="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0">
-                        <a href="#" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center mx-3 text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
+                        <a href="/cancer-information/about-cancer" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center mx-3 text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
                             About Cancer  
                             <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
                             </svg>
                         </a>
-                        <a href="#" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center mx-3 text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
+                        <a href="/cancer-information/cancer-types" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center mx-3 text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
                             Cancer Types  
                             <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
                             </svg>
                         </a>
-                        <a href="#" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center mx-3 text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
+                        <a href="/cancer-information/cancer-treatments" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center mx-3 text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
                             Treatment 
                             <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
                             </svg>
                         </a>
-                        <a href="#" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center mx-3 text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
+                        <a href="/cancer-information/cancer-prevention" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center mx-3 text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
                             Prevention 
                             <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
                             </svg>
                         </a>
-                        <a href="#" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center mx-3 text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
+                        <a href="/cancer-information/cancer-detection" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center mx-3 text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
                             Early Detection 
                             <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
                             </svg>
                         </a>
-                        <a href="#" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center mx-3 text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
+                        <a href="/cancer-information/cancer-recovery" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center mx-3 text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
                             Recovery 
                             <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
                             </svg>
                         </a>
-                        <a href="#" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center mx-3 text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
+                        <a href="/cancer-information/cancer-diagnosis" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center mx-3 text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
                             Diagnosis   
                             <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
@@ -118,12 +118,30 @@ export default function CancerInformation() {
             <div className='bg-white p-4 flex flex-col my-20'>
                 <div className='flex justify-center flex-col items-center mb-10'>
                     <div className='text-4xl font-bold mb-2'>About Cancer</div>
-                    {/* <div className='text-2xl'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et</div> */}
+                    <div className='text-2xl'>In this section we'll walk you through the basics about cancer - what is cancer, what are the types of cancer, what causes it, and more.</div>
                 </div>
                 <div className='container mx-auto text-white flex justify-between'> 
-                    <CardDetailCancer />
-                    <CardDetailCancer />
-                    <CardDetailCancer />
+                    <CardDetailCancer 
+                        title="What is Cancer?"
+                        href="https://www.cancer.ie/cancer-information-and-support/cancer-information/about-cancer/what-is-cancer"
+                    />
+                    <CardDetailCancer 
+                        title="What cause cancer?"
+                        href="https://www.cancer.ie/cancer-information-and-support/cancer-information/about-cancer/causes-of-cancer"
+                    />
+                    <CardDetailCancer 
+                        title="How many people get cancer in Malaysia?"
+                        href="https://www.pantai.com.my/medical-specialties/oncology/cancer-statistics-malaysia"
+                    />
+                </div>
+
+                {/* Button linking to the About page */}
+                <div className='flex justify-center mt-8'>
+                    <a href='/cancer-information/about-cancer'>
+                        <button className='bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-700'>
+                            Find More
+                        </button>
+                    </a>
                 </div>
             </div>
 
@@ -133,21 +151,59 @@ export default function CancerInformation() {
                     {/* <div className='text-2xl'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et</div> */}
                 </div>
                 <div className='container mx-auto text-white flex justify-between'> 
-                    <CardDetailCancer />
-                    <CardDetailCancer />
-                    <CardDetailCancer />
+                <CardDetailCancer 
+                        title="Breast Cancer"
+                        href="https://www.cancer.ie/cancer-information-and-support/cancer-types/breast-cancer"
+                    />
+                    <CardDetailCancer 
+                        title="Lung Cancer"
+                        href="https://www.cancer.ie/cancer-information-and-support/cancer-types/lung-cancer"
+                    />
+                    <CardDetailCancer 
+                        title="Liver Cancer"
+                        href="https://www.cancer.ie/cancer-information-and-support/cancer-types/liver-cancer"
+                    />
+                </div>
+
+                {/* Button linking to the About page */}
+                <div className='flex justify-center mt-8'>
+                    <a href='/cancer-information/cancer-types'>
+                        <button className='bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-700'>
+                            Find More
+                        </button>
+                    </a>
                 </div>
             </div>
 
             <div className='bg-white p-4 flex flex-col my-20'>
                 <div className='flex justify-center flex-col items-center mb-10'>
                     <div className='text-4xl font-bold mb-2'>Treatment</div>
-                    {/* <div className='text-2xl'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et</div> */}
+                    <div className='text-2xl'>There are many types of cancer treatment. The types of treatment that you receive will depend on the type of cancer you have and how advanced it is.</div>
                 </div>
                 <div className='container mx-auto text-white flex justify-between'> 
-                    <CardDetailCancer />
-                    <CardDetailCancer />
-                    <CardDetailCancer />
+                <CardDetailCancer 
+                        title="Chemotherapy"
+                        href="https://www.cancer.gov/about-cancer/treatment/types/chemotherapy"
+                        description="Learn about lung cancer symptoms, risk factors, and treatment options."
+                        // letak image
+                    />
+                    <CardDetailCancer 
+                        title="Hormone Therapy"
+                        href="https://www.cancer.gov/about-cancer/treatment/types/hormone-therapy"
+                    />
+                    <CardDetailCancer 
+                        title="Hyperthermia"
+                        href="https://www.cancer.gov/about-cancer/treatment/types/hyperthermia"
+                    />
+                </div>
+
+                {/* Button linking to the About page */}
+                <div className='flex justify-center mt-8'>
+                    <a href='/cancer-information/cancer-treatments'>
+                        <button className='bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-700'>
+                            Find More
+                        </button>
+                    </a>
                 </div>
             </div>
 
@@ -157,21 +213,57 @@ export default function CancerInformation() {
                     {/* <div className='text-2xl'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et</div> */}
                 </div>
                 <div className='container mx-auto text-white flex justify-between'> 
-                    <CardDetailCancer />
-                    <CardDetailCancer />
-                    <CardDetailCancer />
+                    <CardDetailCancer 
+                        title="Your diet and cancer"
+                        href="https://www.cancer.ie/cancer-information-and-support/cancer-prevention/diet-and-cancer"
+                    />
+                    <CardDetailCancer 
+                        title="Alcohol and Cancer"
+                        href="https://www.cancer.ie/cancer-information-and-support/cancer-prevention/alcohol-and-cancer"
+                    />
+                    <CardDetailCancer 
+                        title="Exercise and Cancer"
+                        href="https://www.cancer.ie/cancer-information-and-support/cancer-prevention/physical-activity-and-cancer"
+                    />
+                </div>
+
+                {/* Button linking to the About page */}
+                <div className='flex justify-center mt-8'>
+                    <a href='/cancer-information/cancer-prevention'>
+                        <button className='bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-700'>
+                            Find More
+                        </button>
+                    </a>
                 </div>
             </div>
 
             <div className='bg-white p-4 flex flex-col my-20'>
                 <div className='flex justify-center flex-col items-center mb-10'>
                     <div className='text-4xl font-bold mb-2'>Early Detection</div>
-                    {/* <div className='text-2xl'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et</div> */}
+                        <div className='text-2xl'>Checking for cancer (or for abnormal cells that may become cancer) in people who have no symptoms is called screening.</div>
                 </div>
                 <div className='container mx-auto text-white flex justify-between'> 
-                    <CardDetailCancer />
-                    <CardDetailCancer />
-                    <CardDetailCancer />
+                    <CardDetailCancer 
+                        title="Cancer Screening Overview"
+                        href="https://www.cancer.gov/about-cancer/screening/patient-screening-overview-pdq"
+                    />
+                    <CardDetailCancer 
+                        title="Screening Test"
+                        href="https://www.cancer.gov/about-cancer/screening/screening-tests"
+                    />
+                    <CardDetailCancer 
+                        title="Screening Research"
+                        href="https://www.cancer.gov/about-cancer/screening/research"
+                    />
+                </div>
+
+                {/* Button linking to the About page */}
+                <div className='flex justify-center mt-8'>
+                    <a href='/cancer-information/cancer-detection'>
+                        <button className='bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-700'>
+                            Find More
+                        </button>
+                    </a>
                 </div>
             </div>
 
@@ -181,9 +273,27 @@ export default function CancerInformation() {
                     {/* <div className='text-2xl'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et</div> */}
                 </div>
                 <div className='container mx-auto text-white flex justify-between'> 
-                    <CardDetailCancer />
-                    <CardDetailCancer />
-                    <CardDetailCancer />
+                    <CardDetailCancer 
+                        title="Survival Rates for Cervical Cancer"
+                        href="https://www.cancer.org/cancer/types/cervical-cancer/detection-diagnosis-staging/survival.html"
+                    />
+                    <CardDetailCancer 
+                        title="Key Statistics for Cervical Cancer"
+                        href="https://www.cancer.org/cancer/types/cervical-cancer/about/key-statistics.html"
+                    />
+                    <CardDetailCancer 
+                        title="Survival Rates for Breast Cancer"
+                        href="https://www.cancer.org/cancer/types/breast-cancer/understanding-a-breast-cancer-diagnosis/breast-cancer-survival-rates.html?_ga=2.61577580.1539447105.1539136573-1874053871.1524533477"
+                    />
+                </div>
+
+                {/* Button linking to the About page */}
+                <div className='flex justify-center mt-8'>
+                    <a href='/cancer-information/cancer-recovery'>
+                        <button className='bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-700'>
+                            Find More
+                        </button>
+                    </a>
                 </div>
             </div>
 
@@ -193,9 +303,27 @@ export default function CancerInformation() {
                     {/* <div className='text-2xl'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et</div> */}
                 </div>
                 <div className='container mx-auto text-white flex justify-between'> 
-                    <CardDetailCancer />
-                    <CardDetailCancer />
-                    <CardDetailCancer />
+                    <CardDetailCancer 
+                        title="Tumor Grade"
+                        href="https://www.cancer.gov/about-cancer/diagnosis-staging/diagnosis/tumor-grade"
+                    />
+                    <CardDetailCancer 
+                        title="Tumor Markers"
+                        href="https://www.cancer.gov/about-cancer/diagnosis-staging/diagnosis/tumor-markers-fact-sheet"
+                    />
+                    <CardDetailCancer 
+                        title="Pathology Reports"
+                        href="https://www.cancer.gov/about-cancer/diagnosis-staging/diagnosis/pathology-reports-fact-sheet"
+                    />
+                </div>
+
+                {/* Button linking to the About page */}
+                <div className='flex justify-center mt-8'>
+                    <a href='/cancer-information/cancer-diagnosis'>
+                        <button className='bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-700'>
+                            Find More
+                        </button>
+                    </a>
                 </div>
             </div>
 

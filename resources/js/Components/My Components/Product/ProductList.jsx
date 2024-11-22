@@ -107,36 +107,52 @@ export default function ProductList( {all_products} ) {
                 </div>
                 <div className="mb-4 grid gap-4 sm:grid-cols-2 md:mb-8 lg:grid-cols-3 xl:grid-cols-4">
                     {all_products.map((product) => (
-
-                        <div key={product.id} className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                        <div className="h-56 w-full">
-                        <a href="#">
-                            <img className="mx-auto h-full dark:hidden" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/ipad-keyboard.svg" alt="" />
-                            <img className="mx-auto hidden h-full dark:block" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/ipad-keyboard-dark.svg" alt="" />
-                        </a>
-                        </div>
-                        <div className="pt-6">
-
-                            <Link href={`/product/${product.slug}`} className="text-lg font-semibold leading-tight text-gray-900 hover:underline dark:text-white">
-                                {product.name}
-                            </Link>
-                            {/* <a href="#" className="text-lg font-semibold leading-tight text-gray-900 hover:underline dark:text-white">{product.name}</a> */}
-
-                            <div className="mt-4 flex items-center justify-between gap-4">
-                                <p className="text-1xl font-extrabold leading-tight text-gray-900 dark:text-white">RM{product.price}</p>
-
-                                <button type="button" onClick={() => handleAddToCart(product.slug)} className="inline-flex items-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4  focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-                                    <svg className="-ms-2 me-2 h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h1.5L8 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm.75-3H7.5M11 7H6.312M17 4v6m-3-3h6" />
-                                    </svg>
-                                    Add to cart
-                                </button>      
+                        <div key={product.id} className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                            {/* Image Container */}
+                            <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-gray-100">
+                                <Link href={`/product/${product.slug}`}>
+                                    <img 
+                                        src={`/storage/${product.image}`} 
+                                        alt={product.name}
+                                        className="h-full w-full object-contain object-center transition-all duration-300 hover:scale-105"
+                                    />
+                                </Link>
                             </div>
-                        
+
+                            {/* Product Details */}
+                            <div className="pt-4">
+                                <Link 
+                                    href={`/product/${product.slug}`} 
+                                    className="text-lg font-semibold leading-tight text-gray-900 hover:text-primary-600 dark:text-white"
+                                >
+                                    {product.name}
+                                </Link>
+
+                                <div className="mt-4 flex items-center justify-between gap-4">
+                                    <div className="text-xl font-bold text-gray-900 dark:text-white">
+                                        RM{parseFloat(product.price).toFixed(2)}
+                                    </div>
+
+                                    <button 
+                                        type="button" 
+                                        onClick={() => handleAddToCart(product.slug)} 
+                                        className="inline-flex items-center gap-2 rounded-lg bg-primary-700 px-4 py-2 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700"
+                                    >
+                                        <svg 
+                                            className="h-5 w-5" 
+                                            fill="none" 
+                                            strokeWidth="2" 
+                                            viewBox="0 0 24 24" 
+                                            stroke="currentColor"
+                                        >
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                                        </svg>
+                                        Add to cart
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                    </div>
                     ))}
-                    
                 </div>
 
                 <div className="w-full text-center">

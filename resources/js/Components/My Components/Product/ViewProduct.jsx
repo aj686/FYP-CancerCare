@@ -1,78 +1,162 @@
-import React from 'react';
+import React, { useState } from 'react';
 import 'flowbite';
+import { ShoppingCart, Heart } from 'lucide-react';
+import { Inertia } from '@inertiajs/inertia';
 
-export default function ViewProduct( {product} ) {
-    // debug
+export default function ViewProduct({ product }) {
+    const [quantity, setQuantity] = useState(1);
+
     if (!product) {
-
-        return <div>Product not found</div>
+        return (
+            <div className="flex h-96 items-center justify-center">
+                <div className="text-center">
+                    <h2 className="text-2xl font-bold text-gray-900">Product not found</h2>
+                    <p className="mt-2 text-gray-600">The product you're looking for doesn't exist.</p>
+                </div>
+            </div>
+        );
     }
 
+    const handleAddToCart = () => {
+        Inertia.post('/cart/add', {
+            slug: product.slug,
+            quantity: quantity
+        }, {
+            onSuccess: () => {
+                alert('Product added to cart successfully!');
+            },
+        });
+    };
+
+    const formatPrice = (price) => {
+        return `RM ${parseFloat(price).toFixed(2)}`;
+    };
+
     return (
-        <section className="py-8 bg-white md:py-16 dark:bg-gray-900 antialiased">
-            <div className="max-w-screen-xl px-4 mx-auto 2xl:px-0">
-            <div className="lg:grid lg:grid-cols-2 lg:gap-8 xl:gap-16">
-                <div className="shrink-0 max-w-md lg:max-w-lg mx-auto">
-                <img className="w-full dark:hidden" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/imac-front.svg" alt="" />
-                <img className="w-full hidden dark:block" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/imac-front-dark.svg" alt="" />
-                </div>
-
-                    <div className="mt-6 sm:mt-8 lg:mt-0">
-                        {/* name */}
-                    <h1
-                        className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white"
-                    >
-                        {product.name}
-                    </h1>
-                    <div className="mt-4 sm:items-center sm:gap-4 sm:flex">
-                        {/* price */}
-                        <p
-                        className="text-2xl font-extrabold text-gray-900 sm:text-3xl dark:text-white"
-                        >
-                         {product.price}
-                        </p>
-                        
-                    </div>
-
-                    <div className="mt-6 sm:gap-4 sm:items-center sm:flex sm:mt-8">
-                        <a
-                        href="#"
-                        title=""
-                        className="text-white mt-4 sm:mt-0 bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800 flex items-center justify-center"
-                        role="button"
-                        >
-                        <svg
-                            className="w-5 h-5 -ms-2 me-2"
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                            stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M4 4h1.5L8 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm.75-3H7.5M11 7H6.312M17 4v6m-3-3h6"
+        <section className="py-8 bg-white dark:bg-gray-900 antialiased">
+            <div className="max-w-screen-xl px-4 mx-auto">
+                <div className="grid gap-8 lg:grid-cols-2">
+                    {/* Product Image Section */}
+                    <div className="relative">
+                        <div className="aspect-square overflow-hidden rounded-lg bg-gray-100 mb-4">
+                            <img 
+                                src={`/storage/${product.image}`}
+                                alt={product.name}
+                                className="h-full w-full object-contain object-center"
                             />
-                        </svg>
-
-                        Add to cart
-                        </a>
+                        </div>
                     </div>
 
-                    <hr className="my-6 md:my-8 border-gray-200 dark:border-gray-800" />
+                    {/* Product Details Section */}
+                    <div className="flex flex-col">
+                        {/* Breadcrumb */}
+                        <nav className="mb-4">
+                            <ol className="flex items-center space-x-2 text-sm">
+                                <li>
+                                    <a href="/" className="text-gray-500 hover:text-primary-600">Home</a>
+                                </li>
+                                <li className="text-gray-500">/</li>
+                                <li>
+                                    <a href="/products" className="text-gray-500 hover:text-primary-600">Products</a>
+                                </li>
+                                <li className="text-gray-500">/</li>
+                                <li className="text-gray-900 font-medium">{product.name}</li>
+                            </ol>
+                        </nav>
 
-                    {/* description */}
-                    <p className="mb-6 text-gray-500 dark:text-gray-400">
-                        {product.description}  
-                    </p>
+                        {/* Product Title */}
+                        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-white">
+                            {product.name}
+                        </h1>
+
+                        {/* Price Section */}
+                        <div className="mt-4 flex items-center space-x-4">
+                            <span className="text-3xl font-bold text-gray-900 dark:text-white">
+                                {formatPrice(product.price)}
+                            </span>
+                            {product.old_price && (
+                                <span className="text-xl text-gray-500 line-through">
+                                    {formatPrice(product.old_price)}
+                                </span>
+                            )}
+                        </div>
+
+                        {/* Description */}
+                        <div className="mt-6 space-y-4">
+                            <p className="text-base text-gray-600 dark:text-gray-400">
+                                {product.description}
+                            </p>
+                        </div>
+
+                        {/* Quantity Selector */}
+                        <div className="mt-6">
+                            <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                                Quantity
+                            </label>
+                            <div className="mt-2 flex items-center space-x-3">
+                                <button 
+                                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                    className="rounded-md bg-gray-100 p-2 text-gray-600 hover:bg-gray-200"
+                                >
+                                    -
+                                </button>
+                                <input
+                                    type="number"
+                                    id="quantity"
+                                    name="quantity"
+                                    min="1"
+                                    value={quantity}
+                                    onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                                    className="w-20 rounded-md border-gray-200 text-center shadow-sm dark:bg-gray-800 dark:border-gray-700"
+                                />
+                                <button 
+                                    onClick={() => setQuantity(quantity + 1)}
+                                    className="rounded-md bg-gray-100 p-2 text-gray-600 hover:bg-gray-200"
+                                >
+                                    +
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="mt-8 flex flex-col sm:flex-row gap-4">
+                            <button
+                                onClick={handleAddToCart}
+                                className="flex-1 inline-flex justify-center items-center gap-2 rounded-lg bg-primary-700 px-5 py-3 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700"
+                            >
+                                <ShoppingCart className="h-5 w-5" />
+                                Add to Cart
+                            </button>
+                            
+                            <button
+                                className="flex-1 inline-flex justify-center items-center gap-2 rounded-lg bg-gray-100 px-5 py-3 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                            >
+                                <Heart className="h-5 w-5" />
+                                Add to Wishlist
+                            </button>
+                        </div>
+
+                        {/* Additional Info */}
+                        <div className="mt-8 border-t border-gray-200 pt-8 dark:border-gray-700">
+                            <div className="space-y-4">
+                                <div className="flex items-start">
+                                    <div className="ml-3">
+                                        <p className="text-sm font-medium text-gray-900 dark:text-white">Free Delivery</p>
+                                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Enter your postal code for Delivery Availability</p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start">
+                                    <div className="ml-3">
+                                        <p className="text-sm font-medium text-gray-900 dark:text-white">Return Delivery</p>
+                                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Free 30 Days Delivery Returns. Details</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-            
-            </div>
+                </div>
             </div>
         </section>
     );
-}   
+}

@@ -10,7 +10,7 @@ import FlexTwoSideCancer from '@/Components/My Components/Homepage/FlexTwoSideCa
 import CardResearch from '@/Components/My Components/Homepage/CardResearch';
 import EventList from '@/Components/My Components/Involved/EventLists';
 
-export default function GetInvolved() {
+export default function GetInvolved( {events} ) {
     return (
         <>
             <Head title="Get Invovled" />
@@ -29,6 +29,11 @@ export default function GetInvolved() {
                 <li>
                     <NavLink href="/get-involved" className="text-black">
                         Get Involved
+                    </NavLink>
+                </li>
+                <li>
+                    <NavLink href="/plan" className="text-black">
+                        Plan
                     </NavLink>
                 </li>
                 <li>
@@ -89,10 +94,7 @@ export default function GetInvolved() {
                         <div className="text-4xl font-bold mb-2 text-center">Support an Event Now</div>
                         <div className="text-2xl text-center">Volunteer your time at one of our fundraising events to help us celebrate life and take meaningful action in the fight against cancer.</div>
                     </div>
-                    <EventList />
-                    <EventList />
-                    <EventList />
-                    <EventList />
+                    <EventList events={events} />
                 </div>
             </div>
 

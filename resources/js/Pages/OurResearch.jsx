@@ -4,8 +4,9 @@ import Navbar from '@/Components/Navbar'; // Import your Navbar component
 import NavLink from '@/Components/NavLink'; // Import NavLink 
 import PrimaryButton from '@/Components/PrimaryButton';
 import 'flowbite';
+import BlogList from '@/Components/My Components/Blog/BlogList';
 
-export default function OurResearch() {
+export default function OurResearch( {blogs} ) {
     return (
         <>
             <Head title="Our Research" />
@@ -78,7 +79,8 @@ export default function OurResearch() {
 
             <div className='bg-gray-600 p-4'>
                 <div className='container mx-auto text-white'> 
-                    Section 1
+                    {/* Blog List */}
+                    <BlogList blogs = {blogs} />
                 </div>
             </div>
             

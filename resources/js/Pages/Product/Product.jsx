@@ -8,7 +8,7 @@ import ProductList from '@/Components/My Components/Product/ProductList';
 
 // retrieve props: all_products
 
-export default function Products( {all_products} ) {
+export default function Products( { all_products } ) {
     return (
         <>
             <Head title="Products" />

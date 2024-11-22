@@ -156,7 +156,7 @@ export default function Cart( {cart} ) {
                                         <a href="#" className="shrink-0 md:order-1">
                                             <img
                                             className="h-20 w-20 dark:hidden"
-                                            src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/imac-front.svg"
+                                            src={`/storage${cart[key].image}`}
                                             alt={cart[key].name}
                                             />
                                             <img

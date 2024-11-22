@@ -85,12 +85,36 @@ export default function Homepage() {
             <div className='bg-white p-4 flex flex-col my-20'>
                 <div className='flex justify-center flex-col items-center mb-10'>
                     <div className='text-4xl font-bold mb-2'>What We Do</div>
-                    <div className='text-2xl'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et</div>
+                    <div className='text-2xl'>At CancerCare Connect, we believe in transforming the cancer care journey through three essential pillars of support.</div>
                 </div>
                 <div className='container mx-auto text-white flex justify-between'> 
-                    <Card />
-                    <Card />
-                    <Card />
+                    <Card 
+                        title="Educate"
+                        description="We provide comprehensive knowledge and resources to help you understand your cancer journey better."
+                        icon= {
+                            <svg className="w-7 h-7 text-gray-500 dark:text-gray-400 mb-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6v4l3.276 3.276M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                            </svg>
+                        }
+                    />
+                    <Card 
+                        title="Encourage"
+                        description="We stand beside you with emotional support and community connections that help strengthen your spirit:"
+                        icon= {
+                            <svg className="w-7 h-7 text-gray-500 dark:text-gray-400 mb-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M18 5h-.7c.229-.467.349-.98.351-1.5a3.5 3.5 0 0 0-3.5-3.5c-1.717 0-3.215 1.2-4.331 2.481C8.4.842 6.949 0 5.5 0A3.5 3.5 0 0 0 2 3.5c.003.52.123 1.033.351 1.5H2a2 2 0 0 0-2 2v3a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V7a2 2 0 0 0-2-2ZM8.058 5H5.5a1.5 1.5 0 0 1 0-3c.9 0 2 .754 3.092 2.122-.219.337-.392.635-.534.878Zm6.1 0h-3.742c.933-1.368 2.371-3 3.739-3a1.5 1.5 0 0 1 0 3h.003ZM11 13H9v7h2v-7Zm-4 0H2v5a2 2 0 0 0 2 2h3v-7Zm6 0v7h3a2 2 0 0 0 2-2v-5h-5Z"/>
+                            </svg>
+                        }
+                    />
+                    <Card 
+                        title="Empower"
+                        description="We empower you to take control of your healthcare journey by providing personalized guidance and resources to advocate for your care needs."
+                        icon= {
+                            <svg className="w-7 h-7 text-gray-500 dark:text-gray-400 mb-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 0 0 .95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 0 0-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 0 0-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 0 0-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 0 0 .951-.69l1.07-3.292z"/>
+                            </svg>
+                        }
+                    />
                 </div>
             </div>
 
@@ -101,14 +125,34 @@ export default function Homepage() {
                     <div className='text-4xl font-bold mb-2'>Know About Cancer</div>
                     <div className='text-2xl'>If you have been given a cancer diagnosis or have a loved one who has, we offer useful guidance on various topics such as symptoms, screenings, and coping post-treatment.</div>
                     <div className='grid grid-cols-4 gap-4 py-10'>
-                        <CardCancer />
-                        <CardCancer />
-                        <CardCancer />
-                        <CardCancer />
-                        <CardCancer />
-                        <CardCancer />
-                        <CardCancer />
-                        <CardCancer />
+                        <CardCancer 
+                            title="About Cancer"
+                            href="/cancer-information/about-cancer"
+                        />
+                        <CardCancer 
+                            title="Cancer Types"
+                            href="/cancer-information/cancer-types"
+                        />
+                        <CardCancer 
+                            title="Treatment"
+                            href="/cancer-information/cancer-treatments"
+                        />
+                        <CardCancer 
+                            title="Prevention"
+                            href="/cancer-information/cancer-prevention"
+                        />
+                        <CardCancer 
+                            title="Early Detection"
+                            href="/cancer-information/cancer-detection"
+                        />
+                        <CardCancer 
+                            title="Recovery"
+                            href="/cancer-information/cancer-recovery"
+                        />
+                        <CardCancer 
+                            title="Diagnosis"
+                            href="/cancer-information/cancer-diagnosis"
+                        />       
                     </div>
                 </div>
             </div>  

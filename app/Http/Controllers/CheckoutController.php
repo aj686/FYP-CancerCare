@@ -82,7 +82,7 @@ class CheckoutController extends Controller
                 'postcode' => $validatedUser['postcode'],
                 'country' => $validatedUser['country'],
                 'phonenumber' => $validatedUser['phonenumber'],
-                'total_price' => $this->calculateTotalPrice($validatedUser['cart']),
+                'total_price' => $this->calculateTotalPrice($cart),
                 'shipping_status' => 'pending',  // Default order status
                 'payment_method' => 'stripe', // Assume Stripe for now
             ]);

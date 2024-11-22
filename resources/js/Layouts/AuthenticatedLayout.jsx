@@ -7,8 +7,8 @@ import { Link, usePage } from '@inertiajs/react';
 
 export default function Authenticated({ header, children }) {
     const user = usePage().props.auth.user;
-
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+    const { auth } = usePage().props;
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -17,15 +17,38 @@ export default function Authenticated({ header, children }) {
                     <div className="flex justify-between h-16">
                         <div className="flex">
                             <div className="shrink-0 flex items-center">
-                                <Link href="/">
+                                <Link href={auth.user.usertype === 'admin' ? route('admin.dashboard') : route('dashboard')}>
                                     <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
                                 </Link>
                             </div>
 
                             <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink href={route('dashboard')} active={route().current('dashboard')}>
+                                <NavLink href={auth.user.usertype === 'admin' ? route('admin.dashboard') : route('dashboard')}>
                                     Dashboard
                                 </NavLink>
+
+                                {/* Conditionally render for admin only */}
+                                {auth.user.usertype === 'admin' && (
+                                    <>
+                                        <NavLink href={route('admin.products')}>Products</NavLink>
+                                        <NavLink href={route('admin.programs')}>Programs</NavLink>
+                                        <NavLink href={route('admin.users')}>Users</NavLink>
+                                        <NavLink href={route('admin.orders')}>Orders</NavLink>
+                                        <NavLink href={route('admin.payments')}>Payments</NavLink>
+                                        <NavLink href={route('admin.blogs')}>Blog</NavLink>
+                                        <NavLink href={route('profile.edit')}>Profile</NavLink>
+                                    </>
+                                )}
+
+                                {/* Links for Regular Users only */}
+                                {auth.user.usertype === 'user' && (
+                                    <>
+                                        <NavLink href={route('user.bookings')}>Bookings</NavLink>
+                                        <NavLink href={route('profile.edit')}>Profile</NavLink>
+                                        <NavLink href={route('user.orders')}>Orders</NavLink>
+                                        <NavLink href={route('home-page')}>Homepage</NavLink>
+                                    </>
+                                )}
                             </div>
                         </div>
 

@@ -12,6 +12,7 @@ use App\Models\Payment;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Barryvdh\Debugbar\Facades\Debugbar;
+use Illuminate\Support\Facades\Log;
 
 
 class PaymentController extends Controller
@@ -20,7 +21,8 @@ class PaymentController extends Controller
     public function payOrderByStripe(Order $order) {
 
         // Get secret key - Initialize Stripe
-        Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
+        // Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
+        Stripe::setApiKey(config('services.stripe.secret'));
 
         try {
             // Retrieve the order items associated with the order
@@ -94,7 +96,7 @@ class PaymentController extends Controller
         Debugbar::info($request->all());
 
         // Now you can use $sessionId to retrieve the Stripe session
-        $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
+        $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
         $session = $stripe->checkout->sessions->retrieve($sessionId);
 
         Debugbar::info($session);
@@ -151,5 +153,51 @@ class PaymentController extends Controller
             'message' => 'Payment was canceled.',
             'order' => $order, // Pass additional order details if necessary
         ]);
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        // Log the incoming request
+        Log::info('Order status update request received', [
+            'order_id' => $id,
+            'request_data' => $request->all()
+        ]);
+
+        try {
+            // Validate request
+            $validated = $request->validate([
+                'status' => 'required|in:default,paid,canceled'
+            ]);
+
+            // Find the order
+            $order = Order::findOrFail($id);
+            
+            // Log current state
+            Log::info('Current order status', [
+                'order_id' => $order->id,
+                'old_status' => $order->status,
+                'new_status' => $validated['status']
+            ]);
+
+            // Update status
+            $order->status = $validated['status'];
+            $order->save();
+
+            Log::info('Order status updated successfully', [
+                'order_id' => $order->id,
+                'new_status' => $order->status
+            ]);
+
+            return back()->with('success', 'Order status updated successfully');
+
+        } catch (\Exception $e) {
+            Log::error('Error updating order status', [
+                'order_id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return back()->with('error', 'Failed to update order status. Error: ' . $e->getMessage());
+        }
     }
 }

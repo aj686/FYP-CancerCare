@@ -25,6 +25,7 @@ class Order extends Model
         'country',
         'phonenumber',
         'total_price',
+        'status',
         'shipping_status',
         'payment_method'
     ];

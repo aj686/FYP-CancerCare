@@ -33,6 +33,10 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        if ($request->user()->usertype === 'admin') {
+            return redirect('admin/dashboard');
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
@@ -47,6 +51,6 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('/homepage');
     }
 }

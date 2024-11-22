@@ -20,7 +20,9 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'usertype',
         'password',
+        'usertype',
     ];
 
     /**
@@ -50,4 +52,56 @@ class User extends Authenticatable
     public function orders() {
         return $this->hasMany(Order::class);
     }
+
+    public function isAdmin()
+    {
+        return $this->usertype === 'admin';
+    }
+
+
+    // Membership & Event Registration
+    // Add event registration relationships
+    // Membership relationship
+    public function membership()
+    {
+        return $this->hasOne(Membership::class)->where('status', 'active')
+                    ->where('end_date', '>', now());
+    }
+
+    // Get all memberships (including expired ones)
+    public function allMemberships()
+    {
+        return $this->hasMany(Membership::class);
+    }
+
+    // Event registration relationship
+    public function eventRegistrations()
+    {
+        return $this->hasMany(EventRegistration::class);
+    }
+
+    public function registeredEvents()
+    {
+        return $this->belongsToMany(Events::class, 'event_registrations', 'user_id', 'events_id')
+                    ->withPivot('status')
+                    ->withTimestamps();
+    }
+
+    // Helper methods
+    public function hasActiveMembership()
+    {
+        return $this->allMemberships()
+                    ->where('status', 'active')
+                    ->where('end_date', '>', now())
+                    ->exists();
+    }
+
+    public function isRegisteredForEvent($eventId)
+    {
+        return $this->eventRegistrations()
+                    ->where('events_id', $eventId)
+                    ->where('status', 'registered')
+                    ->exists();
+    }
+
 }
