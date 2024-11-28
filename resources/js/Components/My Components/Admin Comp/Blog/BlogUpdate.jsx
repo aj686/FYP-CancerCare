@@ -1,6 +1,7 @@
 import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
+import RichTextEditor from "./RichTextEditor";
 import { useForm } from "@inertiajs/react";
 import { Inertia } from "@inertiajs/inertia";
 import { PencilIcon } from "lucide-react";
@@ -58,11 +59,10 @@ export default function BlogUpdate({ className, blogId, blog }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         
-        // Create FormData to handle file upload
         const formData = new FormData();
         Object.keys(editData).forEach(key => {
             if (key === 'thumbnail' && editData[key] === null) {
-                return; // Skip if no new image
+                return;
             }
             formData.append(key, editData[key]);
         });
@@ -150,14 +150,10 @@ export default function BlogUpdate({ className, blogId, blog }) {
 
                             {/* Content */}
                             <div>
-                                <InputLabel htmlFor="content" value="Content *" />
-                                <textarea
-                                    id="content"
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500"
-                                    value={editData.content}
-                                    onChange={(e) => setEditData("content", e.target.value)}
-                                    rows="8"
-                                    required
+                                <InputLabel htmlFor="editor-content" value="Content *" />
+                                <RichTextEditor 
+                                    content={editData.content}
+                                    onChange={(newContent) => setEditData("content", newContent)}
                                 />
                                 <InputError className="mt-2" message={errors.content} />
                             </div>

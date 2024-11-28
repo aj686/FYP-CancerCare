@@ -3,64 +3,21 @@ import React from 'react';
 import Navbar from '@/Components/Navbar'; // Import your Navbar component
 import NavLink from '@/Components/NavLink'; // Import NavLink component
 import PrimaryButton from '@/Components/PrimaryButton';
+import Dropdown from '@/Components/Dropdown';
 import 'flowbite';
 import Card from '@/Components/My Components/Homepage/Card';
 import CardCancer from '@/Components/My Components/Homepage/CardCancer';
 import FlexTwoSideCancer from '@/Components/My Components/Homepage/FlexTwoSideCancer';
 import CardResearch from '@/Components/My Components/Homepage/CardResearch';
+import DynamicNavbar from '@/Components/My Components/AboutCancer/DynamicNavbar';
 
 export default function Homepage() {
     return (
         <>
+        
             <Head title="Homepage" />
-            <Navbar>
-                {/* Pass NavLink components as children to Navbar */}
-                <li>
-                    <NavLink href="/homepage" className="text-black">
-                        Home
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink href="/cancer-information" className="text-black">
-                        Cancer
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink href="/get-involved" className="text-black">
-                        Get Involved
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink href="/our-research" className="text-black">
-                        Our Research
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink href="/product" className="text-black">
-                        Shop with Us
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink href="/about" className="text-black">
-                        About
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink href="/login" className="text-white">
-                        <PrimaryButton
-                            className="bg-blue-500 hover:bg-blue-700">
-                            Login
-                        </PrimaryButton>
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink href="/register" className="text-white">
-                        <PrimaryButton>
-                            Register
-                        </PrimaryButton>
-                    </NavLink>
-                </li>
-            </Navbar>
+            <DynamicNavbar />
+            
 
             <section className="bg-center bg-no-repeat bg-cover bg-[url('https://img.freepik.com/free-photo/child-suffering-from-cancer_23-2149501388.jpg?t=st=1726590400~exp=1726594000~hmac=1e2097c5774a6f8fe97b9005842dd287f8a9467fc3f6ffe3e13282549213db73&w=996')] bg-gray-700 bg-blend-multiply h-screen">
                 <div className="px-4 mx-auto max-w-screen-xl text-center py-24 lg:py-56">

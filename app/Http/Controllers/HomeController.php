@@ -7,24 +7,58 @@ use Inertia\Inertia;
 use App\Models\Events;
 use App\Models\Blogs;
 use App\Models\EventRegistration;
+use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
     public function index() {
+        
+        // if User Logged In // Not Ternary Operator 
+        // if(Auth::check()) {
+        //     $user = Auth::user();
+        //     return Inertia::render('Homepage',[
+        //         'user' => $user,
+        //     ]);
+        // } else {
+        //     return Inertia::render("Homepage");
+        // }
+
         return Inertia::render("Homepage");
+
     }
 
+    // public function indexGuest() {
+    //     // if User Not Logged In
+    //     return Inertia::render('Guest/Homepage');
+    // }
+
     public function cancerInformation() {
-        return Inertia::render("CancerInformation");
+
+        if(Auth::check()) {
+            $user = Auth::user();
+            return Inertia::render('CancerInformation');
+        } else {
+            return Inertia::render("Guest/CancerInformation");
+        }
     }
 
     // Pass events to GetInvolved component then pass to EvenList component
     public function getInvolved() {
-        return Inertia::render("GetInvolved", [
-            'events' => Events::where('status', 'active')
+
+        if(Auth::check()) {
+            $user = Auth::user();
+            return Inertia::render('GetInvolved',[
+                'events' => Events::where('status', 'active')
                 ->orderBy('start_date', 'asc')
                 ->get()
-        ]);
+            ]);
+            } else {
+                return Inertia::render("Guest/GetInvolved",[
+                    'events' => Events::where('status', 'active')
+                    ->orderBy('start_date', 'asc')
+                    ->get()
+                ]);
+            } 
     }
 
     // View each detail event
@@ -54,11 +88,11 @@ class HomeController extends Controller
         ]);
     }
 
-    public function eventList() {
-        return Inertia::render("Involved/EventLists", [
-            'events' => Events::all()
-        ]);
-    }
+    // public function eventList() {
+    //     return Inertia::render("Involved/EventLists", [
+    //         'events' => Events::all()
+    //     ]);
+    // }
 
     public function ourResearch() {
         return Inertia::render("OurResearch" ,[
@@ -89,4 +123,43 @@ class HomeController extends Controller
         return Inertia::render("About");
     }
 
+    // Methods for guest users
+    // protected function guestIndex()
+    // {
+    //     return Inertia::render('Guest/Homepage');
+    // }
+
+    // protected function guestCancerInformation()
+    // {
+    //     return Inertia::render('Guest/CancerInformation');
+    // }
+
+    // protected function guestGetInvolved()
+    // {
+    //     return Inertia::render('Guest/GetInvolved');
+    // }
+
+    // protected function guestShowEvent($event)
+    // {
+    //     return Inertia::render('Guest/Event/Show', [
+    //         'event' => $event
+    //     ]);
+    // }
+
+    // protected function guestOurResearch()
+    // {
+    //     return Inertia::render('Guest/OurResearch');
+    // }
+
+    // protected function guestShowBlog($title)
+    // {
+    //     return Inertia::render('Guest/Blog/Show', [
+    //         'title' => $title
+    //     ]);
+    // }
+
+    // protected function guestAbout()
+    // {
+    //     return Inertia::render('Guest/About');
+    // }
 }

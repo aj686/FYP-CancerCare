@@ -11,7 +11,7 @@ export default function Plan( {plans} ) {
     return (
         <>
             <Head title="Plan" />
-            <DynamicNavbar /> 
+            <DynamicNavbar />
 
             <section className="bg-center bg-no-repeat bg-cover bg-[url('https://img.freepik.com/free-photo/curvy-pink-streamer-closeup_23-2148050293.jpg?t=st=1726639737~exp=1726643337~hmac=52c3d94107ae4236b83203f757da5bd81a33dcb6d74227b9a2011e98c9a87687&w=996')] bg-gray-700 bg-blend-multiply h-screen">
                 <div className="px-4 mx-auto max-w-screen-xl text-center py-24 lg:py-56">

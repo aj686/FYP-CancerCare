@@ -5,6 +5,7 @@ import { Head } from '@inertiajs/react';
 import Navbar from '@/Components/Navbar';
 import NavLink from '@/Components/NavLink';
 import PrimaryButton from '@/Components/PrimaryButton';
+import DynamicNavbar from '@/Components/My Components/AboutCancer/DynamicNavbar';
 
 export default function BlogViewDetail() {
   const { blog } = usePage().props;
@@ -16,36 +17,7 @@ export default function BlogViewDetail() {
         <meta name="description" content={blog.header} />
       </Head>
       
-      <Navbar>
-        <li>
-          <NavLink href="/homepage" className="text-black">Home</NavLink>
-        </li>
-        <li>
-          <NavLink href="/cancer-information" className="text-black">Cancer</NavLink>
-        </li>
-        <li>
-          <NavLink href="/get-involved" className="text-black">Get Involved</NavLink>
-        </li>
-        <li>
-          <NavLink href="/our-research" className="text-black">Our Research</NavLink>
-        </li>
-        <li>
-          <NavLink href="/product" className="text-black">Shop with Us</NavLink>
-        </li>
-        <li>
-          <NavLink href="/about" className="text-black">About</NavLink>
-        </li>
-        <li>
-          <NavLink href="/login" className="text-white">
-            <PrimaryButton className="bg-blue-500 hover:bg-blue-700">Login</PrimaryButton>
-          </NavLink>
-        </li>
-        <li>
-          <NavLink href="/register" className="text-white">
-            <PrimaryButton>Register</PrimaryButton>
-          </NavLink>
-        </li>
-      </Navbar>
+      <DynamicNavbar />
       
       <main className="bg-gray-50 min-h-screen">
         <BlogDetail blog={blog} />

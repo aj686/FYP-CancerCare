@@ -48,7 +48,7 @@ class PaymentController extends Controller
                 'customer_email' => $order->email,
                 'line_items' => [[
                     'price_data' => [
-                        'currency' => 'usd', // Use your currency
+                        'currency' => 'myr', // Use your currency
                         'product_data' => [
                             'name' => 'Order #' . $order->ordernumber,
                         ],

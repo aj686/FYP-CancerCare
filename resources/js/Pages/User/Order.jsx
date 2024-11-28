@@ -1,8 +1,18 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
-import { EyeIcon, TruckIcon } from 'lucide-react';
+import { EyeIcon, TruckIcon, PrinterIcon } from 'lucide-react';
+import { useState } from 'react';
+import OrderDetails from './UserComp/OrderDetails';
 
 export default function Order({ auth, orders, count }) {
+    const [selectedOrder, setSelectedOrder] = useState(null);
+    
+    const handlePrintInvoice = (order) => {
+        // Open invoice in new window for printing
+        const printWindow = window.open(`/invoice/${order.id}`, '_blank');
+        printWindow.focus();
+    };
+
     return (
         <AuthenticatedLayout
             header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Order Dashboard</h2>}
@@ -47,7 +57,7 @@ export default function Order({ auth, orders, count }) {
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.email}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.phonenumber}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                    ${order.total_price}
+                                                    RM{order.total_price}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
@@ -69,13 +79,19 @@ export default function Order({ auth, orders, count }) {
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.payment_method}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                     <div className="flex space-x-2">
-                                                        <button className="text-blue-600 hover:text-blue-900 flex items-center space-x-1">
+                                                        <button 
+                                                            onClick={() => setSelectedOrder(order)}
+                                                            className="text-blue-600 hover:text-blue-900 flex items-center space-x-1"
+                                                        >
                                                             <EyeIcon className="h-5 w-5" />
                                                             <span>Details</span>
                                                         </button>
-                                                        <button className="text-green-600 hover:text-green-900 flex items-center space-x-1">
-                                                            <TruckIcon className="h-5 w-5" />
-                                                            <span>Track</span>
+                                                        <button 
+                                                            onClick={() => handlePrintInvoice(order)}
+                                                            className="text-gray-600 hover:text-gray-900 flex items-center space-x-1"
+                                                        >
+                                                            <PrinterIcon className="h-5 w-5" />
+                                                            <span>Invoice</span>
                                                         </button>
                                                     </div>
                                                 </td>
@@ -88,6 +104,14 @@ export default function Order({ auth, orders, count }) {
                     </div>
                 </div>
             </div>
+
+            {selectedOrder && (
+                <OrderDetails 
+                    order={selectedOrder}
+                    isOpen={!!selectedOrder}
+                    onClose={() => setSelectedOrder(null)}
+                />
+            )}
         </AuthenticatedLayout>
     );
 }

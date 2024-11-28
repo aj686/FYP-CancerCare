@@ -72,6 +72,16 @@ export default function Cart( {cart} ) {
         return totalPrice + shippingPrice;
     };
 
+    // // Debug function to log image details
+    // const logImageDetails = (item) => {
+    //     console.log('Cart item details:', {
+    //         name: item.name,
+    //         originalImagePath: item.image,
+    //         fullImageUrl: `/storage/${item.image}`,
+    //         exists: typeof item.image === 'string' && item.image.length > 0
+    //     });
+    // };
+
 
 
     return (

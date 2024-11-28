@@ -1,150 +1,98 @@
+// resources/js/Layouts/DashboardLayout.jsx
 import { useState } from 'react';
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import Dropdown from '@/Components/Dropdown';
-import NavLink from '@/Components/NavLink';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
+import { Menu, X, LayoutDashboard, Package, Users, ShoppingCart, CreditCard, FileText, Calendar, Ticket, Home } from 'lucide-react';
+import Dropdown from '@/Components/Dropdown';
+import ApplicationLogo from '@/Components/ApplicationLogo';
 
-export default function Authenticated({ header, children }) {
-    const user = usePage().props.auth.user;
-    const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+export default function DashboardLayout({ children }) {
+    const [sidebarOpen, setSidebarOpen] = useState(true);
     const { auth } = usePage().props;
+    const user = auth.user;
 
     return (
         <div className="min-h-screen bg-gray-100">
-            <nav className="bg-white border-b border-gray-100">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-16">
-                        <div className="flex">
-                            <div className="shrink-0 flex items-center">
-                                <Link href={auth.user.usertype === 'admin' ? route('admin.dashboard') : route('dashboard')}>
-                                    <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
-                                </Link>
-                            </div>
-
-                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink href={auth.user.usertype === 'admin' ? route('admin.dashboard') : route('dashboard')}>
-                                    Dashboard
-                                </NavLink>
-
-                                {/* Conditionally render for admin only */}
-                                {auth.user.usertype === 'admin' && (
-                                    <>
-                                        <NavLink href={route('admin.products')}>Products</NavLink>
-                                        <NavLink href={route('admin.programs')}>Programs</NavLink>
-                                        <NavLink href={route('admin.users')}>Users</NavLink>
-                                        <NavLink href={route('admin.orders')}>Orders</NavLink>
-                                        <NavLink href={route('admin.payments')}>Payments</NavLink>
-                                        <NavLink href={route('admin.blogs')}>Blog</NavLink>
-                                        <NavLink href={route('profile.edit')}>Profile</NavLink>
-                                    </>
-                                )}
-
-                                {/* Links for Regular Users only */}
-                                {auth.user.usertype === 'user' && (
-                                    <>
-                                        <NavLink href={route('user.bookings')}>Bookings</NavLink>
-                                        <NavLink href={route('profile.edit')}>Profile</NavLink>
-                                        <NavLink href={route('user.orders')}>Orders</NavLink>
-                                        <NavLink href={route('home-page')}>Homepage</NavLink>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="hidden sm:flex sm:items-center sm:ms-6">
-                            <div className="ms-3 relative">
-                                <Dropdown>
-                                    <Dropdown.Trigger>
-                                        <span className="inline-flex rounded-md">
-                                            <button
-                                                type="button"
-                                                className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150"
-                                            >
-                                                {user.name}
-
-                                                <svg
-                                                    className="ms-2 -me-0.5 h-4 w-4"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20"
-                                                    fill="currentColor"
-                                                >
-                                                    <path
-                                                        fillRule="evenodd"
-                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                        clipRule="evenodd"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </span>
-                                    </Dropdown.Trigger>
-
-                                    <Dropdown.Content>
-                                        <Dropdown.Link href={route('profile.edit')}>Profile</Dropdown.Link>
-                                        <Dropdown.Link href={route('logout')} method="post" as="button">
-                                            Log Out
-                                        </Dropdown.Link>
-                                    </Dropdown.Content>
-                                </Dropdown>
-                            </div>
-                        </div>
-
-                        <div className="-me-2 flex items-center sm:hidden">
-                            <button
-                                onClick={() => setShowingNavigationDropdown((previousState) => !previousState)}
-                                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out"
-                            >
-                                <svg className="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                    <path
-                                        className={!showingNavigationDropdown ? 'inline-flex' : 'hidden'}
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        className={showingNavigationDropdown ? 'inline-flex' : 'hidden'}
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
+            {/* Top Navbar */}
+            <nav className="fixed top-0 w-full bg-white border-b border-gray-200 z-10">
+                <div className="px-4 h-16 flex items-center justify-between">
+                    <div className="flex items-center">
+                        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 hover:bg-gray-100 rounded-md">
+                            {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
+                        </button>
+                        <Link href="/" className="ml-4">
+                            <ApplicationLogo className="h-9 w-auto" />
+                        </Link>
                     </div>
-                </div>
-
-                <div className={(showingNavigationDropdown ? 'block' : 'hidden') + ' sm:hidden'}>
-                    <div className="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink href={route('dashboard')} active={route().current('dashboard')}>
-                            Dashboard
-                        </ResponsiveNavLink>
-                    </div>
-
-                    <div className="pt-4 pb-1 border-t border-gray-200">
-                        <div className="px-4">
-                            <div className="font-medium text-base text-gray-800">{user.name}</div>
-                            <div className="font-medium text-sm text-gray-500">{user.email}</div>
-                        </div>
-
-                        <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route('profile.edit')}>Profile</ResponsiveNavLink>
-                            <ResponsiveNavLink method="post" href={route('logout')} as="button">
-                                Log Out
-                            </ResponsiveNavLink>
-                        </div>
+                    <div className="flex items-center">
+                        <Dropdown>
+                            <Dropdown.Trigger>
+                                <button className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out">
+                                    <span>{user.name}</span>
+                                    <svg className="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                                    </svg>
+                                </button>
+                            </Dropdown.Trigger>
+                            <Dropdown.Content>
+                                <Dropdown.Link href={route('profile.edit')}>Profile</Dropdown.Link>
+                                <Dropdown.Link href={route('logout')} method="post" as="button">Log Out</Dropdown.Link>
+                            </Dropdown.Content>
+                        </Dropdown>
                     </div>
                 </div>
             </nav>
 
-            {header && (
-                <header className="bg-white shadow">
-                    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">{header}</div>
-                </header>
-            )}
+            {/* Sidebar */}
+            <aside className={`fixed left-0 top-16 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 transition-all duration-300 ${
+                sidebarOpen ? 'w-64' : 'w-0 -translate-x-full'
+            }`}>
+                <nav className="p-4 overflow-y-auto h-full">
+                    {auth.user.usertype === 'admin' ? (
+                        <div className="space-y-1">
+                            <SidebarLink href={route('admin.dashboard')} icon={LayoutDashboard}>Dashboard</SidebarLink>
+                            <SidebarLink href={route('admin.products')} icon={Package}>Products</SidebarLink>
+                            <SidebarLink href={route('admin.users')} icon={Users}>Users</SidebarLink>
+                            <SidebarLink href={route('admin.orders')} icon={ShoppingCart}>Orders</SidebarLink>
+                            <SidebarLink href={route('admin.payments')} icon={CreditCard}>Payments</SidebarLink>
+                            <SidebarLink href={route('admin.blogs')} icon={FileText}>Blog</SidebarLink>
+                            <SidebarLink href={route('admin.registration')} icon={Calendar}>Event Registration</SidebarLink>
+                            <SidebarLink href={route('admin.membership')} icon={Ticket}>Membership</SidebarLink>
+                        </div>
+                    ) : (
+                        <div className="space-y-1">
+                            <SidebarLink href={route('dashboard')} icon={LayoutDashboard}>Dashboard</SidebarLink>
+                            <SidebarLink href={route('user.bookings')} icon={Calendar}>Bookings</SidebarLink>
+                            <SidebarLink href={route('user.orders')} icon={ShoppingCart}>Orders</SidebarLink>
+                            <SidebarLink href={route('home-page')} icon={Home}>Homepage</SidebarLink>
+                        </div>
+                    )}
+                </nav>
+            </aside>
 
-            <main>{children}</main>
+            {/* Main Content */}
+            <main className={`pt-16 transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-0'}`}>
+                <div className="p-6">
+                    {children}
+                </div>
+            </main>
         </div>
+    );
+}
+
+function SidebarLink({ href, icon: Icon, children }) {
+    const isActive = route().current(href.split('.').slice(-1)[0]);
+    
+    return (
+        <Link
+            href={href}
+            className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                isActive
+                    ? 'bg-gray-100 text-gray-900'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+            }`}
+        >
+            <Icon className="w-5 h-5 mr-3" />
+            {children}
+        </Link>
     );
 }

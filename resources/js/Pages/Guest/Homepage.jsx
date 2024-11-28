@@ -3,49 +3,144 @@ import React from 'react';
 import Navbar from '@/Components/Navbar'; // Import your Navbar component
 import NavLink from '@/Components/NavLink'; // Import NavLink component
 import PrimaryButton from '@/Components/PrimaryButton';
+import Dropdown from '@/Components/Dropdown';
 import 'flowbite';
-import SubscriptionPlan from '@/Components/My Components/Plan/SubscriptionPlan';
+import Card from '@/Components/My Components/Homepage/Card';
+import CardCancer from '@/Components/My Components/Homepage/CardCancer';
+import FlexTwoSideCancer from '@/Components/My Components/Homepage/FlexTwoSideCancer';
+import CardResearch from '@/Components/My Components/Homepage/CardResearch';
 import DynamicNavbar from '@/Components/My Components/AboutCancer/DynamicNavbar';
 
-export default function Plan( {plans} ) {
+export default function Homepage() {
     return (
         <>
-            <Head title="Plan" />
-            <DynamicNavbar /> 
+            <Head title="Homepage" />
+            <DynamicNavbar />
 
-            <section className="bg-center bg-no-repeat bg-cover bg-[url('https://img.freepik.com/free-photo/curvy-pink-streamer-closeup_23-2148050293.jpg?t=st=1726639737~exp=1726643337~hmac=52c3d94107ae4236b83203f757da5bd81a33dcb6d74227b9a2011e98c9a87687&w=996')] bg-gray-700 bg-blend-multiply h-screen">
+            <section className="bg-center bg-no-repeat bg-cover bg-[url('https://img.freepik.com/free-photo/child-suffering-from-cancer_23-2149501388.jpg?t=st=1726590400~exp=1726594000~hmac=1e2097c5774a6f8fe97b9005842dd287f8a9467fc3f6ffe3e13282549213db73&w=996')] bg-gray-700 bg-blend-multiply h-screen">
                 <div className="px-4 mx-auto max-w-screen-xl text-center py-24 lg:py-56">
-                    <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl">Membership</h1>
-                    <p class="mb-8 text-lg font-normal text-gray-300 lg:text-xl sm:px-16 lg:px-48">Membership</p>
+                    <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl">Together, We Fight Cancer, Uniting for a cure</h1>
+                    <p class="mb-8 text-lg font-normal text-gray-300 lg:text-xl sm:px-16 lg:px-48">We focus on advancing cancer research and treatment, harnessing the power of innovation to improve lives and create a healthier future for all.</p>
                     <div class="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0">
                         <a href="#" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
-                            Subscribe as membership
+                            Find your cancer now
                             <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
                             </svg>
                         </a>
-                        {/* <a href="#" class="inline-flex justify-center hover:text-gray-900 items-center py-3 px-5 sm:ms-4 text-base font-medium text-center text-white rounded-lg border border-white hover:bg-gray-100 focus:ring-4 focus:ring-gray-400">
+                        <a href="#" class="inline-flex justify-center hover:text-gray-900 items-center py-3 px-5 sm:ms-4 text-base font-medium text-center text-white rounded-lg border border-white hover:bg-gray-100 focus:ring-4 focus:ring-gray-400">
                             Learn more
-                        </a>   */}
+                        </a>  
                     </div>
                 </div>
             </section>
 
-            {/* Event Listing Section */}
+            {/* Our Objective Section */}
+            {/* Card Component -> need to add prop for dynamics - educate, encourage and empower */}
+            <div className='bg-white p-4 flex flex-col my-20'>
+                <div className='flex justify-center flex-col items-center mb-10'>
+                    <div className='text-4xl font-bold mb-2'>What We Do</div>
+                    <div className='text-2xl'>At CancerCare Connect, we believe in transforming the cancer care journey through three essential pillars of support.</div>
+                </div>
+                <div className='container mx-auto text-white flex justify-between'> 
+                    <Card 
+                        title="Educate"
+                        description="We provide comprehensive knowledge and resources to help you understand your cancer journey better."
+                        icon= {
+                            <svg className="w-7 h-7 text-gray-500 dark:text-gray-400 mb-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6v4l3.276 3.276M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                            </svg>
+                        }
+                    />
+                    <Card 
+                        title="Encourage"
+                        description="We stand beside you with emotional support and community connections that help strengthen your spirit:"
+                        icon= {
+                            <svg className="w-7 h-7 text-gray-500 dark:text-gray-400 mb-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M18 5h-.7c.229-.467.349-.98.351-1.5a3.5 3.5 0 0 0-3.5-3.5c-1.717 0-3.215 1.2-4.331 2.481C8.4.842 6.949 0 5.5 0A3.5 3.5 0 0 0 2 3.5c.003.52.123 1.033.351 1.5H2a2 2 0 0 0-2 2v3a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V7a2 2 0 0 0-2-2ZM8.058 5H5.5a1.5 1.5 0 0 1 0-3c.9 0 2 .754 3.092 2.122-.219.337-.392.635-.534.878Zm6.1 0h-3.742c.933-1.368 2.371-3 3.739-3a1.5 1.5 0 0 1 0 3h.003ZM11 13H9v7h2v-7Zm-4 0H2v5a2 2 0 0 0 2 2h3v-7Zm6 0v7h3a2 2 0 0 0 2-2v-5h-5Z"/>
+                            </svg>
+                        }
+                    />
+                    <Card 
+                        title="Empower"
+                        description="We empower you to take control of your healthcare journey by providing personalized guidance and resources to advocate for your care needs."
+                        icon= {
+                            <svg className="w-7 h-7 text-gray-500 dark:text-gray-400 mb-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 0 0 .95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 0 0-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 0 0-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 0 0-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 0 0 .951-.69l1.07-3.292z"/>
+                            </svg>
+                        }
+                    />
+                </div>
+            </div>
+
+            {/* Abour Cancer Section */}
+            {/* CardCancer Component - need to add prop for dynamics */}
+            <div className='bg-slate-200'>
+                <div className="px-4 mx-auto max-w-screen-xl py-16 lg:py-10">
+                    <div className='text-4xl font-bold mb-2'>Know About Cancer</div>
+                    <div className='text-2xl'>If you have been given a cancer diagnosis or have a loved one who has, we offer useful guidance on various topics such as symptoms, screenings, and coping post-treatment.</div>
+                    <div className='grid grid-cols-4 gap-4 py-10'>
+                        <CardCancer 
+                            title="About Cancer"
+                            href="/cancer-information/about-cancer"
+                        />
+                        <CardCancer 
+                            title="Cancer Types"
+                            href="/cancer-information/cancer-types"
+                        />
+                        <CardCancer 
+                            title="Treatment"
+                            href="/cancer-information/cancer-treatments"
+                        />
+                        <CardCancer 
+                            title="Prevention"
+                            href="/cancer-information/cancer-prevention"
+                        />
+                        <CardCancer 
+                            title="Early Detection"
+                            href="/cancer-information/cancer-detection"
+                        />
+                        <CardCancer 
+                            title="Recovery"
+                            href="/cancer-information/cancer-recovery"
+                        />
+                        <CardCancer 
+                            title="Diagnosis"
+                            href="/cancer-information/cancer-diagnosis"
+                        />       
+                    </div>
+                </div>
+            </div>  
+
+            {/* Get Involved Section */}
+            {/* FlexTwoSideCancer Component - need to add prop for dynamics  */}
+            <div className="px-4 mx-auto max-w-screen-xl py-16 lg:py-10">
+                <FlexTwoSideCancer/>
+            </div>
+
+            {/* Our Research Section */}
             {/* CardResearch Component -> need to add prop for dynamics - educate, encourage and empower */}
-            <div className="bg-white">
+            <div className="bg-sky-100">
                 <div className="px-4 mx-auto max-w-screen-xl py-16 lg:py-10 flex flex-col">
                     <div className="flex justify-center flex-col items-center mb-10">
-                        <div className="text-4xl font-bold mb-2 text-center">Be a membership now</div>
-                        {/* <div className="text-2xl text-center">Volunteer your time at one of our fundraising events to help us celebrate life and take meaningful action in the fight against cancer.</div> */}
+                        <div className="text-4xl font-bold mb-2 text-center">Life-Saving Cancer Research</div>
+                        <div className="text-2xl text-center">Advancing cancer research is essential to discovering better treatments, understanding its causes, and improving the lives of those affected by the disease.</div>
                     </div>
-                    {/* Plan */}
-                    <SubscriptionPlan plans = {plans} />
+                    <div className="container mx-auto text-white grid grid-cols-1 md:grid-cols-3 gap-8"> 
+                        <CardResearch />
+                        <CardResearch />
+                        <CardResearch />
+                    </div>
+                    <div>
+                        <button type="button" className="mt-6 focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900">
+                            Our Research Program
+                        </button>
+                    </div>
                 </div>
             </div>
 
             {/* Footer Section */}
-            <footer class="p-4 bg-blue-100 sm:p-6 dark:bg-gray-800">
+            <footer class="p-4 bg-white sm:p-6 dark:bg-gray-800">
                 <div class="mx-auto max-w-screen-xl">
                     <div class="md:flex md:justify-between">
                         <div class="mb-6 md:mb-0">
@@ -114,7 +209,10 @@ export default function Plan( {plans} ) {
                     </div>
                 </div>
             </footer>
+
             
+
+
         </>
     );
 }

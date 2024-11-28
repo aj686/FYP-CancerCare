@@ -81,7 +81,7 @@ export default function Checkout( {order} ) {
     return(
         <>
         <Head title="Checkout" />
-            <DynamicNavbar />
+        <DynamicNavbar />
 
             {/* Checkout Section */}
             <section className="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
@@ -260,7 +260,7 @@ export default function Checkout( {order} ) {
                                             <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 md:p-6">
                                                 <div className="space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
                                                 {/* Image Section */}
-                                                <div className="relative h-20 w-20">
+                                                {/* <div className="relative h-20 w-20">
                                                     <img
                                                         className="h-full w-full object-cover dark:hidden"
                                                         src={`/storage/${order[key].image}`} // Here the problem where the image not appear but in session have the path
@@ -283,7 +283,7 @@ export default function Checkout( {order} ) {
                                                         }}
                                                         alt={order[key].name}
                                                     />
-                                                </div>
+                                                </div> */}
 
                                                 {/* Quantity Control */}
                                                 <div className="flex items-center justify-between md:order-3 md:justify-end">

@@ -11,6 +11,9 @@ use App\Models\Events;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Blogs;
+use App\Models\EventRegistration;
+use App\Models\Membership;
+use App\Models\Plan;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB; // Add this import
@@ -455,7 +458,85 @@ class AdminController extends Controller
         return back()->with('message', 'Blog deleted successfully');
     }
 
+    // Event Registrations
+    public function eventRegistration() {
+        $eventRegistration = EventRegistration::all();
+        $count = $eventRegistration->count();
+
+        return Inertia::render('Admin/EventRegister',[
+            'events_register' => $eventRegistration,
+            'count' => $count,
+        ]);
+    }
+    public function updateEventRegistration(Request $request) {}
+    public function destroyEventRegistration(Request $request) {}
+
+    // Memberships
+    public function membership() {
+        $membership = Membership::all();
+        $count = $membership->count();
+        return Inertia::render('Admin/Membership',[
+            'members' => $membership,
+            'count' => $count,
+        ]);
+    }
+    public function updateMembership(Request $request) {}
+    public function destroyMembership(Request $request) {}
     
+    // Plans
+    public function plans() {
+        $plans = Plan::all();
+        $count = $plans->count();
+        return Inertia::render('Admin/Plan',[
+            'plans' => $plans,
+            'count' => $count,
+        ]);
+    }
+    public function createPlans(Request $request, Plan $plan) {
+
+        $validated = $request->validate([
+            'name' => 'required|max:255',
+            'slug' => 'required|unique:plans,slug',
+            'stripe_plan' => 'required|unique:plans,stripe_plan',
+            'price' => 'required|numeric|min:0',
+            'description' => 'required|min:10',
+        ]);
+        
+        $plan->create($validated);
+        
+        return back()->with('message', 'Plan created successfully!');
+        
+    }   
+    public function updatePlans(Request $request, $plan_id) {
+        $plan = Plan::findOrFail($plan_id);
+
+        $validated = $request->validate([
+            'name' => 'required|max:255',
+            'slug' => 'required|unique:plans,slug,' . $plan_id,
+            'stripe_plan' => 'required|unique:plans,stripe_plan,' . $plan_id,
+            'price' => 'required|numeric|min:0',
+            'description' => 'required|min:10',
+        ]);
+
+        try {
+            DB::beginTransaction();
+            
+            $plan->update($validated);
+            
+            DB::commit();
+            
+            return back()->with('message', 'Plan updated successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error updating plan: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Failed to update plan. ' . $e->getMessage()]);
+        }
+    }
+    public function destroyPlans(Plan $plan, $plan_id) {
+        $planId = $plan->findOrFail($plan_id);
+        $planId->delete();
+        return back()->with('message', 'Plan deleted successfully');
+    }
 
     
 }

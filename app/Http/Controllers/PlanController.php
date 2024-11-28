@@ -13,8 +13,17 @@ class PlanController extends Controller
     public function index() {
         $plans = Plan::all();
 
-        return Inertia::render('Plan', [
-            'plans' => $plans,
-        ]);
+        if(Auth::check()) {
+            $user = Auth::user();
+            return Inertia::render('Plan', [
+                'plans' => $plans,
+            ]);
+        } else {
+            return Inertia::render('Guest/Plan', [
+                'plans' => $plans,
+            ]);
+        }
+        
+        
     }
 }

@@ -55,6 +55,64 @@ export default function ViewEvent({ event, isRegistered: initialIsRegistered, ha
     const spotsLeft = event.participant_count - registeredCount;
     const isFull = registeredCount >= event.participant_count;
 
+    const renderEventDetails = () => (
+        <div className="md:w-3/5 p-6">
+            <h1 className="text-3xl font-bold mb-4">{event.title}</h1>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="flex items-center">
+                    <Calendar className="w-5 h-5 mr-2 text-gray-500" />
+                    <span>{formatDate(event.start_date)}</span>
+                </div>
+                <div className="flex items-center">
+                    <Clock className="w-5 h-5 mr-2 text-gray-500" />
+                    <span>{event.event_time}</span>
+                </div>
+                <div className="flex items-center">
+                    <MapPin className="w-5 h-5 mr-2 text-gray-500" />
+                    <span>{event.location}</span>
+                </div>
+                <div className="flex items-center">
+                    <Tag className="w-5 h-5 mr-2 text-gray-500" />
+                    <span>{event.price > 0 ? `RM ${event.price}` : 'Free'}</span>
+                </div>
+            </div>
+
+            <div className="prose max-w-none mb-6">
+                <h2 className="text-xl font-semibold mb-2">About This Event</h2>
+                <p className="text-gray-600">{event.description}</p>
+            </div>
+
+            <div className="mb-6">
+                <div className="flex items-center justify-between mb-2">
+                    <span>
+                        <Users className="w-4 h-4 inline mr-1" />
+                        {spotsLeft} spots remaining
+                    </span>
+                    <span>{Math.round((registeredCount / event.participant_count) * 100)}% Full</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                        className="bg-indigo-600 rounded-full h-2"
+                        style={{
+                            width: `${(registeredCount / event.participant_count) * 100}%`
+                        }}
+                    />
+                </div>
+            </div>
+
+            {renderActionButton()}
+
+            {isRegistered && (
+                <div className="mt-4 bg-green-50 border-l-4 border-green-400 p-4">
+                    <p className="text-sm text-green-700">
+                        You are registered for this event! We look forward to seeing you there.
+                    </p>
+                </div>
+            )}
+        </div>
+    );
+
     const renderActionButton = () => {
         if (!auth?.user) {
             return (
@@ -90,29 +148,38 @@ export default function ViewEvent({ event, isRegistered: initialIsRegistered, ha
             );
         }
 
+        // Modified this section for better UX with paid events
         if (event.price > 0 && !hasMembership) {
             return (
-                <div className="border rounded-lg p-4 space-y-4 bg-white">
-                    <div className="bg-blue-50 border-l-4 border-blue-400 p-4">
-                        <p className="text-sm text-blue-700">
-                            This is a premium event that requires membership. Join now to access all premium events!
-                        </p>
-                    </div>
-                    <div className="space-y-2">
-                        <h4 className="font-semibold">Membership Benefits:</h4>
-                        <ul className="list-disc pl-5 space-y-1 text-sm">
-                            <li>Access to all premium events</li>
-                            <li>Priority registration</li>
-                            <li>Exclusive content and resources</li>
-                            <li>Only RM25/month</li>
-                        </ul>
-                    </div>
-                    <Link
-                        href={route('membership.subscribe')}
-                        className="inline-flex w-full items-center justify-center px-6 py-3 text-base font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
+                <div className="space-y-4">
+                    <button 
+                        onClick={handleRegister}
+                        disabled={processing}
+                        className="w-full px-6 py-3 text-base font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50"
                     >
-                        Subscribe to Join (RM25/month)
-                    </Link>
+                        Register for Event
+                    </button>
+                    
+                    <div className="border rounded-lg p-4 space-y-4 bg-blue-50">
+                        <p className="text-sm text-blue-700">
+                            Note: This is a premium event. You'll need to subscribe to our membership to complete registration.
+                        </p>
+                        <div className="space-y-2">
+                            <h4 className="font-semibold">Membership Benefits:</h4>
+                            <ul className="list-disc pl-5 space-y-1 text-sm">
+                                <li>Access to all premium events</li>
+                                <li>Priority registration</li>
+                                <li>Exclusive content and resources</li>
+                                <li>Only RM25/month</li>
+                            </ul>
+                        </div>
+                        <Link
+                            href={route('membership.subscribe')}
+                            className="inline-flex w-full items-center justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
+                        >
+                            Subscribe Now (RM25/month)
+                        </Link>
+                    </div>
                 </div>
             );
         }
@@ -140,7 +207,6 @@ export default function ViewEvent({ event, isRegistered: initialIsRegistered, ha
 
             <div className="bg-white rounded-lg shadow-lg overflow-hidden">
                 <div className="flex flex-col md:flex-row">
-                    {/* Left side - Image */}
                     <div className="md:w-2/5 relative">
                         <img
                             src={`/storage/${event.image}`}
@@ -154,63 +220,7 @@ export default function ViewEvent({ event, isRegistered: initialIsRegistered, ha
                             </div>
                         )}
                     </div>
-
-                    {/* Right side - Content */}
-                    <div className="md:w-3/5 p-6">
-                        <h1 className="text-3xl font-bold mb-4">{event.title}</h1>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                            <div className="flex items-center">
-                                <Calendar className="w-5 h-5 mr-2 text-gray-500" />
-                                <span>{formatDate(event.start_date)}</span>
-                            </div>
-                            <div className="flex items-center">
-                                <Clock className="w-5 h-5 mr-2 text-gray-500" />
-                                <span>{event.event_time}</span>
-                            </div>
-                            <div className="flex items-center">
-                                <MapPin className="w-5 h-5 mr-2 text-gray-500" />
-                                <span>{event.location}</span>
-                            </div>
-                            <div className="flex items-center">
-                                <Tag className="w-5 h-5 mr-2 text-gray-500" />
-                                <span>{event.price > 0 ? `RM ${event.price}` : 'Free'}</span>
-                            </div>
-                        </div>
-
-                        <div className="prose max-w-none mb-6">
-                            <h2 className="text-xl font-semibold mb-2">About This Event</h2>
-                            <p className="text-gray-600">{event.description}</p>
-                        </div>
-
-                        <div className="mb-6">
-                            <div className="flex items-center justify-between mb-2">
-                                <span>
-                                    <Users className="w-4 h-4 inline mr-1" />
-                                    {spotsLeft} spots remaining
-                                </span>
-                                <span>{Math.round((registeredCount / event.participant_count) * 100)}% Full</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
-                                <div
-                                    className="bg-indigo-600 rounded-full h-2"
-                                    style={{
-                                        width: `${(registeredCount / event.participant_count) * 100}%`
-                                    }}
-                                />
-                            </div>
-                        </div>
-
-                        {renderActionButton()}
-
-                        {isRegistered && (
-                            <div className="mt-4 bg-green-50 border-l-4 border-green-400 p-4">
-                                <p className="text-sm text-green-700">
-                                    You are registered for this event! We look forward to seeing you there.
-                                </p>
-                            </div>
-                        )}
-                    </div>
+                    {renderEventDetails()}
                 </div>
             </div>
         </div>

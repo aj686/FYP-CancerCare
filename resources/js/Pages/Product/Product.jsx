@@ -5,6 +5,7 @@ import NavLink from '@/Components/NavLink'; // Import NavLink component
 import PrimaryButton from '@/Components/PrimaryButton';
 import 'flowbite';
 import ProductList from '@/Components/My Components/Product/ProductList';
+import DynamicNavbar from '@/Components/My Components/AboutCancer/DynamicNavbar';
 
 // retrieve props: all_products
 
@@ -12,64 +13,8 @@ export default function Products( { all_products } ) {
     return (
         <>
             <Head title="Products" />
-            <Navbar>
-                {/* Pass NavLink components as children to Navbar */}
-                <li>
-                    <NavLink href="/homepage" className="text-black">
-                        Home
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink href="/cancer-information" className="text-black">
-                        Cancer
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink href="/get-involved" className="text-black">
-                        Get Involved
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink href="/our-research" className="text-black">
-                        Our Research
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink href="/product" className="text-black">
-                        Shop with Us
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink href="/about" className="text-black">
-                        About
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink href="/login" className="text-white">
-                        <PrimaryButton
-                            className="bg-blue-500 hover:bg-blue-700">
-                            Login
-                        </PrimaryButton>
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink href="/register" className="text-white">
-                        <PrimaryButton>
-                            Register
-                        </PrimaryButton>
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink href="/cart" className="text-black">
-                        <span class="sr-only">
-                            Cart
-                        </span>
-                        <svg class="w-5 h-5 lg:me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"/>
-                        </svg>   
-                    </NavLink>
-                </li>
-            </Navbar>
+            <DynamicNavbar />
+           
 
             <section className="bg-center bg-no-repeat bg-cover bg-[url('https://img.freepik.com/free-photo/black-friday-elements-assortment_23-2149074075.jpg?t=st=1726643063~exp=1726646663~hmac=0d5a9dcde5ce7aae7dda28a2daa061c7dde0ef6e3f5e4f46833851a3e9bf2723&w=996')] bg-gray-500 bg-blend-multiply h-screen">
                 <div className="px-4 mx-auto max-w-screen-xl text-center py-24 lg:py-56">

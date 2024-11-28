@@ -3,11 +3,8 @@ import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import { useForm } from "@inertiajs/react";
 import React, { useState, useEffect } from 'react';
-import { 
-    Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, 
-    Link, Image as ImageIcon, List, ListOrdered, Heading1, Heading2, 
-    Quote, Code, PlusIcon, Undo, Redo
-} from 'lucide-react';
+import { PlusIcon } from 'lucide-react';
+import RichTextEditor from "./RichTextEditor";
 
 export default function BlogAdd({ className = "", disabled }) {
     const { data, setData, post, reset, errors, processing } = useForm({
@@ -22,7 +19,6 @@ export default function BlogAdd({ className = "", disabled }) {
         active: "1",
     });
 
-    // Track if editor has unsaved changes
     const [isDirty, setIsDirty] = useState(false);
 
     const generateSlug = (title) => {
@@ -40,58 +36,6 @@ export default function BlogAdd({ className = "", disabled }) {
             slug: generateSlug(newTitle)
         }));
         setIsDirty(true);
-    };
-
-    // Rich Text Editor Functions
-    const formatText = (command, value = null) => {
-        document.execCommand(command, false, value);
-        const content = document.getElementById('editor-content').innerHTML;
-        setData('content', content);
-        setIsDirty(true);
-    };
-
-    const handleKeyCommands = (e) => {
-        if (e.ctrlKey || e.metaKey) {
-            switch (e.key.toLowerCase()) {
-                case 'b':
-                    e.preventDefault();
-                    formatText('bold');
-                    break;
-                case 'i':
-                    e.preventDefault();
-                    formatText('italic');
-                    break;
-                case 'u':
-                    e.preventDefault();
-                    formatText('underline');
-                    break;
-                case 'z':
-                    e.preventDefault();
-                    if (e.shiftKey) {
-                        document.execCommand('redo', false);
-                    } else {
-                        document.execCommand('undo', false);
-                    }
-                    break;
-            }
-        }
-    };
-
-    const insertHeading = (level) => {
-        formatText('formatBlock', `h${level}`);
-    };
-
-    const handleImageUpload = async (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            // Here you would typically upload the file to your server
-            // and get back a URL. This is a simplified example
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                formatText('insertImage', e.target.result);
-            };
-            reader.readAsDataURL(file);
-        }
     };
 
     const submit = (e) => {
@@ -118,7 +62,6 @@ export default function BlogAdd({ className = "", disabled }) {
         });
     };
 
-    // Warn about unsaved changes
     useEffect(() => {
         const handleBeforeUnload = (e) => {
             if (isDirty) {
@@ -130,17 +73,6 @@ export default function BlogAdd({ className = "", disabled }) {
         window.addEventListener('beforeunload', handleBeforeUnload);
         return () => window.removeEventListener('beforeunload', handleBeforeUnload);
     }, [isDirty]);
-
-    const EditorButton = ({ onClick, children, title }) => (
-        <button
-            type="button"
-            onClick={onClick}
-            className="p-2 hover:bg-gray-200 rounded transition-colors duration-200"
-            title={title}
-        >
-            {children}
-        </button>
-    );
 
     return (
         <>
@@ -254,117 +186,13 @@ export default function BlogAdd({ className = "", disabled }) {
                             {/* Rich Text Editor */}
                             <div>
                                 <InputLabel htmlFor="editor-content" value="Content *" />
-                                <div className="mt-1 border rounded-md border-gray-300 shadow-sm focus-within:border-green-500 focus-within:ring-1 focus-within:ring-green-500">
-                                    {/* Editor Toolbar */}
-                                    <div className="border-b border-gray-300 bg-gray-50 p-2 flex flex-wrap gap-2">
-                                        {/* Text Formatting */}
-                                        <div className="flex items-center gap-1 border-r pr-2">
-                                            <EditorButton onClick={() => formatText('bold')} title="Bold (Ctrl+B)">
-                                                <Bold className="w-4 h-4" />
-                                            </EditorButton>
-                                            <EditorButton onClick={() => formatText('italic')} title="Italic (Ctrl+I)">
-                                                <Italic className="w-4 h-4" />
-                                            </EditorButton>
-                                            <EditorButton onClick={() => formatText('underline')} title="Underline (Ctrl+U)">
-                                                <Underline className="w-4 h-4" />
-                                            </EditorButton>
-                                        </div>
-
-                                        {/* Alignment */}
-                                        <div className="flex items-center gap-1 border-r pr-2">
-                                            <EditorButton onClick={() => formatText('justifyLeft')} title="Align Left">
-                                                <AlignLeft className="w-4 h-4" />
-                                            </EditorButton>
-                                            <EditorButton onClick={() => formatText('justifyCenter')} title="Align Center">
-                                                <AlignCenter className="w-4 h-4" />
-                                            </EditorButton>
-                                            <EditorButton onClick={() => formatText('justifyRight')} title="Align Right">
-                                                <AlignRight className="w-4 h-4" />
-                                            </EditorButton>
-                                        </div>
-
-                                        {/* Headings */}
-                                        <div className="flex items-center gap-1 border-r pr-2">
-                                            <EditorButton onClick={() => insertHeading(1)} title="Heading 1">
-                                                <Heading1 className="w-4 h-4" />
-                                            </EditorButton>
-                                            <EditorButton onClick={() => insertHeading(2)} title="Heading 2">
-                                                <Heading2 className="w-4 h-4" />
-                                            </EditorButton>
-                                        </div>
-
-                                        {/* Lists */}
-                                        <div className="flex items-center gap-1 border-r pr-2">
-                                            <EditorButton onClick={() => formatText('insertUnorderedList')} title="Bullet List">
-                                                <List className="w-4 h-4" />
-                                            </EditorButton>
-                                            <EditorButton onClick={() => formatText('insertOrderedList')} title="Numbered List">
-                                                <ListOrdered className="w-4 h-4" />
-                                            </EditorButton>
-                                        </div>
-
-                                        {/* Other Formatting */}
-                                        <div className="flex items-center gap-1 border-r pr-2">
-                                            <EditorButton onClick={() => formatText('formatBlock', 'blockquote')} title="Quote">
-                                                <Quote className="w-4 h-4" />
-                                            </EditorButton>
-                                            <EditorButton onClick={() => formatText('formatBlock', 'pre')} title="Code Block">
-                                                <Code className="w-4 h-4" />
-                                            </EditorButton>
-                                        </div>
-
-                                        {/* Links and Images */}
-                                        <div className="flex items-center gap-1">
-                                            <EditorButton
-                                                onClick={() => {
-                                                    const url = prompt('Enter URL:');
-                                                    if (url) formatText('createLink', url);
-                                                }}
-                                                title="Insert Link"
-                                            >
-                                                <Link className="w-4 h-4" />
-                                            </EditorButton>
-                                            <div className="relative">
-                                                <EditorButton
-                                                    onClick={() => document.getElementById('image-upload').click()}
-                                                    title="Insert Image"
-                                                >
-                                                    <ImageIcon className="w-4 h-4" />
-                                                </EditorButton>
-                                                <input
-                                                    type="file"
-                                                    id="image-upload"
-                                                    className="hidden"
-                                                    accept="image/*"
-                                                    onChange={handleImageUpload}
-                                                />
-                                            </div>
-                                        </div>
-
-                                        {/* Undo/Redo */}
-                                        <div className="flex items-center gap-1 ml-auto">
-                                            <EditorButton onClick={() => document.execCommand('undo')} title="Undo (Ctrl+Z)">
-                                                <Undo className="w-4 h-4" />
-                                            </EditorButton>
-                                            <EditorButton onClick={() => document.execCommand('redo')} title="Redo (Ctrl+Shift+Z)">
-                                            <Redo className="w-4 h-4" />
-                                            </EditorButton>
-                                        </div>
-                                    </div>
-
-                                    {/* Editor Content Area */}
-                                    <div
-                                        id="editor-content"
-                                        contentEditable="true"
-                                        className="min-h-[300px] p-4 focus:outline-none prose max-w-none"
-                                        onInput={(e) => {
-                                            setData('content', e.currentTarget.innerHTML);
-                                            setIsDirty(true);
-                                        }}
-                                        onKeyDown={handleKeyCommands}
-                                        dangerouslySetInnerHTML={{ __html: data.content }}
-                                    />
-                                </div>
+                                <RichTextEditor 
+                                    content={data.content}
+                                    onChange={(newContent) => {
+                                        setData('content', newContent);
+                                        setIsDirty(true);
+                                    }}
+                                />
                                 <InputError className="mt-2" message={errors.content} />
                             </div>
 

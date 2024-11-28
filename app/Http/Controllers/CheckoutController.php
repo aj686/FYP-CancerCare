@@ -27,6 +27,7 @@ class CheckoutController extends Controller
             // // You can redirect to the cart page if it's empty
             // return redirect()->route('cart.index')->with('message', 'Your cart is empty.');
         }
+
         return Inertia::render('Checkout', props:['order' => $checkoutOrder]);
 
         
