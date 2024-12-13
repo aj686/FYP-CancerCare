@@ -12,7 +12,7 @@ import {
     ArrowUturnLeftIcon  } 
     from '@heroicons/react/24/outline';
 
-export default function PaymentView({ payment }) {
+export default function PaymentView({ payment, paymentID }) {
     return (
         <>
             {/* Button to open the modal */}

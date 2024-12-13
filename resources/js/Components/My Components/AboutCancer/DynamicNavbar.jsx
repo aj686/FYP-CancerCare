@@ -3,6 +3,7 @@ import React from 'react';
 import NavLink from '@/Components/NavLink';
 import PrimaryButton from '@/Components/PrimaryButton';
 import Dropdown from '@/Components/Dropdown';
+import YellowButton from '@/Components/YellowButton';
 
 export default function DynamicNavbar() {
 
@@ -47,6 +48,11 @@ export default function DynamicNavbar() {
                                 Our Research
                             </NavLink>
                         </li>
+                            <li>
+                                <NavLink href="/stories" className="text-black">
+                                    Our Story
+                                </NavLink>
+                            </li>
                         <li>
                             <NavLink href="/product" className="text-black">
                                 Shop with Us
@@ -135,9 +141,9 @@ export default function DynamicNavbar() {
                             <>
                                 <li>
                                     <NavLink href="/login" className="text-white">
-                                        <PrimaryButton className="bg-blue-500 hover:bg-blue-700">
+                                        <YellowButton className="bg-blue-500 hover:bg-blue-700">
                                             Login
-                                        </PrimaryButton>
+                                        </YellowButton>
                                     </NavLink>
                                 </li>
                                 <li>

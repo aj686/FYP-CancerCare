@@ -6,6 +6,7 @@ import Navbar from '@/Components/Navbar';
 import NavLink from '@/Components/NavLink';
 import PrimaryButton from '@/Components/PrimaryButton';
 import DynamicNavbar from '@/Components/My Components/AboutCancer/DynamicNavbar';
+import Footer from '@/Components/My Components/Footer';
 
 export default function BlogViewDetail() {
   const { blog } = usePage().props;
@@ -22,6 +23,8 @@ export default function BlogViewDetail() {
       <main className="bg-gray-50 min-h-screen">
         <BlogDetail blog={blog} />
       </main>
+
+      <Footer />
     </>
   );
 }

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Events;
 use App\Models\Blogs;
+use App\Models\Plan;
 use App\Models\EventRegistration;
 use Illuminate\Support\Facades\Auth;
 
@@ -23,7 +24,10 @@ class HomeController extends Controller
         //     return Inertia::render("Homepage");
         // }
 
-        return Inertia::render("Homepage");
+        return Inertia::render("Homepage",[
+            'blogs' => Blogs::all(),
+            'plans' => Plan::all(),
+        ]);
 
     }
 

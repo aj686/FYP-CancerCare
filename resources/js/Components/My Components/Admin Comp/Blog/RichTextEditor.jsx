@@ -1,230 +1,216 @@
-import { useEditor, EditorContent } from '@tiptap/react';
+// RichTextEditor.jsx
+import { useEditor, EditorContent, EditorProvider, useCurrentEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import Link from '@tiptap/extension-link';
-import Image from '@tiptap/extension-image';
-import TextAlign from '@tiptap/extension-text-align';
+import { useState, useEffect } from 'react';
 import { 
-    Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, 
-    Link as LinkIcon, Image as ImageIcon, List, ListOrdered, 
-    Heading1, Heading2, Quote, Code, Undo, Redo
+    Bold, Italic, Strikethrough, Link as LinkIcon, 
+    List, ListOrdered, Quote, Code, Undo, Redo,
+    Heading1, Heading2, ImageIcon, AlignLeft, 
+    AlignCenter, AlignRight
 } from 'lucide-react';
+import TextAlign from '@tiptap/extension-text-align';
 
-const EditorButton = ({ onClick, children, title, isActive = false }) => (
+const MenuButton = ({ onClick, isActive = false, disabled = false, children, className = '' }) => (
     <button
         type="button"
         onClick={onClick}
-        className={`p-2 hover:bg-gray-200 rounded transition-colors duration-200 ${
-            isActive ? 'bg-gray-200' : ''
-        }`}
-        title={title}
+        disabled={disabled}
+        className={`
+            p-2 rounded-md transition-colors duration-200
+            ${isActive ? 'bg-yellow-100 text-yellow-800' : 'text-gray-600 hover:bg-gray-100'}
+            ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+            ${className}
+        `}
     >
         {children}
     </button>
 );
 
-const EditorMenuBar = ({ editor }) => {
-    if (!editor) {
-        return null;
-    }
+const MenuBar = () => {
+    const { editor } = useCurrentEditor();
+
+    if (!editor) return null;
+
+    const addImage = () => {
+        const url = window.prompt('Enter image URL:');
+        if (url) {
+            editor.chain().focus().setImage({ src: url }).run();
+        }
+    };
+
+    const addLink = () => {
+        const url = window.prompt('Enter URL:');
+        if (url) {
+            editor.chain().focus().setLink({ href: url }).run();
+        }
+    };
 
     return (
-        <div className="border-b border-gray-300 bg-gray-50 p-2 flex flex-wrap gap-2">
-            {/* Text Formatting */}
-            <div className="flex items-center gap-1 border-r pr-2">
-                <EditorButton
-                    onClick={() => editor.chain().focus().toggleBold().run()}
-                    isActive={editor.isActive('bold')}
-                    title="Bold (Ctrl+B)"
-                >
-                    <Bold className="w-4 h-4" />
-                </EditorButton>
-                <EditorButton
-                    onClick={() => editor.chain().focus().toggleItalic().run()}
-                    isActive={editor.isActive('italic')}
-                    title="Italic (Ctrl+I)"
-                >
-                    <Italic className="w-4 h-4" />
-                </EditorButton>
-                <EditorButton
-                    onClick={() => editor.chain().focus().toggleUnderline().run()}
-                    isActive={editor.isActive('underline')}
-                    title="Underline (Ctrl+U)"
-                >
-                    <Underline className="w-4 h-4" />
-                </EditorButton>
-            </div>
-
-            {/* Alignment */}
-            <div className="flex items-center gap-1 border-r pr-2">
-                <EditorButton
-                    onClick={() => editor.chain().focus().setTextAlign('left').run()}
-                    isActive={editor.isActive({ textAlign: 'left' })}
-                    title="Align Left"
-                >
-                    <AlignLeft className="w-4 h-4" />
-                </EditorButton>
-                <EditorButton
-                    onClick={() => editor.chain().focus().setTextAlign('center').run()}
-                    isActive={editor.isActive({ textAlign: 'center' })}
-                    title="Align Center"
-                >
-                    <AlignCenter className="w-4 h-4" />
-                </EditorButton>
-                <EditorButton
-                    onClick={() => editor.chain().focus().setTextAlign('right').run()}
-                    isActive={editor.isActive({ textAlign: 'right' })}
-                    title="Align Right"
-                >
-                    <AlignRight className="w-4 h-4" />
-                </EditorButton>
-            </div>
-
-            {/* Headings */}
-            <div className="flex items-center gap-1 border-r pr-2">
-                <EditorButton
-                    onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-                    isActive={editor.isActive('heading', { level: 1 })}
-                    title="Heading 1"
-                >
-                    <Heading1 className="w-4 h-4" />
-                </EditorButton>
-                <EditorButton
-                    onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-                    isActive={editor.isActive('heading', { level: 2 })}
-                    title="Heading 2"
-                >
-                    <Heading2 className="w-4 h-4" />
-                </EditorButton>
-            </div>
-
-            {/* Lists */}
-            <div className="flex items-center gap-1 border-r pr-2">
-                <EditorButton
-                    onClick={() => editor.chain().focus().toggleBulletList().run()}
-                    isActive={editor.isActive('bulletList')}
-                    title="Bullet List"
-                >
-                    <List className="w-4 h-4" />
-                </EditorButton>
-                <EditorButton
-                    onClick={() => editor.chain().focus().toggleOrderedList().run()}
-                    isActive={editor.isActive('orderedList')}
-                    title="Numbered List"
-                >
-                    <ListOrdered className="w-4 h-4" />
-                </EditorButton>
-            </div>
-
-            {/* Other Formatting */}
-            <div className="flex items-center gap-1 border-r pr-2">
-                <EditorButton
-                    onClick={() => editor.chain().focus().toggleBlockquote().run()}
-                    isActive={editor.isActive('blockquote')}
-                    title="Quote"
-                >
-                    <Quote className="w-4 h-4" />
-                </EditorButton>
-                <EditorButton
-                    onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-                    isActive={editor.isActive('codeBlock')}
-                    title="Code Block"
-                >
-                    <Code className="w-4 h-4" />
-                </EditorButton>
-            </div>
-
-            {/* Links and Images */}
-            <div className="flex items-center gap-1">
-                <EditorButton
-                    onClick={() => {
-                        const url = window.prompt('Enter URL:');
-                        if (url) {
-                            editor.chain().focus().setLink({ href: url }).run();
-                        }
-                    }}
-                    isActive={editor.isActive('link')}
-                    title="Insert Link"
-                >
-                    <LinkIcon className="w-4 h-4" />
-                </EditorButton>
-                <div className="relative">
-                    <EditorButton
-                        onClick={() => document.getElementById('image-upload').click()}
-                        title="Insert Image"
+        <div className="border-b border-gray-200 bg-white p-2 sticky top-0 z-10">
+            <div className="flex flex-wrap gap-1">
+                {/* Text Formatting */}
+                <div className="flex items-center space-x-1 border-r pr-2">
+                    <MenuButton 
+                        onClick={() => editor.chain().focus().toggleBold().run()}
+                        isActive={editor.isActive('bold')}
                     >
-                        <ImageIcon className="w-4 h-4" />
-                    </EditorButton>
-                    <input
-                        type="file"
-                        id="image-upload"
-                        className="hidden"
-                        accept="image/*"
-                        onChange={(e) => {
-                            if (e.target.files?.length) {
-                                const file = e.target.files[0];
-                                const reader = new FileReader();
-                                reader.onload = (e) => {
-                                    if (e.target?.result) {
-                                        editor.chain().focus().setImage({ src: e.target.result.toString() }).run();
-                                    }
-                                };
-                                reader.readAsDataURL(file);
-                            }
-                        }}
-                    />
+                        <Bold className="w-4 h-4" />
+                    </MenuButton>
+                    <MenuButton 
+                        onClick={() => editor.chain().focus().toggleItalic().run()}
+                        isActive={editor.isActive('italic')}
+                    >
+                        <Italic className="w-4 h-4" />
+                    </MenuButton>
+                    <MenuButton 
+                        onClick={() => editor.chain().focus().toggleStrike().run()}
+                        isActive={editor.isActive('strike')}
+                    >
+                        <Strikethrough className="w-4 h-4" />
+                    </MenuButton>
                 </div>
-            </div>
 
-            {/* Undo/Redo */}
-            <div className="flex items-center gap-1 ml-auto">
-                <EditorButton
-                    onClick={() => editor.chain().focus().undo().run()}
-                    disabled={!editor.can().undo()}
-                    title="Undo (Ctrl+Z)"
-                >
-                    <Undo className="w-4 h-4" />
-                </EditorButton>
-                <EditorButton
-                    onClick={() => editor.chain().focus().redo().run()}
-                    disabled={!editor.can().redo()}
-                    title="Redo (Ctrl+Shift+Z)"
-                >
-                    <Redo className="w-4 h-4" />
-                </EditorButton>
+                {/* Headings */}
+                <div className="flex items-center space-x-1 border-r pr-2">
+                    <MenuButton 
+                        onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+                        isActive={editor.isActive('heading', { level: 1 })}
+                    >
+                        <Heading1 className="w-4 h-4" />
+                    </MenuButton>
+                    <MenuButton 
+                        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+                        isActive={editor.isActive('heading', { level: 2 })}
+                    >
+                        <Heading2 className="w-4 h-4" />
+                    </MenuButton>
+                </div>
+
+                {/* Lists */}
+                <div className="flex items-center space-x-1 border-r pr-2">
+                    <MenuButton 
+                        onClick={() => editor.chain().focus().toggleBulletList().run()}
+                        isActive={editor.isActive('bulletList')}
+                    >
+                        <List className="w-4 h-4" />
+                    </MenuButton>
+                    <MenuButton 
+                        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                        isActive={editor.isActive('orderedList')}
+                    >
+                        <ListOrdered className="w-4 h-4" />
+                    </MenuButton>
+                </div>
+
+                {/* Alignment */}
+                <div className="flex items-center space-x-1 border-r pr-2">
+                    <MenuButton 
+                        onClick={() => editor.chain().focus().setTextAlign('left').run()}
+                        isActive={editor.isActive({ textAlign: 'left' })}
+                    >
+                        <AlignLeft className="w-4 h-4" />
+                    </MenuButton>
+                    <MenuButton 
+                        onClick={() => editor.chain().focus().setTextAlign('center').run()}
+                        isActive={editor.isActive({ textAlign: 'center' })}
+                    >
+                        <AlignCenter className="w-4 h-4" />
+                    </MenuButton>
+                    <MenuButton 
+                        onClick={() => editor.chain().focus().setTextAlign('right').run()}
+                        isActive={editor.isActive({ textAlign: 'right' })}
+                    >
+                        <AlignRight className="w-4 h-4" />
+                    </MenuButton>
+                </div>
+
+                {/* Special Elements */}
+                <div className="flex items-center space-x-1 border-r pr-2">
+                    <MenuButton 
+                        onClick={() => editor.chain().focus().toggleBlockquote().run()}
+                        isActive={editor.isActive('blockquote')}
+                    >
+                        <Quote className="w-4 h-4" />
+                    </MenuButton>
+                    <MenuButton 
+                        onClick={() => editor.chain().focus().toggleCode().run()}
+                        isActive={editor.isActive('code')}
+                    >
+                        <Code className="w-4 h-4" />
+                    </MenuButton>
+                    <MenuButton onClick={addLink} isActive={editor.isActive('link')}>
+                        <LinkIcon className="w-4 h-4" />
+                    </MenuButton>
+                    <MenuButton onClick={addImage}>
+                        <ImageIcon className="w-4 h-4" />
+                    </MenuButton>
+                </div>
+
+                {/* Undo/Redo */}
+                <div className="flex items-center space-x-1">
+                    <MenuButton 
+                        onClick={() => editor.chain().focus().undo().run()}
+                        disabled={!editor.can().chain().focus().undo().run()}
+                    >
+                        <Undo className="w-4 h-4" />
+                    </MenuButton>
+                    <MenuButton 
+                        onClick={() => editor.chain().focus().redo().run()}
+                        disabled={!editor.can().chain().focus().redo().run()}
+                    >
+                        <Redo className="w-4 h-4" />
+                    </MenuButton>
+                </div>
             </div>
         </div>
     );
 };
 
-export default function RichTextEditor({ content, onChange }) {
-    const editor = useEditor({
-        extensions: [
-            StarterKit,
-            Link.configure({
-                openOnClick: false,
-                HTMLAttributes: {
-                    class: 'text-blue-600 hover:text-blue-800 underline'
-                }
-            }),
-            Image.configure({
-                HTMLAttributes: {
-                    class: 'max-w-full h-auto rounded'
-                }
-            }),
-            TextAlign.configure({
-                types: ['heading', 'paragraph'],
-            }),
-        ],
-        content: content,
-        onUpdate: ({ editor }) => {
-            onChange(editor.getHTML());
-        },
-    });
+const extensions = [
+    StarterKit.configure({
+        bulletList: { keepMarks: true },
+        orderedList: { keepMarks: true },
+    }),
+    TextAlign.configure({  // Add this extension
+        types: ['heading', 'paragraph'],
+        defaultAlignment: 'left',
+    }),
+];
+
+export default function RichTextEditor({ content = '', onChange }) {
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+        return () => setIsMounted(false);
+    }, []);
+
+    if (!isMounted) {
+        return (
+            <div className="mt-1 border rounded-md border-gray-200 p-4 min-h-[300px] flex items-center justify-center text-gray-500 bg-gray-50">
+                <div className="flex flex-col items-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-500 mb-2"></div>
+                    <span>Loading editor...</span>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className="mt-1 border rounded-md border-gray-300 shadow-sm focus-within:border-green-500 focus-within:ring-1 focus-within:ring-green-500">
-            <EditorMenuBar editor={editor} />
-            <EditorContent editor={editor} className="min-h-[300px] p-4 prose max-w-none focus:outline-none" />
+        <div className="border rounded-md border-gray-200 bg-white overflow-hidden">
+            <EditorProvider
+                slotBefore={<MenuBar />}
+                extensions={extensions}
+                content={content}
+                onUpdate={({ editor }) => {
+                    onChange(editor.getHTML());
+                }}
+                editorProps={{
+                    attributes: {
+                        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-xl focus:outline-none max-w-none p-4 min-h-[300px]',
+                    },
+                }}
+            />
         </div>
     );
-};s
+}

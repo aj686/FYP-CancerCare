@@ -20,6 +20,11 @@ class OrderItem extends Model
         'updated_at',  
     ];
 
+    protected $casts = [
+        'price' => 'float',
+        'quantity' => 'integer'
+    ];
+
     public function order()
     {
         return $this->belongsTo(Order::class);
@@ -28,5 +33,11 @@ class OrderItem extends Model
     public function product()
     {
         return $this->belongsTo(Products::class);
+    }
+    
+    // Helper method to get subtotal
+    public function getSubtotal()
+    {
+        return $this->price * $this->quantity;
     }
 }

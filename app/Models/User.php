@@ -7,10 +7,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Order;
+use App\Models\Membership;
+use Laravel\Cashier\Billable;
+use HasActiveMembership;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, Billable;
 
     /**
      * The attributes that are mass assignable.
@@ -22,7 +25,6 @@ class User extends Authenticatable
         'email',
         'usertype',
         'password',
-        'usertype',
     ];
 
     /**
@@ -62,11 +64,6 @@ class User extends Authenticatable
     // Membership & Event Registration
     // Add event registration relationships
     // Membership relationship
-    public function membership()
-    {
-        return $this->hasOne(Membership::class)->where('status', 'active')
-                    ->where('end_date', '>', now());
-    }
 
     // Get all memberships (including expired ones)
     public function allMemberships()
@@ -88,13 +85,27 @@ class User extends Authenticatable
     }
 
     // Helper methods
-    public function hasActiveMembership()
+    /**
+     * Check if user has an active membership
+     *
+     * @return bool
+     */
+    public function hasActiveMembership(): bool
     {
         return $this->allMemberships()
                     ->where('status', 'active')
                     ->where('end_date', '>', now())
                     ->exists();
+        
+                    
     }
+
+    public function membership()
+    {
+        return $this->hasOne(Membership::class)->where('status', 'active')
+                    ->where('end_date', '>', now());
+    }
+
 
     public function isRegisteredForEvent($eventId)
     {
@@ -102,6 +113,12 @@ class User extends Authenticatable
                     ->where('events_id', $eventId)
                     ->where('status', 'registered')
                     ->exists();
+    }
+    
+    // connect to membership cotroller to verify subscribe user or not
+    public function memberships()
+    {
+        return $this->hasMany(Membership::class);
     }
 
 }

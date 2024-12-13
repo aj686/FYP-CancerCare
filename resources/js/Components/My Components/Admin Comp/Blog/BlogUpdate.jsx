@@ -1,11 +1,12 @@
 import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
-import RichTextEditor from "./RichTextEditor";
-import { useForm } from "@inertiajs/react";
-import { Inertia } from "@inertiajs/inertia";
+import { useForm, router } from "@inertiajs/react";
 import { PencilIcon } from "lucide-react";
 import { useState } from "react";
+import { useEffect } from "react";
+import { lazy, Suspense } from 'react';
+const RichTextEditor = lazy(() => import('./RichTextEditor'));
 
 export default function BlogUpdate({ className, blogId, blog }) {
     const [imagePreview, setImagePreview] = useState(blog.thumbnail ? `/storage/${blog.thumbnail}` : null);
@@ -26,7 +27,7 @@ export default function BlogUpdate({ className, blogId, blog }) {
         tags: blog.tags,
         author: blog.author,
         date: blog.date,
-        active: blog.active,
+        active: blog.active.toString(),  
         _method: 'PATCH'
     });
 
@@ -67,7 +68,8 @@ export default function BlogUpdate({ className, blogId, blog }) {
             formData.append(key, editData[key]);
         });
 
-        Inertia.post(`/admin/update-blog/${blog.id}`, formData, {
+        // Replace Inertia.post with router.post
+        router.post(`/admin/update-blog/${blog.id}`, formData, {
             forceFormData: true,
             onSuccess: () => {
                 document.getElementById(blogId).close();
@@ -151,10 +153,12 @@ export default function BlogUpdate({ className, blogId, blog }) {
                             {/* Content */}
                             <div>
                                 <InputLabel htmlFor="editor-content" value="Content *" />
-                                <RichTextEditor 
-                                    content={editData.content}
-                                    onChange={(newContent) => setEditData("content", newContent)}
-                                />
+                                <div className="mt-1">
+                                    <RichTextEditor 
+                                        content={editData.content || ''}
+                                        onChange={(newContent) => setEditData("content", newContent)}
+                                    />
+                                </div>
                                 <InputError className="mt-2" message={errors.content} />
                             </div>
 

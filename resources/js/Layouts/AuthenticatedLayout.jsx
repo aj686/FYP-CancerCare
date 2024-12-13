@@ -55,6 +55,7 @@ export default function DashboardLayout({ children }) {
                             <SidebarLink href={route('admin.orders')} icon={ShoppingCart}>Orders</SidebarLink>
                             <SidebarLink href={route('admin.payments')} icon={CreditCard}>Payments</SidebarLink>
                             <SidebarLink href={route('admin.blogs')} icon={FileText}>Blog</SidebarLink>
+                            <SidebarLink href={route('admin.stories')} icon={FileText}>Stories</SidebarLink>
                             <SidebarLink href={route('admin.registration')} icon={Calendar}>Event Registration</SidebarLink>
                             <SidebarLink href={route('admin.membership')} icon={Ticket}>Membership</SidebarLink>
                         </div>
@@ -63,6 +64,11 @@ export default function DashboardLayout({ children }) {
                             <SidebarLink href={route('dashboard')} icon={LayoutDashboard}>Dashboard</SidebarLink>
                             <SidebarLink href={route('user.bookings')} icon={Calendar}>Bookings</SidebarLink>
                             <SidebarLink href={route('user.orders')} icon={ShoppingCart}>Orders</SidebarLink>
+                            {user.has_active_membership && (
+                                <SidebarLink href={route('stories.my-stories')} icon={FileText}>
+                                    Your Stories
+                                </SidebarLink>
+                            )}
                             <SidebarLink href={route('home-page')} icon={Home}>Homepage</SidebarLink>
                         </div>
                     )}

@@ -33,6 +33,7 @@ export default function Payment({ auth, payments, count }) {
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment ID</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stripe ID</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User ID</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order Number</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
@@ -45,6 +46,7 @@ export default function Payment({ auth, payments, count }) {
                                             <tr key={payment.id} className="hover:bg-gray-50">
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{payment.id}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{payment.order_id}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{payment.stripe_session_id}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="font-medium text-gray-900">{payment.user_id}</div>
                                                 </td>
@@ -57,10 +59,10 @@ export default function Payment({ auth, payments, count }) {
                                                     <div className="flex space-x-2">
                                                         {/* View Detail */}
                                                         <PaymentView
-                                                            key={order.id}
+                                                            key={payment.id}
                                                             className="text-blue-600 hover:text-blue-900"
-                                                            orderId={`my_modal_2${payment.id}`}
-                                                            order={order}
+                                                            paymentId={`my_modal_2${payment.id}`}
+                                                            payment={payment}
                                                         >
                                                             <PencilIcon className="h-5 w-5" />
                                                             <span>View</span>

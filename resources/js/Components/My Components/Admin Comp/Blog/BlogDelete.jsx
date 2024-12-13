@@ -2,14 +2,14 @@ import { useForm } from "@inertiajs/react";
 import { TrashIcon } from "lucide-react";
 
 export default function BlogDelete({ className, blogId, blog }) {
-    const { data, processing, reset } = useForm({
+    const { data, processing, reset, delete: destroy } = useForm({  // Add delete: destroy
         blog_id: blog.id,
         title: blog.title
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route('admin.blogs.destroy', blog.id), {
+        destroy(route('admin.blogs.delete', blog.id), {  // Change to match route name
             preserveScroll: true,
             onSuccess: () => {
                 document.getElementById(blogId).close();

@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Stripe\Stripe;
-use Stripe\Checkout\Session;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
@@ -13,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Log;
+use Stripe\{Stripe, Webhook, Checkout\Session};
 
 
 class PaymentController extends Controller
@@ -57,7 +56,7 @@ class PaymentController extends Controller
                     'quantity' => 1,
                 ]],
                 'mode' => 'payment',
-                'success_url' => route('payment.success', ['order_id' => $order->id, 'session_id' => '{CHECKOUT_SESSION_ID}']), // Redirect after success
+                'success_url' => route('payment.success', ['order_id' => $order->id]) . '?session_id={CHECKOUT_SESSION_ID}', // Redirect after success
                 // 'cancel_url' => route('payment.cancel', ['order' => $order->id]),   // Redirect after cancel
                 'cancel_url' => route('payment.cancel', ['order_id' => $order->id,])
             ]);
@@ -72,68 +71,58 @@ class PaymentController extends Controller
 
     // Payment success page (optional, used for redirection)
     public function paymentSuccess(Request $request, $order_id) {
+        try {
+            // Find the order
+            $order = Order::findOrFail($order_id);
+            $sessionId = $request->get('session_id');
+            
+            if (!$sessionId) {
+                return Inertia::render('Checkout/Success', [
+                    'error' => 'Session ID is required'
+                ]);
+            }
         
-        // Retrieve the order using the order_id
-        $order = Order::findOrFail($order_id);
-    
-        // Update the order status to 'paid'
-        if ($order->status === 'unpaid') {
-            $order->status = 'paid';
-            $order->save();
-        }
-    
-        // Retrieve session_id from the request query parameter
-        $sessionId = $request->get('session_id');
-
-        if (!$sessionId) {
-            return response()->json(['error' => 'Session ID is required'], 400);
-        }
-
-        // Log the session_id to Debugbar
-        Debugbar::info($sessionId);
-
-        // You can also log the whole request for more details
-        Debugbar::info($request->all());
-
-        // Now you can use $sessionId to retrieve the Stripe session
-        $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
-        $session = $stripe->checkout->sessions->retrieve($sessionId);
-
-        Debugbar::info($session);
-    
-        // If the user is authenticated, create a payment record for the logged-in user
-        if (Auth::check()) {
-            $user = Auth::user();
-            Payment::create([
-                'order_id' => $order->id,
-                'ordernumber' => $order->ordernumber,
-                'user_id' => $user->id, // Authenticated user
-                'stripe_session_id' => $session->id,
-                'payment_method' => $session->payment_method_types[0],
-                'amount' => $order->total_price,
-                'payment_status' => $session->payment_status,
-                'payment_date' => now(),
+            // Initialize Stripe and get session details
+            $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
+            $session = $stripe->checkout->sessions->retrieve($sessionId);
+            
+            // Only update if payment was successful and order is still pending
+            if ($session->payment_status === 'paid' && $order->status === 'pending') {
+                // Update order status
+                $order->update([
+                    'status' => 'paid',
+                    'shipping_status' => 'processing' // Optional: Update shipping status
+                ]);
+                
+                // Create payment record
+                Payment::create([
+                    'order_id' => $order->id,
+                    'ordernumber' => $order->ordernumber,
+                    'user_id' => Auth::check() ? Auth::id() : null,
+                    'stripe_session_id' => $session->id,
+                    'payment_method' => $session->payment_method_types[0],
+                    'amount' => $order->total_price,
+                    'payment_status' => $session->payment_status,
+                    'payment_date' => now(),
+                ]);
+            }
+        
+            return Inertia::render('Checkout/Success', [
+                'orderId' => $order->id,
+                'message' => 'Payment successful!',
+                'order' => [
+                    'total_price' => $order->total_price,
+                    'status' => $order->status,
+                    'ordernumber' => $order->ordernumber
+                ]
             ]);
-        } else {
-            // For guest users, create a payment record with null for user_id
-            Payment::create([
-                'order_id' => $order->id,
-                'ordernumber' => $order->ordernumber,
-                'user_id' => null, // Null for guest
-                'stripe_session_id' => $session->id,
-                'payment_method' => $session->payment_method_types[0],
-                'amount' => $order->total_price,
-                'payment_status' => $session->payment_status,
-                'payment_date' => now(),
+    
+        } catch (\Exception $e) {
+            Log::error('Payment success error: ' . $e->getMessage());
+            return Inertia::render('Checkout/Success', [
+                'error' => 'There was an error processing your payment confirmation'
             ]);
         }
-    
-        // Render the PaymentSuccess React component using Inertia and pass the order details
-        return Inertia::render('/Checkout/PaymentSuccess', [
-            'order_id' => $order->id,
-            'message' => 'Payment successful!',
-            'order' => $order, // Pass order details for display if necessary
-        ]);
     }
    
 
@@ -200,4 +189,121 @@ class PaymentController extends Controller
             return back()->with('error', 'Failed to update order status. Error: ' . $e->getMessage());
         }
     }
+
+    // public function getInvoice(Payment $payment)
+    // {
+    //     try {
+    //         if (!$payment->stripe_session_id) {
+    //             return response()->json(['error' => 'No Stripe session found'], 404);
+    //         }
+
+    //         // Retrieve the session from Stripe
+    //         $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
+    //         $session = $stripe->checkout->sessions->retrieve($payment->stripe_session_id);
+            
+    //         // Get the invoice
+    //         if ($session->invoice) {
+    //             $invoice = $stripe->invoices->retrieve($session->invoice);
+                
+    //             // Store invoice URL if not already stored
+    //             if (!$payment->stripe_invoice_url) {
+    //                 $payment->update([
+    //                     'stripe_invoice_id' => $session->invoice,
+    //                     'stripe_invoice_url' => $invoice->hosted_invoice_url,
+    //                     'invoice_pdf' => $invoice->invoice_pdf
+    //                 ]);
+    //             }
+
+    //             // Redirect to invoice URL
+    //             return redirect($payment->stripe_invoice_url);
+    //         }
+
+    //         return back()->with('error', 'No invoice found');
+    //     } catch (\Exception $e) {
+    //         Log::error('Invoice retrieval error', ['error' => $e->getMessage()]);
+    //         return back()->with('error', 'Failed to retrieve invoice');
+    //     }
+    // }
+
+    // public function handleWebhook(Request $request)
+    // {
+    //     $payload = $request->getContent();
+    //     $sig_header = $request->header('Stripe-Signature');
+
+    //     try {
+    //         $event = Webhook::constructEvent(
+    //             $payload,
+    //             $sig_header,
+    //             config('services.stripe.webhook_secret')
+    //         );
+    //     } catch (\Exception $e) {
+    //         Log::error('Webhook Error', ['error' => $e->getMessage()]);
+    //         return response()->json(['error' => $e->getMessage()], 400);
+    //     }
+
+    //     try {
+    //         switch ($event->type) {
+    //             case 'checkout.session.completed':
+    //                 $session = $event->data->object;
+    //                 $invoice = \Stripe\Invoice::retrieve($session->invoice);
+    //                 $payment = Payment::where('stripe_session_id', $session->id)->firstOrFail();
+                    
+    //                 $payment->update([
+    //                     'status' => 'completed',
+    //                     'stripe_invoice_id' => $session->invoice,
+    //                     'stripe_invoice_url' => $invoice->hosted_invoice_url,
+    //                     'invoice_pdf' => $invoice->invoice_pdf
+    //                 ]);
+
+    //                 // Update order status if needed
+    //                 if ($payment->order) {
+    //                     $payment->order->update([
+    //                         'status' => 'paid',
+    //                         'shipping_status' => 'processing'
+    //                     ]);
+    //                 }
+    //                 break;
+
+    //             case 'invoice.payment_succeeded':
+    //                 $invoice = $event->data->object;
+    //                 $payment = Payment::where('stripe_invoice_id', $invoice->id)->first();
+    //                 if ($payment) {
+    //                     $payment->update([
+    //                         'stripe_invoice_url' => $invoice->hosted_invoice_url,
+    //                         'invoice_pdf' => $invoice->invoice_pdf
+    //                     ]);
+    //                 }
+    //                 break;
+
+    //             case 'invoice.payment_failed':
+    //                 $invoice = $event->data->object;
+    //                 $payment = Payment::where([
+    //                     'stripe_invoice_id' => $invoice->id,
+    //                     'status' => 'completed'
+    //                 ])->first();
+
+    //                 if ($payment) {
+    //                     $payment->update(['status' => 'failed']);
+    //                 }
+    //                 break;
+
+    //             case 'invoice.created':
+    //                 $invoice = $event->data->object;
+    //                 $payment = Payment::where('stripe_invoice_id', $invoice->id)->first();
+    //                 Log::info('Invoice Data', ['invoice' => $invoice]);
+                    
+    //                 if ($payment) {
+    //                     $payment->update([
+    //                         'stripe_invoice_url' => $invoice->hosted_invoice_url
+    //                     ]);
+    //                 }
+    //                 break;
+    //         }
+
+    //         return response()->json(['status' => 'success']);
+    //     } catch (\Exception $e) {
+    //         Log::error('Webhook Processing Error', ['error' => $e->getMessage()]);
+    //         return response()->json(['error' => $e->getMessage()], 500);
+    //     }
+    // }
 }

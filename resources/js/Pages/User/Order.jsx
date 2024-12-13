@@ -7,10 +7,24 @@ import OrderDetails from './UserComp/OrderDetails';
 export default function Order({ auth, orders, count }) {
     const [selectedOrder, setSelectedOrder] = useState(null);
     
-    const handlePrintInvoice = (order) => {
-        // Open invoice in new window for printing
-        const printWindow = window.open(`/invoice/${order.id}`, '_blank');
-        printWindow.focus();
+    const handlePrintInvoice = async (order) => {
+        try {
+            // Get the payment for this order
+            const response = await fetch(`/payment/${order.id}/invoice`);
+            
+            if (!response.ok) {
+                // If no Stripe invoice, fall back to your custom invoice
+                const printWindow = window.open(`/invoice/${order.id}`, '_blank');
+                printWindow.focus();
+            }
+            
+            // Response will be a redirect to Stripe invoice URL
+        } catch (error) {
+            console.error('Error fetching invoice:', error);
+            // Fall back to custom invoice on error
+            const printWindow = window.open(`/invoice/${order.id}`, '_blank');
+            printWindow.focus();
+        }
     };
 
     return (
@@ -93,6 +107,12 @@ export default function Order({ auth, orders, count }) {
                                                             <PrinterIcon className="h-5 w-5" />
                                                             <span>Invoice</span>
                                                         </button>
+                                                        {/* <OrderInvoiceButton 
+                                                            order={{
+                                                                ...order,
+                                                                setSelectedOrder // Pass the setter function
+                                                            }} 
+                                                        /> */}
                                                     </div>
                                                 </td>
                                             </tr>

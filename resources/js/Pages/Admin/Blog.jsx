@@ -5,6 +5,7 @@ import BlogAdd from '@/Components/My Components/Admin Comp/Blog/BlogAdd';
 import BlogDelete from '@/Components/My Components/Admin Comp/Blog/BlogDelete';
 import BlogUpdate from '@/Components/My Components/Admin Comp/Blog/BlogUpdate';
 
+
 export default function Blog({ auth, blogs, count }) {
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('en-US', {

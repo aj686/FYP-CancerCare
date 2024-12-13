@@ -84,6 +84,7 @@ class CheckoutController extends Controller
                 'country' => $validatedUser['country'],
                 'phonenumber' => $validatedUser['phonenumber'],
                 'total_price' => $this->calculateTotalPrice($cart),
+                'status' => 'pending',
                 'shipping_status' => 'pending',  // Default order status
                 'payment_method' => 'stripe', // Assume Stripe for now
             ]);
@@ -106,6 +107,7 @@ class CheckoutController extends Controller
                 'country' => $validatedUser['country'],
                 'phonenumber' => $validatedUser['phonenumber'],
                 'total_price' => $this->calculateTotalPrice($cart),
+                'status' => 'pending', 
                 'shipping_status' => 'pending',  // Default order status
                 'payment_method' => 'stripe', // Payment method (e.g., Stripe)
             ]);
@@ -141,12 +143,11 @@ class CheckoutController extends Controller
 
             // Check if the session was created successfully and return the payment URL
             if ($stripeSession && isset($stripeSession->url)) {
-                // return response()->json(['payment_url' => $stripeSession->url]);
-                // return redirect($stripeSession->url);
                 return Inertia::location($stripeSession->url);
-
             } else {
-                return response()->json(['error' => 'Unable to create payment session'], 500);
+                return Inertia::render('Checkout', [
+                    'error' => 'Unable to create payment session'
+                ]);
             }
         }
 

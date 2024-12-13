@@ -2,20 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Membership extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'user_id',
+        'plan_id',
         'start_date',
         'end_date',
         'status',
         'amount',
-        'stripe_subscription_id'
+        'stripe_session_id',
+        'stripe_invoice_id',
+        'stripe_invoice_url'
+
     ];
 
     protected $casts = [
@@ -28,8 +29,8 @@ class Membership extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function isActive()
+    public function plan()
     {
-        return $this->status === 'active' && $this->end_date > now();
+        return $this->belongsTo(Plan::class);
     }
 }

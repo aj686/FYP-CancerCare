@@ -6,19 +6,15 @@ export default function ViewEvent({ event, isRegistered: initialIsRegistered, ha
     const [isRegistered, setIsRegistered] = React.useState(initialIsRegistered);
     const { post, delete: destroy, processing } = useForm();
 
+    // Preserve all existing functions
     const handleRegister = () => {
-        if (!auth?.user) {
-            return;
-        }
-
-        // Check if event requires membership
+        if (!auth?.user) return;
         if (event.price > 0 && !hasMembership) {
             if (confirm('This event requires membership. Would you like to subscribe for RM25/month to access all events?')) {
                 window.location.href = route('membership.subscribe');
             }
             return;
         }
-
         if (confirm('Would you like to register for this event?')) {
             post(route('events.register', event.id), {
                 onSuccess: (page) => {
@@ -56,44 +52,44 @@ export default function ViewEvent({ event, isRegistered: initialIsRegistered, ha
     const isFull = registeredCount >= event.participant_count;
 
     const renderEventDetails = () => (
-        <div className="md:w-3/5 p-6">
-            <h1 className="text-3xl font-bold mb-4">{event.title}</h1>
+        <div className="md:w-3/5 p-8">
+            <h1 className="text-3xl font-bold mb-4 text-purpleTua">{event.title}</h1>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div className="flex items-center">
-                    <Calendar className="w-5 h-5 mr-2 text-gray-500" />
-                    <span>{formatDate(event.start_date)}</span>
+                    <Calendar className="w-5 h-5 mr-2 text-purpleMid" />
+                    <span className="text-gray-700">{formatDate(event.start_date)}</span>
                 </div>
                 <div className="flex items-center">
-                    <Clock className="w-5 h-5 mr-2 text-gray-500" />
-                    <span>{event.event_time}</span>
+                    <Clock className="w-5 h-5 mr-2 text-purpleMid" />
+                    <span className="text-gray-700">{event.event_time}</span>
                 </div>
                 <div className="flex items-center">
-                    <MapPin className="w-5 h-5 mr-2 text-gray-500" />
-                    <span>{event.location}</span>
+                    <MapPin className="w-5 h-5 mr-2 text-purpleMid" />
+                    <span className="text-gray-700">{event.location}</span>
                 </div>
                 <div className="flex items-center">
-                    <Tag className="w-5 h-5 mr-2 text-gray-500" />
-                    <span>{event.price > 0 ? `RM ${event.price}` : 'Free'}</span>
+                    <Tag className="w-5 h-5 mr-2 text-purpleMid" />
+                    <span className="text-gray-700">{event.price > 0 ? `RM ${event.price}` : 'Free'}</span>
                 </div>
             </div>
 
-            <div className="prose max-w-none mb-6">
-                <h2 className="text-xl font-semibold mb-2">About This Event</h2>
+            <div className="prose max-w-none mb-8">
+                <h2 className="text-xl font-semibold mb-3 text-purpleTua">About This Event</h2>
                 <p className="text-gray-600">{event.description}</p>
             </div>
 
-            <div className="mb-6">
+            <div className="mb-8">
                 <div className="flex items-center justify-between mb-2">
-                    <span>
-                        <Users className="w-4 h-4 inline mr-1" />
+                    <span className="flex items-center text-gray-700">
+                        <Users className="w-4 h-4 mr-1 text-purpleMid" />
                         {spotsLeft} spots remaining
                     </span>
-                    <span>{Math.round((registeredCount / event.participant_count) * 100)}% Full</span>
+                    <span className="text-gray-700">{Math.round((registeredCount / event.participant_count) * 100)}% Full</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                        className="bg-indigo-600 rounded-full h-2"
+                        className="bg-gradient-to-r from-purpleMid to-purpleTua rounded-full h-2 transition-all duration-300"
                         style={{
                             width: `${(registeredCount / event.participant_count) * 100}%`
                         }}
@@ -104,8 +100,8 @@ export default function ViewEvent({ event, isRegistered: initialIsRegistered, ha
             {renderActionButton()}
 
             {isRegistered && (
-                <div className="mt-4 bg-green-50 border-l-4 border-green-400 p-4">
-                    <p className="text-sm text-green-700">
+                <div className="mt-4 bg-purpleMuda/20 border-l-4 border-purpleTua p-4 rounded-r-lg">
+                    <p className="text-sm text-purpleTua">
                         You are registered for this event! We look forward to seeing you there.
                     </p>
                 </div>
@@ -118,7 +114,7 @@ export default function ViewEvent({ event, isRegistered: initialIsRegistered, ha
             return (
                 <Link
                     href={route('login')}
-                    className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
+                    className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-gradient-to-r from-purpleMid to-purpleTua rounded-full hover:shadow-lg transition-all duration-300"
                 >
                     Login to Register
                 </Link>
@@ -130,7 +126,7 @@ export default function ViewEvent({ event, isRegistered: initialIsRegistered, ha
                 <button
                     onClick={handleCancel}
                     disabled={processing}
-                    className="w-full px-6 py-3 text-base font-medium text-white bg-red-600 rounded-md hover:bg-red-700 disabled:opacity-50"
+                    className="w-full px-6 py-3 text-base font-medium text-white bg-red-500 rounded-full hover:bg-red-600 disabled:opacity-50 transition-colors duration-300"
                 >
                     Cancel Registration
                 </button>
@@ -141,32 +137,31 @@ export default function ViewEvent({ event, isRegistered: initialIsRegistered, ha
             return (
                 <button 
                     disabled 
-                    className="w-full px-6 py-3 text-base font-medium text-white bg-gray-400 rounded-md cursor-not-allowed"
+                    className="w-full px-6 py-3 text-base font-medium text-white bg-gray-400 rounded-full cursor-not-allowed"
                 >
                     Event Full
                 </button>
             );
         }
 
-        // Modified this section for better UX with paid events
         if (event.price > 0 && !hasMembership) {
             return (
                 <div className="space-y-4">
                     <button 
                         onClick={handleRegister}
                         disabled={processing}
-                        className="w-full px-6 py-3 text-base font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                        className="w-full px-6 py-3 text-base font-medium text-white bg-gradient-to-r from-purpleMid to-purpleTua rounded-full hover:shadow-lg disabled:opacity-50 transition-all duration-300"
                     >
                         Register for Event
                     </button>
                     
-                    <div className="border rounded-lg p-4 space-y-4 bg-blue-50">
-                        <p className="text-sm text-blue-700">
+                    <div className="border border-purpleMuda rounded-xl p-4 space-y-4 bg-purpleMuda/10">
+                        <p className="text-sm text-purpleTua">
                             Note: This is a premium event. You'll need to subscribe to our membership to complete registration.
                         </p>
                         <div className="space-y-2">
-                            <h4 className="font-semibold">Membership Benefits:</h4>
-                            <ul className="list-disc pl-5 space-y-1 text-sm">
+                            <h4 className="font-semibold text-purpleTua">Membership Benefits:</h4>
+                            <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
                                 <li>Access to all premium events</li>
                                 <li>Priority registration</li>
                                 <li>Exclusive content and resources</li>
@@ -175,7 +170,7 @@ export default function ViewEvent({ event, isRegistered: initialIsRegistered, ha
                         </div>
                         <Link
                             href={route('membership.subscribe')}
-                            className="inline-flex w-full items-center justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
+                            className="inline-flex w-full items-center justify-center px-6 py-3 text-base font-medium text-purpleTua bg-yellow-300 rounded-full hover:bg-yellow-400 transition-colors duration-300"
                         >
                             Subscribe Now (RM25/month)
                         </Link>
@@ -188,7 +183,7 @@ export default function ViewEvent({ event, isRegistered: initialIsRegistered, ha
             <button 
                 onClick={handleRegister}
                 disabled={processing}
-                className="w-full px-6 py-3 text-base font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                className="w-full px-6 py-3 text-base font-medium text-white bg-gradient-to-r from-purpleMid to-purpleTua rounded-full hover:shadow-lg disabled:opacity-50 transition-all duration-300"
             >
                 Register Now
             </button>
@@ -199,13 +194,13 @@ export default function ViewEvent({ event, isRegistered: initialIsRegistered, ha
         <div className="max-w-7xl mx-auto p-6">
             <Link
                 href={route('getInvolved-page')}
-                className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6"
+                className="inline-flex items-center text-purpleTua hover:text-purpleMid mb-6 transition-colors duration-300"
             >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Events
             </Link>
 
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-purpleMuda/20">
                 <div className="flex flex-col md:flex-row">
                     <div className="md:w-2/5 relative">
                         <img
@@ -215,7 +210,7 @@ export default function ViewEvent({ event, isRegistered: initialIsRegistered, ha
                             style={{ minHeight: '400px' }}
                         />
                         {event.price === 0 && (
-                            <div className="absolute top-4 left-4 bg-green-500 text-white px-4 py-2 rounded-full text-sm font-semibold">
+                            <div className="absolute top-4 left-4 bg-gradient-to-r from-yellow-300 to-yellow-400 text-purpleTua px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
                                 Free Entry!
                             </div>
                         )}

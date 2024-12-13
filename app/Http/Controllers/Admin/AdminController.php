@@ -14,6 +14,7 @@ use App\Models\Blogs;
 use App\Models\EventRegistration;
 use App\Models\Membership;
 use App\Models\Plan;
+use App\Models\UserStory;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB; // Add this import
@@ -342,6 +343,8 @@ class AdminController extends Controller
     public function blogs() {
         $blogs = Blogs::all();
         $count = $blogs->count();
+        
+        Log::info('Blogs data:', ['count' => $count, 'blogs' => $blogs->toArray()]);
 
         return Inertia::render('Admin/Blog', [
             'blogs' => $blogs,
@@ -391,9 +394,9 @@ class AdminController extends Controller
         
     }
     // RESEARCH BLOG - UPDATE
-    public function updateBlogs(Request $request, $blog_id) {
-
-        $blog = Blogs::findOrFail($blog_id);Log::info('Blog update request received', [
+    public function updateBlogs(Request $request, $blog_id)
+    {
+        Log::info('Blog update request received', [
             'blog_id' => $blog_id,
             'request_data' => $request->except('thumbnail')
         ]);
@@ -413,30 +416,22 @@ class AdminController extends Controller
                 'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
             ]);
 
-            // Handle thumbnail upload if new file is provided
             if ($request->hasFile('thumbnail')) {
-                // Delete old thumbnail
+                // Delete old thumbnail if it exists
                 if ($blog->thumbnail) {
-                    $oldImagePath = public_path('storage/' . $blog->thumbnail);
-                    if (file_exists($oldImagePath)) {
-                        unlink($oldImagePath);
-                    }
+                    Storage::delete('public/' . $blog->thumbnail);
                 }
                 
                 // Store new thumbnail
-                $image = $request->file('thumbnail');
-                $imageName = time() . '.' . $image->getClientOriginalExtension();
-                $image->move(public_path('storage/thumbnail'), $imageName);
-                $validated['thumbnail'] = 'thumbnail/' . $imageName;
+                $path = $request->file('thumbnail')->store('public/thumbnail');
+                $validated['thumbnail'] = str_replace('public/', '', $path);
             }
 
             $blog->update($validated);
 
-            Log::info('Blog updated successfully', [
-                'blog_id' => $blog_id
-            ]);
+            Log::info('Blog updated successfully', ['blog_id' => $blog_id]);
 
-            return back()->with('message', 'Blog updated successfully!');
+            return redirect()->back()->with('success', 'Blog updated successfully!');
 
         } catch (\Exception $e) {
             Log::error('Error updating blog', [
@@ -445,17 +440,24 @@ class AdminController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
 
-            return back()->withErrors(['error' => 'Failed to update blog'])->withInput();
-        }
-
-        
-        
+            return redirect()->back()
+                ->withErrors(['error' => 'Failed to update blog: ' . $e->getMessage()])
+                ->withInput();
+        } 
     }
+    
     // RESEARCH BLOG - DELETE
-    public function destroyBlogs(Blogs $blog, $blog_id) {
-        $blogId = $blog->findOrFail($blog_id);
-        $blogId->delete();
-        return back()->with('message', 'Blog deleted successfully');
+    public function destroyBlogs($id) {  // Simplify parameter
+        $blog = Blogs::findOrFail($id);  // Find blog directly
+        
+        // Delete the blog's thumbnail if it exists
+        if ($blog->thumbnail) {
+            Storage::delete('public/' . $blog->thumbnail);
+        }
+        
+        $blog->delete();
+        
+        return redirect()->back()->with('message', 'Blog deleted successfully');
     }
 
     // Event Registrations
@@ -538,5 +540,88 @@ class AdminController extends Controller
         return back()->with('message', 'Plan deleted successfully');
     }
 
+    // User Story for membership user
+    public function stories() 
+    {
+        $stories = UserStory::with('user')
+            ->latest()
+            ->get();
+        $count = $stories->count();
+        
+        return Inertia::render('Admin/Story', [
+            'stories' => $stories,
+            'count' => $count,
+        ]);
+    }
+
+    public function viewStory($id) 
+    {
+        $story = UserStory::with('user')->findOrFail($id);
+        
+        return Inertia::render('Admin/Story/StoryView', [
+            'story' => $story,
+        ]);
+    }
+
+    public function updateStoryStatus(Request $request, $story_id)
+    {
+        Log::info('Story status update request received', [
+            'story_id' => $story_id,
+            'request_data' => $request->all()
+        ]);
+
+        try {
+            $story = UserStory::findOrFail($story_id);
+
+            $validated = $request->validate([
+                'status' => 'required|in:pending,approved,rejected',
+                'admin_notes' => 'nullable|string|max:500'
+            ]);
+
+            $story->update([
+                'status' => $validated['status'],
+                'admin_notes' => $validated['admin_notes'],
+                'approved_at' => $validated['status'] === 'approved' ? now() : null
+            ]);
+
+            Log::info('Story status updated successfully', ['story_id' => $story_id]);
+
+            return back()->with('message', 'Story status updated successfully');
+
+        } catch (\Exception $e) {
+            Log::error('Error updating story status', [
+                'story_id' => $story_id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return back()
+                ->withErrors(['error' => 'Failed to update story status'])
+                ->withInput();
+        }
+    }
+
+    public function destroyStory($id)
+    {
+        try {
+            $story = UserStory::findOrFail($id);
+            
+            // Delete thumbnail if exists
+            if ($story->thumbnail) {
+                Storage::delete('public/' . $story->thumbnail);
+            }
+            
+            $story->delete();
+            
+            return back()->with('message', 'Story deleted successfully');
+        } catch (\Exception $e) {
+            Log::error('Error deleting story', [
+                'story_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+
+            return back()->withErrors(['error' => 'Failed to delete story']);
+        }
+    }
     
 }

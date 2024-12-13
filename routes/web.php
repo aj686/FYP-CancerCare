@@ -16,6 +16,9 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\EventRegistrationController;
 use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\PlanController;
+use App\Http\Controllers\DonationController;
+use App\Http\Controllers\UserStoryController;
+
 
 
 // HomeController route
@@ -35,7 +38,7 @@ Route::get('/our-research/{title}', [HomeController::class, 'showBlog'])->name('
 Route::get('/about', [HomeController::class, 'about'])->name('about-page');
 
 // Group routes under /cancer-information
-Route::prefix('/cancer-information.guest')->group(function () {
+Route::prefix('/cancer-information')->group(function () {
     // CancerController route nested under cancer-information
     Route::get('/about-cancer', [CancerController::class, 'aboutCancer'])->name('cancer.about');
     Route::get('/cancer-types', [CancerController::class, 'cancerTypes'])->name('cancer.types');
@@ -66,10 +69,31 @@ Route::post('/checkout', [CheckoutController::class, 'createOrder'])->name('chec
 Route::post('/pay-order/{order}', [PaymentController::class, 'payOrderByStripe'])->name('payment.pay');
 Route::get('/payment/success/{order_id}', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
 Route::get('/payment/cancel/{order_id}', [PaymentController::class, 'paymentCancel'])->name('payment.cancel');
+// Route::get('/payment/{payment}/invoice', [PaymentController::class, 'getInvoice'])->name('payment.invoice');
+// Route::post('/webhook/stripe/payment', [PaymentController::class, 'handleWebhook'])->name('payment.webhook');
 
 // Plan routes
 Route::get('/plan', [PlanController::class, 'index'])->name('plan.index');
 
+ // Membership
+ Route::post('/stripe/webhook', [MembershipController::class, 'handleWebhook'])->name('stripe.webhook');
+
+ // Donation
+ // routes/web.php
+// Route::controller(DonationController::class)->group(function () {
+//     Route::get('/donate', 'show')->name('donate.show');
+//     Route::post('/donate/initiate', 'initiateDonation')->name('donation.initiate');
+//     // Remove donation_id parameter from success route
+//     Route::get('/donate/success', 'success')->name('donation.success');
+//     Route::get('/donate/cancel', 'cancel')->name('donation.cancel');
+//     Route::post('/stripe/webhook', 'handleWebhook')->name('donation.webhook');
+// });
+
+Route::get('/donate', [DonationController::class, 'show'])->name('donate.show');
+Route::get('/donate/initiate', [DonationController::class, 'initiateDonation'])->name('donation.initiate');
+Route::get('/donate/success', [DonationController::class, 'success'])->name('donation.success');
+Route::get('/donate/cancel', [DonationController::class, 'cancel'])->name('donation.cancel');
+Route::get('/stripe/webhook', [DonationController::class, 'handleWebhook'])->name('donation.webhook');
 
 
 
@@ -103,9 +127,23 @@ Route::middleware(['auth', 'user'])->group(function () {
     Route::delete('/events/{event}/cancel', [EventRegistrationController::class, 'cancel'])->name('events.cancel');
 
     // Membership routes
-    Route::post('/membership/subscribe/{slug}', [MembershipController::class, 'subscribe'])->name('membership.subscribe');
-    Route::get('/membership/success', [MembershipController::class, 'success'])->name('membership.success');
-    Route::get('/membership/cancel', [MembershipController::class, 'cancel'])->name('membership.cancel');
+    Route::post('membership/subscribe/{plan}', [MembershipController::class, 'subscribe'])->name('membership.subscribe');
+    Route::get('membership/success', [MembershipController::class, 'success'])->name('membership.success');
+    Route::get('membership/cancel', [MembershipController::class, 'cancel'])->name('membership.cancel');
+    
+    // User Story
+    Route::get('/stories', [UserStoryController::class, 'index'])->name('stories.index');
+    Route::get('/stories/{slug}', [UserStoryController::class, 'show'])->name('stories.show');
+
+    // Routes that require membership
+    Route::middleware('membership')->group(function () {
+        Route::get('/user/my-stories', [UserStoryController::class, 'myStories'])->name('stories.my-stories');
+        Route::get('/stories/create/new', [UserStoryController::class, 'create'])->name('stories.create');
+        Route::post('/stories', [UserStoryController::class, 'store'])->name('stories.store');
+        Route::get('/stories/{story}/edit', [UserStoryController::class, 'edit'])->name('stories.edit');
+        Route::patch('/stories/{story}', [UserStoryController::class, 'update'])->name('stories.update');
+        Route::delete('/stories/{story}', [UserStoryController::class, 'destroy'])->name('stories.destroy');
+    });
 
     // Plan routes
     // Route::get('/plan', [PlanController::class, 'index'])->name('plan.index');
@@ -153,9 +191,6 @@ Route::middleware(['auth', 'user'])->group(function () {
     // Route::get('/checkout', [CheckoutController::class, 'showOrder'])->name('checkout.show');
     // Route::post('/checkout', [CheckoutController::class, 'createOrder'])->name('checkout.create');
 });
-
-// Webhook route (no auth middleware)
-Route::post('/stripe/webhook/membership', [MembershipController::class, 'handleWebhook']);
 
 require __DIR__.'/auth.php';
 
@@ -217,5 +252,11 @@ require __DIR__.'/auth.php';
         Route::post('/admin/create-plans', [AdminController::class, 'createPlans'])->name('admin.plans.create');
         Route::patch('/admin/update-plans/{id}', [AdminController::class, 'updatePlans'])->name('admin.plans.update');
         Route::delete('/admin/destroy-plans/{id}', [AdminController::class, 'destroyPlans'])->name('admin.plans.destroy');
+    
+        // user story
+        Route::get('/admin/stories', [AdminController::class, 'stories'])->name('admin.stories');
+        Route::get('/admin/stories/{id}', [AdminController::class, 'viewStory'])->name('admin.stories.view');
+        Route::patch('/admin/stories/{id}/status', [AdminController::class, 'updateStoryStatus'])->name('admin.stories.update-status');
+        Route::delete('/admin/stories/{id}', [AdminController::class, 'destroyStory'])->name('admin.stories.destroy');
     });
     

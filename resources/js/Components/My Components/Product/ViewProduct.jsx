@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import 'flowbite';
-import { ShoppingCart, Heart } from 'lucide-react';
+import { ShoppingCart, Heart, ChevronRight } from 'lucide-react'; // Added ChevronRight import
 import { Inertia } from '@inertiajs/inertia';
+import Footer from '../Footer';
 
 export default function ViewProduct({ product }) {
     const [quantity, setQuantity] = useState(1);
@@ -10,7 +11,7 @@ export default function ViewProduct({ product }) {
         return (
             <div className="flex h-96 items-center justify-center">
                 <div className="text-center">
-                    <h2 className="text-2xl font-bold text-gray-900">Product not found</h2>
+                    <h2 className="text-2xl font-bold text-purpleTua">Product not found</h2>
                     <p className="mt-2 text-gray-600">The product you're looking for doesn't exist.</p>
                 </div>
             </div>
@@ -33,45 +34,49 @@ export default function ViewProduct({ product }) {
     };
 
     return (
-        <section className="py-8 bg-white dark:bg-gray-900 antialiased">
+        <section className="bg-gradient-to-br from-white to-purpleMuda py-12">
             <div className="max-w-screen-xl px-4 mx-auto">
                 <div className="grid gap-8 lg:grid-cols-2">
-                    {/* Product Image Section */}
+                    {/* Product Image */}
                     <div className="relative">
-                        <div className="aspect-square overflow-hidden rounded-lg bg-gray-100 mb-4">
+                        <div className="aspect-square overflow-hidden rounded-xl bg-white p-6 shadow-md">
                             <img 
                                 src={`/storage/${product.image}`}
                                 alt={product.name}
-                                className="h-full w-full object-contain object-center"
+                                className="h-full w-full object-contain object-center transition-all hover:scale-105"
                             />
                         </div>
                     </div>
 
-                    {/* Product Details Section */}
+                    {/* Product Details */}
                     <div className="flex flex-col">
                         {/* Breadcrumb */}
                         <nav className="mb-4">
                             <ol className="flex items-center space-x-2 text-sm">
                                 <li>
-                                    <a href="/" className="text-gray-500 hover:text-primary-600">Home</a>
+                                    <a href="/" className="text-purpleTua hover:text-purpleMid">Home</a>
                                 </li>
-                                <li className="text-gray-500">/</li>
                                 <li>
-                                    <a href="/products" className="text-gray-500 hover:text-primary-600">Products</a>
+                                    <ChevronRight className="h-4 w-4 text-gray-400" />
                                 </li>
-                                <li className="text-gray-500">/</li>
-                                <li className="text-gray-900 font-medium">{product.name}</li>
+                                <li>
+                                    <a href="/products" className="text-purpleTua hover:text-purpleMid">Products</a>
+                                </li>
+                                <li>
+                                    <ChevronRight className="h-4 w-4 text-gray-400" />
+                                </li>
+                                <li className="text-purpleTua font-medium">{product.name}</li>
                             </ol>
                         </nav>
 
-                        {/* Product Title */}
-                        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-white">
+                        {/* Title */}
+                        <h1 className="text-3xl font-bold text-purpleTua sm:text-4xl">
                             {product.name}
                         </h1>
 
-                        {/* Price Section */}
+                        {/* Price */}
                         <div className="mt-4 flex items-center space-x-4">
-                            <span className="text-3xl font-bold text-gray-900 dark:text-white">
+                            <span className="text-3xl font-bold text-purpleTua">
                                 {formatPrice(product.price)}
                             </span>
                             {product.old_price && (
@@ -82,21 +87,21 @@ export default function ViewProduct({ product }) {
                         </div>
 
                         {/* Description */}
-                        <div className="mt-6 space-y-4">
-                            <p className="text-base text-gray-600 dark:text-gray-400">
+                        <div className="mt-6">
+                            <p className="text-gray-600">
                                 {product.description}
                             </p>
                         </div>
 
                         {/* Quantity Selector */}
-                        <div className="mt-6">
-                            <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                        <div className="mt-8">
+                            <label htmlFor="quantity" className="block text-sm font-medium text-purpleTua">
                                 Quantity
                             </label>
                             <div className="mt-2 flex items-center space-x-3">
                                 <button 
                                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                    className="rounded-md bg-gray-100 p-2 text-gray-600 hover:bg-gray-200"
+                                    className="rounded-full bg-purpleMuda h-8 w-8 text-purpleTua hover:bg-purpleMid hover:text-white transition-colors"
                                 >
                                     -
                                 </button>
@@ -107,11 +112,11 @@ export default function ViewProduct({ product }) {
                                     min="1"
                                     value={quantity}
                                     onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                                    className="w-20 rounded-md border-gray-200 text-center shadow-sm dark:bg-gray-800 dark:border-gray-700"
+                                    className="w-20 rounded-lg border-purpleMid text-center shadow-sm focus:border-purpleTua focus:ring-purpleTua"
                                 />
                                 <button 
                                     onClick={() => setQuantity(quantity + 1)}
-                                    className="rounded-md bg-gray-100 p-2 text-gray-600 hover:bg-gray-200"
+                                    className="rounded-full bg-purpleMuda h-8 w-8 text-purpleTua hover:bg-purpleMid hover:text-white transition-colors"
                                 >
                                     +
                                 </button>
@@ -122,14 +127,14 @@ export default function ViewProduct({ product }) {
                         <div className="mt-8 flex flex-col sm:flex-row gap-4">
                             <button
                                 onClick={handleAddToCart}
-                                className="flex-1 inline-flex justify-center items-center gap-2 rounded-lg bg-primary-700 px-5 py-3 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700"
+                                className="flex-1 inline-flex justify-center items-center gap-2 rounded-full bg-purpleTua px-6 py-3 text-sm font-medium text-white hover:bg-purpleMid transition-colors"
                             >
                                 <ShoppingCart className="h-5 w-5" />
                                 Add to Cart
                             </button>
                             
                             <button
-                                className="flex-1 inline-flex justify-center items-center gap-2 rounded-lg bg-gray-100 px-5 py-3 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                                className="flex-1 inline-flex justify-center items-center gap-2 rounded-full bg-purpleMuda px-6 py-3 text-sm font-medium text-purpleTua hover:bg-purpleMid hover:text-white transition-colors"
                             >
                                 <Heart className="h-5 w-5" />
                                 Add to Wishlist
@@ -137,19 +142,19 @@ export default function ViewProduct({ product }) {
                         </div>
 
                         {/* Additional Info */}
-                        <div className="mt-8 border-t border-gray-200 pt-8 dark:border-gray-700">
+                        <div className="mt-8 border-t border-purpleMuda pt-8">
                             <div className="space-y-4">
                                 <div className="flex items-start">
                                     <div className="ml-3">
-                                        <p className="text-sm font-medium text-gray-900 dark:text-white">Free Delivery</p>
-                                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Enter your postal code for Delivery Availability</p>
+                                        <p className="text-sm font-medium text-purpleTua">Free Delivery</p>
+                                        <p className="mt-1 text-sm text-gray-600">Enter your postal code for Delivery Availability</p>
                                     </div>
                                 </div>
 
                                 <div className="flex items-start">
                                     <div className="ml-3">
-                                        <p className="text-sm font-medium text-gray-900 dark:text-white">Return Delivery</p>
-                                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Free 30 Days Delivery Returns. Details</p>
+                                        <p className="text-sm font-medium text-purpleTua">Return Delivery</p>
+                                        <p className="mt-1 text-sm text-gray-600">Free 30 Days Delivery Returns. Details</p>
                                     </div>
                                 </div>
                             </div>

@@ -6,9 +6,11 @@
         "build": "vite build"
     },
     "devDependencies": {
-        "@headlessui/react": "^2.0.0",
-        "@inertiajs/react": "^1.0.0",
+        "@headlessui/react": "^2.2.0",
+        "@inertiajs/react": "^1.2.0",
+        "@shadcn/ui": "^0.0.4",
         "@tailwindcss/forms": "^0.5.3",
+        "@tailwindcss/typography": "^0.5.15",
         "@vitejs/plugin-react": "^4.2.0",
         "autoprefixer": "^10.4.20",
         "axios": "^1.7.4",
@@ -26,16 +28,22 @@
         "@inertiajs/inertia-react": "^0.8.1",
         "@stripe/react-stripe-js": "^2.8.1",
         "@stripe/stripe-js": "^4.10.0",
+        "@tiptap/extension-color": "^2.10.3",
         "@tiptap/extension-image": "^2.10.3",
         "@tiptap/extension-link": "^2.10.3",
+        "@tiptap/extension-list-item": "^2.10.3",
         "@tiptap/extension-text-align": "^2.10.3",
+        "@tiptap/extension-text-style": "^2.10.3",
+        "@tiptap/extension-underline": "^2.10.3",
         "@tiptap/pm": "^2.10.3",
         "@tiptap/react": "^2.10.3",
         "@tiptap/starter-kit": "^2.10.3",
         "apexcharts": "^4.1.0",
         "draft-js": "^0.11.7",
         "draft-js-export-html": "^1.4.1",
+        "framer-motion": "^11.13.5",
         "lucide-react": "^0.456.0",
+        "react-intersection-observer": "^9.13.1",
         "recharts": "^2.13.3"
     }
 }

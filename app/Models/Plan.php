@@ -20,4 +20,17 @@ class Plan extends Model
     public function getRouteKeyName() {
         return 'slug';
     }
+
+    public function memberships()
+    {
+        return $this->hasMany(Membership::class);
+    }
+
+    /**
+     * Check if the plan is available for subscription
+     */
+    public function isActive(): bool
+    {
+        return !empty($this->stripe_plan);
+    }
 }

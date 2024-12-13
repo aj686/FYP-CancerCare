@@ -6,6 +6,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import ViewEvent from '@/Components/My Components/Involved/ViewEvent';
 import { usePage } from '@inertiajs/react';
 import Dropdown from '@/Components/Dropdown';
+import Footer from '@/Components/My Components/Footer';
 
 export default function EventDetails() {
     const { event, isRegistered, hasMembership, auth } = usePage().props;
@@ -107,17 +108,23 @@ export default function EventDetails() {
 
     return (
         <>
-            <Head title={`${event?.title || 'Event Details'}`} />
-            <Navbar>
-                {renderNavLinks()}
-            </Navbar>
+            <div className="min-h-screen flex flex-col">
+                <Head title={`${event?.title || 'Event Details'}`} />
+                <Navbar>
+                    {renderNavLinks()}
+                </Navbar>
 
-            <ViewEvent 
-                event={event}
-                isRegistered={isRegistered}
-                hasMembership={hasMembership}
-                auth={auth || {}}
-            />
+                <main className="flex-grow">
+                    <ViewEvent 
+                        event={event}
+                        isRegistered={isRegistered}
+                        hasMembership={hasMembership}
+                        auth={auth || {}}
+                    />
+                </main>
+
+                <Footer />
+            </div>
         </>
     );
 }

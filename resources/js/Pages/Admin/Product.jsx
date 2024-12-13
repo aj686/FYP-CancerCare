@@ -54,7 +54,7 @@ export default function Product({ auth, products, count }) {
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.slug}</td>
                                                 <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{product.description}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    ${Number(product.price).toLocaleString()}
+                                                    RM{Number(product.price).toLocaleString()}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.stock_quantity}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
