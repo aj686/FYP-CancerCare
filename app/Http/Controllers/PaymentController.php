@@ -18,51 +18,35 @@ class PaymentController extends Controller
 {
     // Pay order via Stripe Checkout Session// Pay order via Stripe Checkout Session
     public function payOrderByStripe(Order $order) {
-
-        // Get secret key - Initialize Stripe
-        // Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
         Stripe::setApiKey(config('services.stripe.secret'));
-
+    
         try {
-            // Retrieve the order items associated with the order
-            $orderItems = OrderItem::where('order_id', $order->id)->get();
-            
-            // Prepare line items for Stripe
-            $lineItems = $orderItems->map(function ($item) {
-                return [
-                    'price_data' => [
-                        'currency' => 'usd',
-                        'product_data' => [
-                            'name' => 'Order Item #' . $item->id, // Description for the item
-                        ],
-                        'unit_amount' => $item->price * 100, // Price in cents
-                    ],
-                    'quantity' => $item->quantity, // Quantity for this item
-                ];
-            })->toArray();
-
             // Create a Stripe Checkout Session for the order
             $checkoutSession = Session::create([
-                'payment_method_types' => ['card'], // Add more methods if needed
+                'payment_method_types' => ['card'],
                 'customer_email' => $order->email,
                 'line_items' => [[
                     'price_data' => [
-                        'currency' => 'myr', // Use your currency
+                        'currency' => 'myr',
                         'product_data' => [
                             'name' => 'Order #' . $order->ordernumber,
                         ],
-                        'unit_amount' => $order->total_price * 100, // Stripe expects the amount in cents
+                        'unit_amount' => $order->total_price * 100,
                     ],
                     'quantity' => 1,
                 ]],
                 'mode' => 'payment',
-                'success_url' => route('payment.success', ['order_id' => $order->id]) . '?session_id={CHECKOUT_SESSION_ID}', // Redirect after success
-                // 'cancel_url' => route('payment.cancel', ['order' => $order->id]),   // Redirect after cancel
+                'success_url' => route('payment.success', ['order_id' => $order->id]) . '?session_id={CHECKOUT_SESSION_ID}',
                 'cancel_url' => route('payment.cancel', ['order_id' => $order->id,])
             ]);
-
+    
+            // Save the session ID to the order
+            $order->update([
+                'stripe_session_id' => $checkoutSession->id
+            ]);
+    
             return $checkoutSession;
-
+    
         } catch (\Exception $e) { 
             return response()->json(['error' => $e->getMessage()], 500);
         }
@@ -86,24 +70,11 @@ class PaymentController extends Controller
             $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
             $session = $stripe->checkout->sessions->retrieve($sessionId);
             
-            // Only update if payment was successful and order is still pending
+            // Only update order status if payment is successful
             if ($session->payment_status === 'paid' && $order->status === 'pending') {
-                // Update order status
                 $order->update([
                     'status' => 'paid',
-                    'shipping_status' => 'processing' // Optional: Update shipping status
-                ]);
-                
-                // Create payment record
-                Payment::create([
-                    'order_id' => $order->id,
-                    'ordernumber' => $order->ordernumber,
-                    'user_id' => Auth::check() ? Auth::id() : null,
-                    'stripe_session_id' => $session->id,
-                    'payment_method' => $session->payment_method_types[0],
-                    'amount' => $order->total_price,
-                    'payment_status' => $session->payment_status,
-                    'payment_date' => now(),
+                    'shipping_status' => 'processing'
                 ]);
             }
         
@@ -137,7 +108,7 @@ class PaymentController extends Controller
         $order->save();
 
         // Render the PaymentCancel React component and pass the order_id
-        return Inertia::render('/Checkout/PaymentCancel', [
+        return Inertia::render('Checkout/PaymentCancel', [
             'order_id' => $order_id,
             'message' => 'Payment was canceled.',
             'order' => $order, // Pass additional order details if necessary
@@ -225,85 +196,77 @@ class PaymentController extends Controller
     //     }
     // }
 
-    // public function handleWebhook(Request $request)
-    // {
-    //     $payload = $request->getContent();
-    //     $sig_header = $request->header('Stripe-Signature');
+    public function handleWebhook(Request $request)
+    {
+        $payload = $request->getContent();
+        $sig_header = $request->header('Stripe-Signature');
 
-    //     try {
-    //         $event = Webhook::constructEvent(
-    //             $payload,
-    //             $sig_header,
-    //             config('services.stripe.webhook_secret')
-    //         );
-    //     } catch (\Exception $e) {
-    //         Log::error('Webhook Error', ['error' => $e->getMessage()]);
-    //         return response()->json(['error' => $e->getMessage()], 400);
-    //     }
+        try {
+            $event = Webhook::constructEvent(
+                $payload,
+                $sig_header,
+                config('services.stripe.webhook_secret')
+            );
 
-    //     try {
-    //         switch ($event->type) {
-    //             case 'checkout.session.completed':
-    //                 $session = $event->data->object;
-    //                 $invoice = \Stripe\Invoice::retrieve($session->invoice);
-    //                 $payment = Payment::where('stripe_session_id', $session->id)->firstOrFail();
+            Log::info('Webhook received', ['type' => $event->type]);
+
+            switch ($event->type) {
+                case 'checkout.session.completed':
+                    $session = $event->data->object;
                     
-    //                 $payment->update([
-    //                     'status' => 'completed',
-    //                     'stripe_invoice_id' => $session->invoice,
-    //                     'stripe_invoice_url' => $invoice->hosted_invoice_url,
-    //                     'invoice_pdf' => $invoice->invoice_pdf
-    //                 ]);
-
-    //                 // Update order status if needed
-    //                 if ($payment->order) {
-    //                     $payment->order->update([
-    //                         'status' => 'paid',
-    //                         'shipping_status' => 'processing'
-    //                     ]);
-    //                 }
-    //                 break;
-
-    //             case 'invoice.payment_succeeded':
-    //                 $invoice = $event->data->object;
-    //                 $payment = Payment::where('stripe_invoice_id', $invoice->id)->first();
-    //                 if ($payment) {
-    //                     $payment->update([
-    //                         'stripe_invoice_url' => $invoice->hosted_invoice_url,
-    //                         'invoice_pdf' => $invoice->invoice_pdf
-    //                     ]);
-    //                 }
-    //                 break;
-
-    //             case 'invoice.payment_failed':
-    //                 $invoice = $event->data->object;
-    //                 $payment = Payment::where([
-    //                     'stripe_invoice_id' => $invoice->id,
-    //                     'status' => 'completed'
-    //                 ])->first();
-
-    //                 if ($payment) {
-    //                     $payment->update(['status' => 'failed']);
-    //                 }
-    //                 break;
-
-    //             case 'invoice.created':
-    //                 $invoice = $event->data->object;
-    //                 $payment = Payment::where('stripe_invoice_id', $invoice->id)->first();
-    //                 Log::info('Invoice Data', ['invoice' => $invoice]);
+                    // Add debug logging
+                    Log::info('Looking for order with session ID', ['session_id' => $session->id]);
                     
-    //                 if ($payment) {
-    //                     $payment->update([
-    //                         'stripe_invoice_url' => $invoice->hosted_invoice_url
-    //                     ]);
-    //                 }
-    //                 break;
-    //         }
+                    $order = Order::where('stripe_session_id', $session->id)->first();
+                    
+                    // Add more debug logging
+                    if ($order) {
+                        Log::info('Order found', ['order_id' => $order->id]);
+                        
+                        try {
+                            $payment = Payment::create([
+                                'order_id' => $order->id,
+                                'ordernumber' => $order->ordernumber,
+                                'user_id' => $order->user_id,
+                                'stripe_session_id' => $session->id,
+                                'payment_method' => $session->payment_method_types[0],
+                                'amount' => $order->total_price,
+                                'payment_status' => 'completed',
+                                'payment_date' => now()
+                            ]);
+                            
+                            Log::info('Payment created successfully', ['payment_id' => $payment->id]);
 
-    //         return response()->json(['status' => 'success']);
-    //     } catch (\Exception $e) {
-    //         Log::error('Webhook Processing Error', ['error' => $e->getMessage()]);
-    //         return response()->json(['error' => $e->getMessage()], 500);
-    //     }
-    // }
+                            $order->update([
+                                'status' => 'paid',
+                                'shipping_status' => 'processing'
+                            ]);
+                        } catch (\Exception $e) {
+                            Log::error('Payment creation failed', [
+                                'error' => $e->getMessage(),
+                                'order_id' => $order->id
+                            ]);
+                        }
+                    } else {
+                        Log::error('Order not found for session ID', ['session_id' => $session->id]);
+                    }
+                    break;
+
+                default:
+                    Log::info('Unhandled event type: ' . $event->type);
+            }
+
+            return response()->json(['status' => 'success'], 200);
+
+        } catch (\UnexpectedValueException $e) {
+            Log::error('Webhook Error:', ['error' => $e->getMessage()]);
+            return response()->json(['error' => $e->getMessage()], 400);
+        } catch (\Stripe\Exception\SignatureVerificationException $e) {
+            Log::error('Webhook Signature Error:', ['error' => $e->getMessage()]);
+            return response()->json(['error' => $e->getMessage()], 400);
+        } catch (\Exception $e) {
+            Log::error('Webhook Processing Error:', ['error' => $e->getMessage()]);
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 }

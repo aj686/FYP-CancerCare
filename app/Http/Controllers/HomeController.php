@@ -12,24 +12,34 @@ use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
-    public function index() {
+    public function index()
+{
+    $blogs = Blogs::latest()->take(3)->get();
+    $plans = Plan::all();
+    
+    if(Auth::check()) {
+        $user = Auth::user();
+        $activeMembership = $user->membership;
         
-        // if User Logged In // Not Ternary Operator 
-        // if(Auth::check()) {
-        //     $user = Auth::user();
-        //     return Inertia::render('Homepage',[
-        //         'user' => $user,
-        //     ]);
-        // } else {
-        //     return Inertia::render("Homepage");
-        // }
-
-        return Inertia::render("Homepage",[
-            'blogs' => Blogs::all(),
-            'plans' => Plan::all(),
+        return Inertia::render('Homepage', [
+            'blogs' => $blogs,
+            'plans' => $plans,
+            'isGuest' => false,
+            'activeMembership' => $activeMembership ? [
+                'plan_id' => $activeMembership->plan_id,
+                'end_date' => $activeMembership->end_date,
+                'status' => $activeMembership->status
+            ] : null,
         ]);
-
+    } else {
+        return Inertia::render('Homepage', [
+            'blogs' => $blogs,
+            'plans' => $plans,
+            'isGuest' => true,
+            'activeMembership' => null,
+        ]);
     }
+}
 
     // public function indexGuest() {
     //     // if User Not Logged In

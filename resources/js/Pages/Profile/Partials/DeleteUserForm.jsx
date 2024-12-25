@@ -7,7 +7,7 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import TextInput from '@/Components/TextInput';
 import { useForm } from '@inertiajs/react';
 
-export default function DeleteUserForm({ className = '' }) {
+export default function DeleteUserForm({ className = '', isAdmin }) {
     const [confirmingUserDeletion, setConfirmingUserDeletion] = useState(false);
     const passwordInput = useRef();
 
@@ -30,7 +30,10 @@ export default function DeleteUserForm({ className = '' }) {
     const deleteUser = (e) => {
         e.preventDefault();
 
-        destroy(route('profile.destroy'), {
+        // Use different routes based on user type
+        const deleteRoute = isAdmin ? 'admin.profile.destroy' : 'profile.destroy';
+
+        destroy(route(deleteRoute), {
             preserveScroll: true,
             onSuccess: () => closeModal(),
             onError: () => passwordInput.current.focus(),

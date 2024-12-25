@@ -20,9 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Exclude from CSRF
         $middleware->validateCsrfTokens(except: [
-            '/stripe/webhook',
+            '/stripe/webhook/subscription',
             '/stripe/webhook/payment',
-            '/stripe/webhook'
+            '/stripe/webhook/donation'
         ]);
 
 

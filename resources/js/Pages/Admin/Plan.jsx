@@ -31,47 +31,69 @@ export default function Plan({auth, plans, count }) {
                         {/* Table Section */}
                         <div className="p-6">
                             <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-gray-200">
+                            <table className="min-w-full divide-y divide-gray-200">
                                     <thead className="bg-gray-50">
                                         <tr>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Slug</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stripe Plan</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Billing</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Features</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
-                                        { plans.map((plan) => (
+                                        {plans.map((plan) => (
                                             <tr key={plan.id} className="hover:bg-gray-50">
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{plan.id}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{plan.name}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{plan.slug}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="font-medium text-gray-900">{plan.stripe_plan}</div>
+                                                    <div className="font-medium text-gray-900">RM {plan.price}</div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                    {plan.billing_interval === 'year' ? 'Yearly' : 'Monthly'}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="font-medium text-gray-900">{plan.price}</div>
+                                                    <div className="flex flex-col space-y-1 text-sm">
+                                                        {plan.can_comment && (
+                                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                                                                Comments
+                                                            </span>
+                                                        )}
+                                                        {plan.can_access_forum && (
+                                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                                                Forum Access
+                                                            </span>
+                                                        )}
+                                                        {plan.can_access_events && (
+                                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                                                                Events Access
+                                                            </span>
+                                                        )}
+                                                        {plan.can_share_stories && (
+                                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                                Share Stories
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{plan.description}</td> 
-
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{plan.description}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                     <div className="flex space-x-2">
-                                                        {/* Update */}
-                                                        <PlanUpdate className="text-blue-600 hover:text-blue-900"
-                                                            planId = {`my_modal_3${plan.id}`}
-                                                            plan = {plan}
+                                                        <PlanUpdate 
+                                                            className="text-blue-600 hover:text-blue-900"
+                                                            planId={`my_modal_3${plan.id}`}
+                                                            plan={plan}
                                                         >
                                                             <PencilIcon className="h-5 w-5" />
                                                             <span>Edit</span>
                                                         </PlanUpdate>
                                                         
-                                                        {/* Delete */}
-                                                        <PlanDelete className="text-red-600 hover:text-red-900"
-                                                            planId = {`my_modal_4${plan.id}`}
-                                                            plan = {plan}
+                                                        <PlanDelete 
+                                                            className="text-red-600 hover:text-red-900"
+                                                            planId={`my_modal_4${plan.id}`}
+                                                            plan={plan}
                                                         >
                                                             <TrashIcon className="h-5 w-5" />
                                                             <span>Delete</span>

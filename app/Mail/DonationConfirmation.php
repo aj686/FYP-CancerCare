@@ -9,25 +9,17 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Donation;
+use Illuminate\Support\Facades\Log;
 
-class DonationConfirmation extends Mailable
+class DonationConfirmation extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
-
-    public $donation;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(Donation $donation)
+    public function __construct(public Donation $donation)
     {
-        $this->donation = $donation;
-    }
-
-    public function build()
-    {
-        return $this->markdown('emails.donations.confirmation')
-                    ->subject('Thank You for Your Donation');
     }
 
     /**
@@ -36,7 +28,7 @@ class DonationConfirmation extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Donation Confirmation',
+            subject: 'Thank You for Your Donation to CancerCare Connect'
         );
     }
 
@@ -45,20 +37,24 @@ class DonationConfirmation extends Mailable
      */
     public function content(): Content
     {
-        return new Content(
-            view: 'view.name',
-        );
+        try {
+            return new Content(
+                view: 'emails.donations.confirmation',
+                with: [
+                    'donation' => $this->donation
+                ],
+            );
+        } catch (\Exception $e) {
+            Log::error('Email content error: ' . $e->getMessage());
+            throw $e;
+        }
     }
 
     /**
      * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
      */
     public function attachments(): array
     {
         return [];
     }
-
-    
 }

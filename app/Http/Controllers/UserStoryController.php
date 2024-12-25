@@ -48,22 +48,25 @@ class UserStoryController extends Controller
             'request_data' => $request->except('thumbnail')
         ]);
 
+        $validated = $request->validate([
+            'title' => 'required|max:255',
+            'content' => 'required',
+            'cancer_type' => 'required|string|max:100',
+            'thumbnail' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
+
         try {
-            $validated = $request->validate([
-                'title' => 'required|max:255',
-                'content' => 'required',
-                'cancer_type' => 'required|string|max:100',
-                'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
-            ]);
+            // Handle thumbnail upload
+            if ($request->hasFile('thumbnail')) {
+                $image = $request->file('thumbnail');
+                $imageName = time() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('storage/thumbnail'), $imageName);
+                $validated['thumbnail'] = 'thumbnail/' . $imageName;
+            }
 
             $validated['user_id'] = Auth::user()->id;
             $validated['slug'] = Str::slug($request->title);
             $validated['status'] = 'pending';
-
-            if ($request->hasFile('thumbnail')) {
-                $path = $request->file('thumbnail')->store('public/stories');
-                $validated['thumbnail'] = str_replace('public/', '', $path);
-            }
 
             UserStory::create($validated);
 
@@ -85,6 +88,7 @@ class UserStoryController extends Controller
     }
 
     // Finds a specific story by its URL-friendly slug
+    // In UserStoryController.php
     public function show($slug)
     {
         $story = UserStory::with('user')
@@ -98,8 +102,23 @@ class UserStoryController extends Controller
             abort(403);
         }
 
+        // Get other stories (excluding current one)
+        $otherStories = UserStory::with('user')
+            ->where('status', 'approved')
+            ->where('id', '!=', $story->id)
+            ->latest()
+            ->take(5)
+            ->get();
+
         return Inertia::render('StoryShow', [
-            'story' => $story
+            'story' => $story,
+            'otherStories' => $otherStories,
+            'auth' => [
+                'user' => Auth::check() ? [
+                    'id' => Auth::id(),
+                    'usertype' => Auth::user()->usertype
+                ] : null
+            ]
         ]);
     }
 
@@ -115,24 +134,32 @@ class UserStoryController extends Controller
             'request_data' => $request->except('thumbnail')
         ]);
 
+        $validated = $request->validate([
+            'title' => 'required|max:255',
+            'content' => 'required',
+            'cancer_type' => 'required|string|max:100',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
+
         try {
-            $validated = $request->validate([
-                'title' => 'required|max:255',
-                'content' => 'required',
-                'cancer_type' => 'required|string|max:100',
-                'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
-            ]);
+            if ($request->hasFile('thumbnail')) {
+                // Delete old thumbnail if exists
+                if ($story->thumbnail) {
+                    $oldPath = public_path('storage/' . $story->thumbnail);
+                    if (file_exists($oldPath)) {
+                        unlink($oldPath);
+                    }
+                }
+                
+                // Upload new thumbnail
+                $image = $request->file('thumbnail');
+                $imageName = time() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('storage/thumbnail'), $imageName);
+                $validated['thumbnail'] = 'thumbnail/' . $imageName;
+            }
 
             $validated['slug'] = Str::slug($request->title);
-            $validated['status'] = 'pending'; // Reset to pending after edit
-
-            if ($request->hasFile('thumbnail')) {
-                if ($story->thumbnail) {
-                    Storage::delete('public/' . $story->thumbnail);
-                }
-                $path = $request->file('thumbnail')->store('public/stories');
-                $validated['thumbnail'] = str_replace('public/', '', $path);
-            }
+            $validated['status'] = 'pending';
 
             $story->update($validated);
 
@@ -180,6 +207,51 @@ class UserStoryController extends Controller
             ]);
 
             return back()->withErrors(['error' => 'Failed to delete story']);
+        }
+    }
+
+    // Commenting out for now
+    public function showComment($slug)
+    {
+        try {
+            $story = UserStory::with(['user', 'comments.user', 'comments.likes'])
+                ->where('slug', $slug)
+                ->firstOrFail();
+
+            if ($story->status !== 'approved' && 
+                $story->user_id !== Auth::user()?->id && 
+                Auth::user()?->usertype !== 'admin') {
+                abort(403);
+            }
+
+            // Get related stories with the same cancer type
+            $relatedStories = UserStory::with('user')
+                ->where('status', 'approved')
+                ->where('cancer_type', $story->cancer_type)
+                ->where('id', '!=', $story->id)
+                ->latest()
+                ->take(5)
+                ->get();
+
+            return Inertia::render('StoryShow', [
+                'story' => array_merge($story->toArray(), [
+                    'relatedStories' => $relatedStories
+                ]),
+                'auth' => [
+                    'user' => Auth::check() ? [
+                        'id' => Auth::id(),
+                        'usertype' => Auth::user()->usertype,
+                        'membership' => Auth::user()->membership
+                    ] : null
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in showComment:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            abort(500, 'Error loading story');
         }
     }
 }

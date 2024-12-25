@@ -55,9 +55,8 @@ export default function DonationPage() {
         e.preventDefault();
         setError(null);
         
-        post(route('donation.initiate'), {
+        post('/donate/initiate', {  // Direct URL path instead of route helper
             onSuccess: async (response) => {
-                // Inertia will handle the redirect automatically
                 if (response?.error) {
                     setError(response.error);
                 }

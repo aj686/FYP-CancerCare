@@ -11,17 +11,18 @@ export default function Register() {
         email: '',
         password: '',
         password_confirmation: '',
-        userType: '',
         age: '',
-        cancer_type: '',
-        survivorship_status: '',
         phone: '',
-        address: '',
+        address_1: '',
+        address_2: '',
+        city: '',
+        state: '',
+        postcode: '',
+        country: 'Malaysia',
     });
 
     const submit = (e) => {
         e.preventDefault();
-
         post(route('register'), {
             onFinish: () => reset('password', 'password_confirmation'),
         });
@@ -105,21 +106,6 @@ export default function Register() {
                         {/* Additional Fields - Right Column */}
                         <div className="space-y-6">
                             <div>
-                                <InputLabel htmlFor="userType" value="I am a" className="text-purpleTua" />
-                                <select
-                                    id="userType"
-                                    name="userType"
-                                    value={data.userType}
-                                    onChange={(e) => setData('userType', e.target.value)}
-                                    className="mt-1 block w-full rounded-lg border-purpleMuda focus:border-purpleTua focus:ring-purpleTua"
-                                >
-                                    <option value="">Select your role</option>
-                                    <option value="patient">Patient</option>
-                                    <option value="parent">Parent/Guardian</option>
-                                </select>
-                            </div>
-
-                            <div>
                                 <InputLabel htmlFor="age" value="Age" className="text-purpleTua" />
                                 <TextInput
                                     id="age"
@@ -128,35 +114,10 @@ export default function Register() {
                                     value={data.age}
                                     className="mt-1 block w-full rounded-lg border-purpleMuda focus:border-purpleTua focus:ring-purpleTua"
                                     onChange={(e) => setData('age', e.target.value)}
+                                    min="0"
+                                    max="150"
                                 />
-                            </div>
-
-                            <div>
-                                <InputLabel htmlFor="cancer_type" value="Type of Cancer" className="text-purpleTua" />
-                                <TextInput
-                                    id="cancer_type"
-                                    name="cancer_type"
-                                    value={data.cancer_type}
-                                    className="mt-1 block w-full rounded-lg border-purpleMuda focus:border-purpleTua focus:ring-purpleTua"
-                                    onChange={(e) => setData('cancer_type', e.target.value)}
-                                />
-                            </div>
-
-                            <div>
-                                <InputLabel htmlFor="survivorship_status" value="Survivorship Status" className="text-purpleTua" />
-                                <select
-                                    id="survivorship_status"
-                                    name="survivorship_status"
-                                    value={data.survivorship_status}
-                                    onChange={(e) => setData('survivorship_status', e.target.value)}
-                                    className="mt-1 block w-full rounded-lg border-purpleMuda focus:border-purpleTua focus:ring-purpleTua"
-                                >
-                                    <option value="">Select status</option>
-                                    <option value="newly_diagnosed">Newly Diagnosed</option>
-                                    <option value="in_treatment">In Treatment</option>
-                                    <option value="post_treatment">Post Treatment</option>
-                                    <option value="survivor">Survivor</option>
-                                </select>
+                                <InputError message={errors.age} className="mt-2" />
                             </div>
 
                             <div>
@@ -167,20 +128,90 @@ export default function Register() {
                                     name="phone"
                                     value={data.phone}
                                     className="mt-1 block w-full rounded-lg border-purpleMuda focus:border-purpleTua focus:ring-purpleTua"
-                                    onChange={(e) => setData('phone', e.target.value)}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        // Only allow digits
+                                        const sanitizedValue = value.replace(/\D/g, '');
+                                        // Validate Malaysian phone number format (01X-XXXXXXXX)
+                                        if (!sanitizedValue || /^01[0-9]{8,9}$/.test(sanitizedValue)) {
+                                            setData('phone', sanitizedValue);
+                                        }
+                                    }}
+                                    placeholder="e.g., 01791313121"
+                                    pattern="01[0-9]{8,9}"
+                                    title="Please enter a valid Malaysian phone number (e.g., 01791313121)"
+                                    maxLength="11"
                                 />
+                                <p className="text-sm text-gray-500 mt-1">Format: 01XXXXXXXXX (Malaysian number)</p>
+                                <InputError message={errors.phone} className="mt-2" />
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="address" value="Address" className="text-purpleTua" />
-                                <textarea
-                                    id="address"
-                                    name="address"
-                                    value={data.address}
-                                    rows="3"
+                                <InputLabel htmlFor="address_1" value="Address Line 1" className="text-purpleTua" />
+                                <TextInput
+                                    id="address_1"
+                                    type="text"
+                                    name="address_1"
+                                    value={data.address_1}
                                     className="mt-1 block w-full rounded-lg border-purpleMuda focus:border-purpleTua focus:ring-purpleTua"
-                                    onChange={(e) => setData('address', e.target.value)}
+                                    onChange={(e) => setData('address_1', e.target.value)}
                                 />
+                                <InputError message={errors.address_1} className="mt-2" />
+                            </div>
+
+                            <div>
+                                <InputLabel htmlFor="address_2" value="Address Line 2" className="text-purpleTua" />
+                                <TextInput
+                                    id="address_2"
+                                    type="text"
+                                    name="address_2"
+                                    value={data.address_2}
+                                    className="mt-1 block w-full rounded-lg border-purpleMuda focus:border-purpleTua focus:ring-purpleTua"
+                                    onChange={(e) => setData('address_2', e.target.value)}
+                                />
+                                <InputError message={errors.address_2} className="mt-2" />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <InputLabel htmlFor="city" value="City" className="text-purpleTua" />
+                                    <TextInput
+                                        id="city"
+                                        type="text"
+                                        name="city"
+                                        value={data.city}
+                                        className="mt-1 block w-full rounded-lg border-purpleMuda focus:border-purpleTua focus:ring-purpleTua"
+                                        onChange={(e) => setData('city', e.target.value)}
+                                    />
+                                    <InputError message={errors.city} className="mt-2" />
+                                </div>
+
+                                <div>
+                                    <InputLabel htmlFor="state" value="State" className="text-purpleTua" />
+                                    <TextInput
+                                        id="state"
+                                        type="text"
+                                        name="state"
+                                        value={data.state}
+                                        className="mt-1 block w-full rounded-lg border-purpleMuda focus:border-purpleTua focus:ring-purpleTua"
+                                        onChange={(e) => setData('state', e.target.value)}
+                                    />
+                                    <InputError message={errors.state} className="mt-2" />
+                                </div>
+                            </div>
+
+                            <div>
+                                <InputLabel htmlFor="postcode" value="Postcode" className="text-purpleTua" />
+                                <TextInput
+                                    id="postcode"
+                                    type="text"
+                                    name="postcode"
+                                    value={data.postcode}
+                                    className="mt-1 block w-full rounded-lg border-purpleMuda focus:border-purpleTua focus:ring-purpleTua"
+                                    onChange={(e) => setData('postcode', e.target.value)}
+                                    maxLength="5"
+                                />
+                                <InputError message={errors.postcode} className="mt-2" />
                             </div>
                         </div>
                     </div>

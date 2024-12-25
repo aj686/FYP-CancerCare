@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Inertia\Inertia;
 use App\Models\Products;
 use App\Models\User;
@@ -19,6 +20,13 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB; // Add this import
 use Illuminate\Support\Facades\Storage; // Add this import
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password as PasswordRule;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Response;
+use Illuminate\Http\RedirectResponse;
 
 class AdminController extends Controller
 {
@@ -259,36 +267,84 @@ class AdminController extends Controller
         ]);
     }
 
-    public function createUser(Request $request, User $user) {
+    public function createUser(Request $request)
+    {
         $validated = $request->validate([
-            'name' => 'required|max:255|min:2',
-            'email' => 'required|email|max:255',
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'confirmed', PasswordRule::defaults()],
+            'usertype' => ['required', 'string', 'in:admin,user'],
+            'age' => ['nullable', 'integer', 'min:0', 'max:150'],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'address_1' => ['nullable', 'string', 'max:255'],
+            'address_2' => ['nullable', 'string', 'max:255'],
+            'city' => ['nullable', 'string', 'max:100'],
+            'state' => ['nullable', 'string', 'max:100'],
+            'postcode' => ['nullable', 'string', 'max:10'],
+            'country' => ['nullable', 'string', 'max:100'],
         ]);
 
-        $user->create($validated);
-        return back()->with('message', 'Product created successfully');
+        // Set default country
+        $validated['country'] = 'Malaysia';
+        
+        // Hash password
+        $validated['password'] = Hash::make($validated['password']);
+
+        try {
+            User::create($validated);
+            return back()->with('success', 'User created successfully');
+        } catch (\Exception $e) {
+            Log::error('Error creating user: ' . $e->getMessage());
+            return back()->with('error', 'Failed to create user. Please try again.');
+        }
     }
 
-    public function updateUser(Request $request, User $user, $user_id) {
-        // You need this for encountering Log the incoming request data
-        // And you can view this logs at storage/logs/laravel.log
-        Log::info('Update request received for user ID: ' . $user_id);
+    public function updateUser(Request $request, $id)
+    {
+        Log::info('Update request received for user ID: ' . $id);
         Log::info('Update request data: ', $request->all());
 
+        $user = User::findOrFail($id);
+
         $validated = $request->validate([
-            'name' => 'required|max:255|min:2',
-            'email' => 'required|email|max:255',
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $id],
+            'usertype' => ['required', 'string', 'in:admin,user,doctor,patient,parent'],
+            'age' => ['nullable', 'integer', 'min:0', 'max:150'],
+            'cancer_type' => ['nullable', 'string', 'max:255'],
+            'survivorship_status' => ['nullable', 'string', 'in:newly_diagnosed,in_treatment,post_treatment,survivor'],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'address' => ['nullable', 'string', 'max:500'],
         ]);
 
-        $userId = $user->findOrFail($user_id);
-    
-        $userId->update($validated);
+        try {
+            $user->update($validated);
+            return back()->with('success', 'User updated successfully');
+        } catch (\Exception $e) {
+            Log::error('Error updating user: ' . $e->getMessage());
+            return back()->with('error', 'Failed to update user. Please try again.');
+        }
     }
 
-    public function destroyUser(User $user, $user_id) {
-        $userId = $user->findOrFail($user_id);
-        $userId->delete();
-        return back()->with('message', 'Student deleted successfully');
+    public function destroyUser($id)
+    {
+        try {
+            $user = User::findOrFail($id);
+            
+            // Prevent deletion of the last admin user
+            if ($user->usertype === 'admin') {
+                $adminCount = User::where('usertype', 'admin')->count();
+                if ($adminCount <= 1) {
+                    return back()->with('error', 'Cannot delete the last admin user.');
+                }
+            }
+
+            $user->delete();
+            return back()->with('success', 'User deleted successfully');
+        } catch (\Exception $e) {
+            Log::error('Error deleting user: ' . $e->getMessage());
+            return back()->with('error', 'Failed to delete user. Please try again.');
+        }
     }
 
     // -------------------------------------------------------------------------------
@@ -502,7 +558,18 @@ class AdminController extends Controller
             'stripe_plan' => 'required|unique:plans,stripe_plan',
             'price' => 'required|numeric|min:0',
             'description' => 'required|min:10',
+            'can_comment' => 'boolean',
+            'can_access_forum' => 'boolean',
+            'can_access_events' => 'boolean',
+            'can_share_stories' => 'boolean',
+            'billing_interval' => 'required|in:month,year'
         ]);
+        
+        // Handle boolean fields explicitly
+        $validated['can_comment'] = $request->boolean('can_comment');
+        $validated['can_access_forum'] = $request->boolean('can_access_forum');
+        $validated['can_access_events'] = $request->boolean('can_access_events');
+        $validated['can_share_stories'] = $request->boolean('can_share_stories');
         
         $plan->create($validated);
         
@@ -518,10 +585,21 @@ class AdminController extends Controller
             'stripe_plan' => 'required|unique:plans,stripe_plan,' . $plan_id,
             'price' => 'required|numeric|min:0',
             'description' => 'required|min:10',
+            'can_comment' => 'boolean',
+            'can_access_forum' => 'boolean',
+            'can_access_events' => 'boolean',
+            'can_share_stories' => 'boolean',
+            'billing_interval' => 'required|in:month,year'
         ]);
 
         try {
             DB::beginTransaction();
+            
+            // Handle boolean fields explicitly
+            $validated['can_comment'] = $request->boolean('can_comment');
+            $validated['can_access_forum'] = $request->boolean('can_access_forum');
+            $validated['can_access_events'] = $request->boolean('can_access_events');
+            $validated['can_share_stories'] = $request->boolean('can_share_stories');
             
             $plan->update($validated);
             
@@ -558,7 +636,7 @@ class AdminController extends Controller
     {
         $story = UserStory::with('user')->findOrFail($id);
         
-        return Inertia::render('Admin/Story/StoryView', [
+        return Inertia::render('Admin/StoryView', [
             'story' => $story,
         ]);
     }
@@ -623,5 +701,128 @@ class AdminController extends Controller
             return back()->withErrors(['error' => 'Failed to delete story']);
         }
     }
+
     
+    /**
+     * Display the admin's profile form.
+     */
+    public function editProfile(Request $request)
+    {
+        return Inertia::render('Profile/Edit', [
+            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+            'status' => session('status'),
+        ]);
+    }
+
+    /**
+     * Update the admin's profile information.
+     */
+    public function updateProfile(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $request->user()->id],
+            'photo' => ['nullable', 'image', 'max:2048'],
+        ]);
+    
+        try {
+            DB::beginTransaction();
+    
+            if ($request->hasFile('photo')) {
+                // Log for debugging
+                Log::info('Processing photo upload', [
+                    'mime' => $request->file('photo')->getMimeType(),
+                    'size' => $request->file('photo')->getSize(),
+                    'original_name' => $request->file('photo')->getClientOriginalName()
+                ]);
+    
+                // Delete old photo if exists
+                if ($request->user()->profile_photo_path) {
+                    $oldPhotoPath = public_path('storage/' . $request->user()->profile_photo_path);
+                    if (file_exists($oldPhotoPath)) {
+                        unlink($oldPhotoPath);
+                    }
+                }
+    
+                // Generate unique filename
+                $fileName = time() . '_' . $request->file('photo')->getClientOriginalName();
+                
+                // Ensure directory exists
+                $path = public_path('storage/profile-photos');
+                if (!file_exists($path)) {
+                    mkdir($path, 0777, true);
+                }
+    
+                // Move the uploaded file
+                $request->file('photo')->move($path, $fileName);
+                
+                // Save path to validated data
+                $validated['profile_photo_path'] = 'profile-photos/' . $fileName;
+    
+                Log::info('Photo saved', [
+                    'path' => $validated['profile_photo_path']
+                ]);
+            }
+    
+            $user = $request->user();
+            $user->fill($validated);
+            $user->save();
+    
+            DB::commit();
+    
+            return back()->with('message', 'Profile updated successfully');
+    
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Profile update failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return back()->withErrors(['error' => 'Failed to update profile: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Update the admin's password.
+     */
+    public function updatePassword(Request $request)
+    {
+        $validated = $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'password' => ['required', 'confirmed', Password::defaults()],
+        ]);
+
+        $request->user()->update([
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        return back()->with('message', 'Password updated successfully');
+    }
+
+    /**
+     * Delete the admin's account.
+     */
+    public function destroyProfile(Request $request)
+    {
+        $request->validate([
+            'password' => ['required', 'current_password'],
+        ]);
+
+        $user = $request->user();
+
+        Auth::logout();
+
+        // Delete profile photo if exists
+        if ($user->profile_photo_path) {
+            Storage::disk('public')->delete($user->profile_photo_path);
+        }
+
+        $user->delete();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return Redirect::to('/homepage');
+    }
 }

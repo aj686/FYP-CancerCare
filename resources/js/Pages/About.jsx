@@ -11,32 +11,25 @@ import Footer from '@/Components/My Components/Footer';
 export default function About() {
     const teamMembers = [
         {
-            name: "Dr. Sarah Lee",
-            title: "Medical Director",
-            image: "/api/placeholder/400/400",
-            contribution: "Led groundbreaking research in early cancer detection methods and established our comprehensive patient care protocol.",
-            linkedin: "#"
+            name: "Datin Rozita",
+            title: "In Charge of MAKNA Organization | Motivator | Sponsor",
+            image: "/storage/person/datin.jpg",
+            // contribution: "Led groundbreaking research in early cancer detection methods and established our comprehensive patient care protocol.",
+            // linkedin: "#"
         },
         {
-            name: "Prof. Ahmad Abdullah",
-            title: "Research Head",
-            image: "/api/placeholder/400/400",
-            contribution: "Pioneered innovative treatment approaches and published over 50 research papers in oncology.",
-            linkedin: "#"
+            name: "Assoc. Prof. Ts. Dr. Munaisyah Abdullah",
+            title: "CIDEX - Centre of Innovative Digital Education and Emerging Tech | Sponsor | Bridging the Gap between Academia and Technology",
+            image: "/storage/person/madam.jpg",
+            // contribution: "Pioneered innovative treatment approaches and published over 50 research papers in oncology.",
+            // linkedin: "#"
         },
         {
-            name: "Dr. Michelle Tan",
-            title: "Patient Care Coordinator",
-            image: "/api/placeholder/400/400",
-            contribution: "Developed our patient support system and counseling programs, helping over 1000 families.",
-            linkedin: "#"
-        },
-        {
-            name: "Dr. James Wong",
-            title: "Community Outreach Director",
-            image: "/api/placeholder/400/400",
-            contribution: "Established partnerships with 20+ organizations and led cancer awareness campaigns nationwide.",
-            linkedin: "#"
+            name: "Mr. Ajwad Aqhari",
+            title: "Designer | Developer | Bachelor of Software Engineering in Information Technology",
+            image: "/storage/person/ajwad.jpg",
+            // contribution: "Established partnerships with 20+ organizations and led cancer awareness campaigns nationwide.",
+            // linkedin: "#"
         }
     ];
 
@@ -77,41 +70,42 @@ export default function About() {
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {teamMembers.map((member, index) => (
-                            <div key={index} className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-1 transition-all duration-300">
-                                <div className="aspect-square relative">
-                                    <img 
-                                        src={member.image} 
-                                        alt={member.name}
-                                        className="w-full h-full object-cover"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-purpleTua/80 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end justify-center p-4">
-                                        <a 
-                                            href={member.linkedin}
-                                            className="text-white hover:text-yellow-300 transition-colors p-2"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                        >
-                                            <Linkedin className="w-6 h-6" />
-                                        </a>
+                    <div className="max-w-6xl mx-auto">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
+                            {teamMembers.map((member, index) => (
+                                <div key={index} className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-1 transition-all duration-300 w-full max-w-sm">
+                                    <div className="aspect-square relative">
+                                        <img 
+                                            src={member.image} 
+                                            alt={member.name}
+                                            className="w-full h-full object-cover"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-purpleTua/80 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end justify-center p-4">
+                                            <a 
+                                                href={member.linkedin}
+                                                className="text-white hover:text-yellow-300 transition-colors p-2"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                <Linkedin className="w-6 h-6" />
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <div className="p-6">
+                                        <h3 className="text-xl font-bold text-purpleTua mb-2">{member.name}</h3>
+                                        <p className="text-purpleMid font-medium mb-3">{member.title}</p>
+                                        <p className="text-gray-600 text-sm">
+                                            {member.contribution}
+                                        </p>
                                     </div>
                                 </div>
-
-                                <div className="p-6">
-                                    <h3 className="text-xl font-bold text-purpleTua mb-2">{member.name}</h3>
-                                    <p className="text-purpleMid font-medium mb-3">{member.title}</p>
-                                    <p className="text-gray-600 text-sm">
-                                        {member.contribution}
-                                    </p>
-                                </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
                 </div>
             </section>
 
-            {/* Additional content sections can be added here */}
             <Footer />
         </>
     );

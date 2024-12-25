@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { Calendar, MapPin, Clock, Tag, ChevronDown, ChevronUp, Users } from 'lucide-react';
+import { Calendar, MapPin, Clock, Tag, ChevronDown, ChevronUp } from 'lucide-react';
 import { Link, useForm } from '@inertiajs/react';
+import RegistrationProgress from './RegistrationProgress';
 
 export default function EventLists({ events, auth = null }) {
     const [expandedEvents, setExpandedEvents] = useState({});
     const [hoveredEvent, setHoveredEvent] = useState(null);
     const { delete: destroy } = useForm();
 
-    // Preserve all existing functions
     const toggleEventExpansion = (eventId, e) => {
         e.preventDefault();
         setExpandedEvents(prev => ({
@@ -34,29 +34,6 @@ export default function EventLists({ events, auth = null }) {
         }
     };
 
-    const renderRegistrationStatus = (event) => {
-        const spotsLeft = event.participant_count - event.registrations_count;
-        const percentageFull = (event.registrations_count / event.participant_count) * 100;
-
-        return (
-            <div className="mt-2">
-                <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm text-gray-600">
-                        <Users className="inline w-4 h-4 mr-1" />
-                        {spotsLeft} spots remaining
-                    </span>
-                    <span className="text-sm text-gray-600">{percentageFull.toFixed(0)}% Full</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                        className="bg-gradient-to-r from-purpleMid to-purpleTua h-2 rounded-full transition-all duration-300" 
-                        style={{ width: `${percentageFull}%` }}
-                    />
-                </div>
-            </div>
-        );
-    };
-
     const renderActionButtons = (event) => {
         if (!auth || !auth.user) {
             return (
@@ -80,13 +57,14 @@ export default function EventLists({ events, auth = null }) {
         const isMember = auth.user.membership_status === 'active';
         const isRegistered = event.registered_users?.includes(auth.user.id);
         const showMembershipRequired = event.price > 0 && !isMember;
-        const isFull = event.registrations_count >= event.participant_count;
+        const registeredCount = event.registrations?.filter(reg => reg.status === 'registered').length || 0;
+        const isFull = registeredCount >= event.participant_count;
 
         return (
             <div className="mt-6">
                 <div className="space-y-3 sm:space-y-0 sm:flex sm:space-x-3">
                     <Link
-                        href={route('events.show.event', event.title)}
+                        href={route('events.show.event', event.id)}
                         className="w-full sm:w-auto bg-purpleMuda text-purpleTua px-6 py-2 rounded-full hover:bg-purpleMuda/80 focus:outline-none transition-colors duration-200 flex items-center justify-center font-medium"
                     >
                         View Details
@@ -215,7 +193,11 @@ export default function EventLists({ events, auth = null }) {
                                 </div>
                             </div>
 
-                            {renderRegistrationStatus(event)}
+                            <RegistrationProgress 
+                                registrations={event.registrations}
+                                participantCount={event.participant_count}
+                            />
+                            
                             {renderActionButtons(event)}
                         </div>
                     </div>

@@ -1,9 +1,9 @@
-// Components/Stories/StoryAdd.jsx
+// StoryAdd.jsx
 import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import { useForm } from "@inertiajs/react";
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { PlusIcon } from 'lucide-react';
 import RichTextEditor from "@/Components/My Components/Admin Comp/Blog/RichTextEditor";
 
@@ -17,6 +17,7 @@ export default function StoryAdd({ className = "", disabled }) {
     });
 
     const [isDirty, setIsDirty] = useState(false);
+    const [imagePreview, setImagePreview] = useState(null);
 
     const generateSlug = (title) => {
         return title
@@ -35,18 +36,32 @@ export default function StoryAdd({ className = "", disabled }) {
         setIsDirty(true);
     };
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setData('thumbnail', file);
+            const reader = new FileReader();
+            reader.onload = (e) => setImagePreview(e.target.result);
+            reader.readAsDataURL(file);
+            setIsDirty(true);
+        }
+    };
+
     const submit = (e) => {
         e.preventDefault();
-
+    
         const formData = new FormData();
-        Object.keys(data).forEach(key => {
-            if (key === 'thumbnail' && data[key]) {
-                formData.append(key, data[key]);
-            } else {
-                formData.append(key, data[key] || '');
-            }
-        });
-
+        // Ensure all fields are added to FormData
+        formData.append('title', data.title);
+        formData.append('slug', data.slug);
+        formData.append('content', data.content);
+        formData.append('cancer_type', data.cancer_type);
+        
+        // Handle thumbnail specifically
+        if (data.thumbnail) {
+            formData.append('thumbnail', data.thumbnail);
+        }
+    
         post(route('stories.store'), {
             data: formData,
             forceFormData: true,
@@ -54,8 +69,12 @@ export default function StoryAdd({ className = "", disabled }) {
                 document.getElementById("story_modal").close();
                 reset();
                 setIsDirty(false);
+                setImagePreview(null);
             },
             preserveScroll: true,
+            onError: (errors) => {
+                console.error('Submission errors:', errors);
+            }
         });
     };
 
@@ -96,6 +115,7 @@ export default function StoryAdd({ className = "", disabled }) {
                                     }
                                     reset();
                                     setIsDirty(false);
+                                    setImagePreview(null);
                                 }}
                             >
                                 ✕
@@ -106,7 +126,6 @@ export default function StoryAdd({ className = "", disabled }) {
 
                     <div className="modal-body py-6">
                         <form onSubmit={submit} className="space-y-6">
-                            {/* Title & Cancer Type Group */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <InputLabel htmlFor="title" value="Title *" />
@@ -138,9 +157,17 @@ export default function StoryAdd({ className = "", disabled }) {
                                 </div>
                             </div>
 
-                            {/* Thumbnail */}
                             <div>
                                 <InputLabel htmlFor="thumbnail" value="Photo (Optional)" />
+                                {imagePreview && (
+                                    <div className="mt-2 mb-4">
+                                        <img
+                                            src={imagePreview}
+                                            alt="Story thumbnail preview"
+                                            className="max-w-xs rounded-lg shadow-md"
+                                        />
+                                    </div>
+                                )}
                                 <input
                                     type="file"
                                     id="thumbnail"
@@ -150,11 +177,8 @@ export default function StoryAdd({ className = "", disabled }) {
                                         file:text-sm file:font-semibold
                                         file:bg-indigo-50 file:text-indigo-700
                                         hover:file:bg-indigo-100"
-                                    onChange={(e) => {
-                                        setData("thumbnail", e.target.files[0]);
-                                        setIsDirty(true);
-                                    }}
-                                    accept="image/jpeg,image/png,image/jpg,image/gif"
+                                    onChange={handleImageChange}
+                                    accept="image/jpeg,png,jpg,gif"
                                 />
                                 <p className="text-sm text-gray-500 mt-1">
                                     Max file size: 2MB. Supported formats: JPEG, PNG, JPG, GIF
@@ -162,7 +186,6 @@ export default function StoryAdd({ className = "", disabled }) {
                                 <InputError className="mt-2" message={errors.thumbnail} />
                             </div>
 
-                            {/* Rich Text Editor */}
                             <div>
                                 <InputLabel htmlFor="editor-content" value="Your Story *" />
                                 <RichTextEditor 
@@ -175,15 +198,25 @@ export default function StoryAdd({ className = "", disabled }) {
                                 <InputError className="mt-2" message={errors.content} />
                             </div>
 
-                            {/* Submit Button */}
-                            <button
-                                className={`w-full text-center items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 focus:bg-indigo-800 active:bg-indigo-900 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 ${
-                                    processing && "opacity-25"
-                                }`}
-                                disabled={processing}
-                            >
-                                {processing ? "Submitting..." : "Submit Your Story"}
-                            </button>
+                            <div className="flex gap-4">
+                                <button
+                                    type="submit"
+                                    className={`flex-1 text-center items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 focus:bg-indigo-800 active:bg-indigo-900 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 ${
+                                        processing && "opacity-25"
+                                    }`}
+                                    disabled={processing}
+                                >
+                                    {processing ? "Submitting..." : "Submit Your Story"}
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={() => document.getElementById("story_modal").close()}
+                                    className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-md font-semibold text-xs uppercase"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -194,6 +227,7 @@ export default function StoryAdd({ className = "", disabled }) {
                         }
                         reset();
                         setIsDirty(false);
+                        setImagePreview(null);
                     }}></button>
                 </form>
             </dialog>

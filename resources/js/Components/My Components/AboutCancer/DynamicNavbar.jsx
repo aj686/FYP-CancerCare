@@ -1,19 +1,50 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import NavLink from '@/Components/NavLink';
 import PrimaryButton from '@/Components/PrimaryButton';
 import Dropdown from '@/Components/Dropdown';
 import YellowButton from '@/Components/YellowButton';
 
 export default function DynamicNavbar() {
+    const { auth, cartCount } = usePage().props;
+    const [cartItemCount, setCartItemCount] = useState(cartCount || 0);
 
-    const { auth } = usePage().props;
+    useEffect(() => {
+        // Update from props
+        setCartItemCount(cartCount);
+
+        // Listen for cart updates
+        const handleCartUpdate = (event) => {
+            setCartItemCount(event.detail.count);
+        };
+
+        // Add event listener
+        document.addEventListener('cartUpdated', handleCartUpdate);
+
+        // Fetch initial cart count
+        const fetchCartCount = async () => {
+            try {
+                const response = await fetch('/cart/count');
+                const data = await response.json();
+                setCartItemCount(data.count);
+            } catch (error) {
+                console.error('Error fetching cart count:', error);
+            }
+        };
+
+        fetchCartCount();
+
+        // Cleanup listener when component unmounts
+        return () => {
+            document.removeEventListener('cartUpdated', handleCartUpdate);
+        };
+    }, [cartCount]);
     
     return (
         <nav className="bg-white border-gray-200 px-4 lg:px-6 py-2.5">
             <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
                 <div className="flex items-center">
-                    <Link href="/">
+                    <Link href="/homepage">
                         <span className="self-center text-xl font-semibold whitespace-nowrap">
                             CancerCare Connect
                         </span>
@@ -48,11 +79,11 @@ export default function DynamicNavbar() {
                                 Our Research
                             </NavLink>
                         </li>
-                            <li>
-                                <NavLink href="/stories" className="text-black">
-                                    Our Story
-                                </NavLink>
-                            </li>
+                        <li>
+                            <NavLink href="/stories" className="text-black">
+                                Our Story
+                            </NavLink>
+                        </li>
                         <li>
                             <NavLink href="/product" className="text-black">
                                 Shop with Us
@@ -64,33 +95,39 @@ export default function DynamicNavbar() {
                             </NavLink>
                         </li>
 
-                        {/* Cart Link */}
-                        <li>
+                        {/* Cart Link with Notification Badge */}
+                        <li className="relative">
                             <NavLink href="/cart" className="text-black">
                                 <span className="sr-only">Cart</span>
-                                <svg 
-                                    className="w-5 h-5 lg:me-1" 
-                                    aria-hidden="true" 
-                                    xmlns="http://www.w3.org/2000/svg" 
-                                    width="24" 
-                                    height="24" 
-                                    fill="none" 
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path 
-                                        stroke="currentColor" 
-                                        strokeLinecap="round" 
-                                        strokeLinejoin="round" 
-                                        strokeWidth="2" 
-                                        d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"
-                                    />
-                                </svg>
+                                <div className="relative inline-block">
+                                    <svg 
+                                        className="w-6 h-6 lg:me-1" 
+                                        aria-hidden="true" 
+                                        xmlns="http://www.w3.org/2000/svg" 
+                                        width="24" 
+                                        height="24" 
+                                        fill="none" 
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path 
+                                            stroke="currentColor" 
+                                            strokeLinecap="round" 
+                                            strokeLinejoin="round" 
+                                            strokeWidth="2" 
+                                            d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"
+                                        />
+                                    </svg>
+                                    {cartItemCount > 0 && (
+                                        <span className="absolute -top-2 -right-2 inline-flex items-center justify-center min-w-[1.25rem] h-5 text-xs font-bold text-white bg-red-600 rounded-full px-1">
+                                            {cartItemCount}
+                                        </span>
+                                    )}
+                                </div>
                             </NavLink>
                         </li>
                         
                         {/* Authentication Links */}
                         {auth?.user ? (
-                            // User is logged in - show dropdown
                             <li className="relative">
                                 <Dropdown>
                                     <Dropdown.Trigger>
@@ -137,7 +174,6 @@ export default function DynamicNavbar() {
                                 </Dropdown>
                             </li>
                         ) : (
-                            // Guest - show login/register buttons
                             <>
                                 <li>
                                     <NavLink href="/login" className="text-white">

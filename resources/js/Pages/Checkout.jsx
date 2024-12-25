@@ -20,7 +20,7 @@ export default function Checkout({ order }) {
         address_1: '',
         address_2: '',
         city: '',
-        country: '',
+        country: 'Malaysia',
         state: '',
         postcode: '',
         phonenumber: '',
@@ -29,6 +29,15 @@ export default function Checkout({ order }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         setLoading(true);
+
+        // Regex validation for phone number
+        const phoneRegex = /^01[0-9]{8,9}$/;
+        if (!phoneRegex.test(data.phonenumber)) {
+            alert('Invalid phone number format. Please use the format 01XXXXXXXX.');
+            setLoading(false);
+            return;
+        }
+
         post('/checkout', {
             onSuccess: (page) => {
                 const { payment_url } = page.props;
@@ -56,6 +65,12 @@ export default function Checkout({ order }) {
         const shippingPrice = 10;
         return getTotalPrice() + shippingPrice;
     };
+
+    const statesInMalaysia = [
+        "Johor", "Kedah", "Kelantan", "Kuala Lumpur", "Labuan", "Melaka", 
+        "Negeri Sembilan", "Pahang", "Penang", "Perak", "Perlis", "Putrajaya", 
+        "Sabah", "Sarawak", "Selangor", "Terengganu"
+    ];
 
     // Common CSS classes
     const inputClass = "block w-full rounded-lg border border-purpleMid/30 bg-white p-2.5 text-sm text-gray-900 focus:border-purpleTua focus:ring-purpleTua transition-colors";
@@ -104,6 +119,7 @@ export default function Checkout({ order }) {
                                         value={data.email}
                                         onChange={e => setData('email', e.target.value)}
                                         required
+                                        placeholder="Enter your email"
                                     />
                                     {errors.email && <p className={errorClass}>{errors.email}</p>}
                                 </div>
@@ -119,6 +135,7 @@ export default function Checkout({ order }) {
                                             value={data.firstname}
                                             onChange={e => setData('firstname', e.target.value)}
                                             required
+                                            placeholder="Enter your first name"
                                         />
                                         {errors.firstname && <p className={errorClass}>{errors.firstname}</p>}
                                     </div>
@@ -131,6 +148,7 @@ export default function Checkout({ order }) {
                                             value={data.lastname}
                                             onChange={e => setData('lastname', e.target.value)}
                                             required
+                                            placeholder="Enter your last name"
                                         />
                                         {errors.lastname && <p className={errorClass}>{errors.lastname}</p>}
                                     </div>
@@ -147,6 +165,7 @@ export default function Checkout({ order }) {
                                             value={data.address_1}
                                             onChange={e => setData('address_1', e.target.value)}
                                             required
+                                            placeholder="Enter your address line 1"
                                         />
                                         {errors.address_1 && <p className={errorClass}>{errors.address_1}</p>}
                                     </div>
@@ -159,6 +178,7 @@ export default function Checkout({ order }) {
                                             className={inputClass}
                                             value={data.address_2}
                                             onChange={e => setData('address_2', e.target.value)}
+                                            placeholder="Enter your address line 2"
                                         />
                                         {errors.address_2 && <p className={errorClass}>{errors.address_2}</p>}
                                     </div>
@@ -173,20 +193,25 @@ export default function Checkout({ order }) {
                                                 value={data.city}
                                                 onChange={e => setData('city', e.target.value)}
                                                 required
+                                                placeholder="Enter your city"
                                             />
                                             {errors.city && <p className={errorClass}>{errors.city}</p>}
                                         </div>
                                         
                                         <div>
                                             <label htmlFor="state" className={labelClass}>State</label>
-                                            <input
-                                                type="text"
+                                            <select
                                                 id="state"
                                                 className={inputClass}
                                                 value={data.state}
                                                 onChange={e => setData('state', e.target.value)}
                                                 required
-                                            />
+                                            >
+                                                <option value="">Select your state</option>
+                                                {statesInMalaysia.map(state => (
+                                                    <option key={state} value={state}>{state}</option>
+                                                ))}
+                                            </select>
                                             {errors.state && <p className={errorClass}>{errors.state}</p>}
                                         </div>
                                         
@@ -199,6 +224,8 @@ export default function Checkout({ order }) {
                                                 value={data.country}
                                                 onChange={e => setData('country', e.target.value)}
                                                 required
+                                                placeholder="Enter your country"
+                                                defaultValue="Malaysia"
                                             />
                                             {errors.country && <p className={errorClass}>{errors.country}</p>}
                                         </div>
@@ -214,6 +241,7 @@ export default function Checkout({ order }) {
                                                 value={data.postcode}
                                                 onChange={e => setData('postcode', e.target.value)}
                                                 required
+                                                placeholder="Enter your postcode"
                                             />
                                             {errors.postcode && <p className={errorClass}>{errors.postcode}</p>}
                                         </div>
@@ -227,6 +255,7 @@ export default function Checkout({ order }) {
                                                 value={data.phonenumber}
                                                 onChange={e => setData('phonenumber', e.target.value)}
                                                 required
+                                                placeholder="Enter your phone number (e.g., 0179519791)"
                                             />
                                             {errors.phonenumber && <p className={errorClass}>{errors.phonenumber}</p>}
                                         </div>

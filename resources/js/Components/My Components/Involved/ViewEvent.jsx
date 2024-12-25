@@ -1,12 +1,12 @@
 import React from 'react';
-import { Calendar, MapPin, Clock, Tag, Users, Share2, ArrowLeft } from 'lucide-react';
+import { Calendar, MapPin, Clock, Tag, Share2, ArrowLeft } from 'lucide-react';
 import { Link, useForm } from '@inertiajs/react';
+import RegistrationProgress from './RegistrationProgress';
 
 export default function ViewEvent({ event, isRegistered: initialIsRegistered, hasMembership, auth }) {
     const [isRegistered, setIsRegistered] = React.useState(initialIsRegistered);
     const { post, delete: destroy, processing } = useForm();
 
-    // Preserve all existing functions
     const handleRegister = () => {
         if (!auth?.user) return;
         if (event.price > 0 && !hasMembership) {
@@ -47,68 +47,6 @@ export default function ViewEvent({ event, isRegistered: initialIsRegistered, ha
         });
     };
 
-    const registeredCount = event.registrations?.length || 0;
-    const spotsLeft = event.participant_count - registeredCount;
-    const isFull = registeredCount >= event.participant_count;
-
-    const renderEventDetails = () => (
-        <div className="md:w-3/5 p-8">
-            <h1 className="text-3xl font-bold mb-4 text-purpleTua">{event.title}</h1>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div className="flex items-center">
-                    <Calendar className="w-5 h-5 mr-2 text-purpleMid" />
-                    <span className="text-gray-700">{formatDate(event.start_date)}</span>
-                </div>
-                <div className="flex items-center">
-                    <Clock className="w-5 h-5 mr-2 text-purpleMid" />
-                    <span className="text-gray-700">{event.event_time}</span>
-                </div>
-                <div className="flex items-center">
-                    <MapPin className="w-5 h-5 mr-2 text-purpleMid" />
-                    <span className="text-gray-700">{event.location}</span>
-                </div>
-                <div className="flex items-center">
-                    <Tag className="w-5 h-5 mr-2 text-purpleMid" />
-                    <span className="text-gray-700">{event.price > 0 ? `RM ${event.price}` : 'Free'}</span>
-                </div>
-            </div>
-
-            <div className="prose max-w-none mb-8">
-                <h2 className="text-xl font-semibold mb-3 text-purpleTua">About This Event</h2>
-                <p className="text-gray-600">{event.description}</p>
-            </div>
-
-            <div className="mb-8">
-                <div className="flex items-center justify-between mb-2">
-                    <span className="flex items-center text-gray-700">
-                        <Users className="w-4 h-4 mr-1 text-purpleMid" />
-                        {spotsLeft} spots remaining
-                    </span>
-                    <span className="text-gray-700">{Math.round((registeredCount / event.participant_count) * 100)}% Full</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                        className="bg-gradient-to-r from-purpleMid to-purpleTua rounded-full h-2 transition-all duration-300"
-                        style={{
-                            width: `${(registeredCount / event.participant_count) * 100}%`
-                        }}
-                    />
-                </div>
-            </div>
-
-            {renderActionButton()}
-
-            {isRegistered && (
-                <div className="mt-4 bg-purpleMuda/20 border-l-4 border-purpleTua p-4 rounded-r-lg">
-                    <p className="text-sm text-purpleTua">
-                        You are registered for this event! We look forward to seeing you there.
-                    </p>
-                </div>
-            )}
-        </div>
-    );
-
     const renderActionButton = () => {
         if (!auth?.user) {
             return (
@@ -132,6 +70,9 @@ export default function ViewEvent({ event, isRegistered: initialIsRegistered, ha
                 </button>
             );
         }
+
+        const registeredCount = event.registrations?.filter(reg => reg.status === 'registered').length || 0;
+        const isFull = registeredCount >= event.participant_count;
 
         if (isFull) {
             return (
@@ -189,6 +130,53 @@ export default function ViewEvent({ event, isRegistered: initialIsRegistered, ha
             </button>
         );
     };
+
+    const renderEventDetails = () => (
+        <div className="md:w-3/5 p-8">
+            <h1 className="text-3xl font-bold mb-4 text-purpleTua">{event.title}</h1>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="flex items-center">
+                    <Calendar className="w-5 h-5 mr-2 text-purpleMid" />
+                    <span className="text-gray-700">{formatDate(event.start_date)}</span>
+                </div>
+                <div className="flex items-center">
+                    <Clock className="w-5 h-5 mr-2 text-purpleMid" />
+                    <span className="text-gray-700">{event.event_time}</span>
+                </div>
+                <div className="flex items-center">
+                    <MapPin className="w-5 h-5 mr-2 text-purpleMid" />
+                    <span className="text-gray-700">{event.location}</span>
+                </div>
+                <div className="flex items-center">
+                    <Tag className="w-5 h-5 mr-2 text-purpleMid" />
+                    <span className="text-gray-700">{event.price > 0 ? `RM ${event.price}` : 'Free'}</span>
+                </div>
+            </div>
+
+            <div className="prose max-w-none mb-8">
+                <h2 className="text-xl font-semibold mb-3 text-purpleTua">About This Event</h2>
+                <p className="text-gray-600">{event.description}</p>
+            </div>
+
+            <div className="mb-8">
+                <RegistrationProgress 
+                    registrations={event.registrations}
+                    participantCount={event.participant_count}
+                />
+            </div>
+
+            {renderActionButton()}
+
+            {isRegistered && (
+                <div className="mt-4 bg-purpleMuda/20 border-l-4 border-purpleTua p-4 rounded-r-lg">
+                    <p className="text-sm text-purpleTua">
+                        You are registered for this event! We look forward to seeing you there.
+                    </p>
+                </div>
+            )}
+        </div>
+    );
 
     return (
         <div className="max-w-7xl mx-auto p-6">

@@ -6,8 +6,10 @@ use inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Models\EventRegistration;
 use App\Models\Order;
+use App\Models\Membership;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\UserStory;
 
 class UserController extends Controller
 {
@@ -84,5 +86,84 @@ class UserController extends Controller
         return Inertia::render('User/UserComp/Invoice', [
             'order' => $order
         ]);
+    }
+
+    public function dashboard()
+    {
+        $user = Auth::user();
+        
+        $orders = Order::where('user_id', $user->id)
+            ->with(['orderItems.product'])
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
+        $bookings = EventRegistration::where('user_id', $user->id)
+            ->with(['event' => function($query) {
+                $query->select('id', 'title', 'start_date', 'end_date');
+            }])
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
+        $stories = UserStory::query()
+            ->where('user_id', $user->id)
+            ->select('id', 'title', 'status', 'created_at')
+            ->where('status', 'approved')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Check active membership
+        $activeMembership = Membership::where('user_id', $user->id)
+            ->where('status', 'active')
+            ->where('end_date', '>', now())
+            ->first();
+
+        // Debug user data
+        // dd($user->toArray());  // Uncomment this to debug
+
+        return Inertia::render('Dashboard', [
+            'auth' => [
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'usertype' => $user->usertype,
+                    'age' => $user->age,
+                    'phone' => $user->phone,
+                    'address_1' => $user->address_1,
+                    'address_2' => $user->address_2,
+                    'city' => $user->city,
+                    'state' => $user->state,
+                    'postcode' => $user->postcode,
+                    'country' => $user->country,
+                    'profile_photo_url' => $user->profile_photo_url,
+                    'has_active_membership' => !is_null($activeMembership),
+                    'membership' => $activeMembership ? [
+                        'start_date' => $activeMembership->start_date->format('Y-m-d'),
+                        'end_date' => $activeMembership->end_date->format('Y-m-d')
+                    ] : null
+                ]
+            ],
+            'orders' => $orders,
+            'bookings' => $bookings,
+            'stories' => $stories
+        ]);
+    }
+
+    public function cancelMembership(Request $request)
+    {
+        $user = Auth::user();
+
+        $membership = Membership::where('user_id', $user->id)
+            ->where('status', 'active')
+            ->first();
+
+        if ($membership) {
+            $membership->update(['status' => 'canceled']);
+            return back()->with('success', 'Membership canceled successfully.');
+        }
+
+        return back()->with('error', 'No active membership found.');
     }
 }

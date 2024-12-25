@@ -1,15 +1,17 @@
-// Components/Stories/StoryUpdate.jsx
+// StoryUpdate.jsx
 import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import { useForm, router } from "@inertiajs/react";
 import { PencilIcon } from "lucide-react";
 import { useState } from "react";
-import { lazy, Suspense } from 'react';
 import RichTextEditor from "@/Components/My Components/Admin Comp/Blog/RichTextEditor";
 
 export default function StoryUpdate({ className, storyId, story }) {
-    const [imagePreview, setImagePreview] = useState(story.thumbnail ? `/storage/${story.thumbnail}` : null);
+    const [imagePreview, setImagePreview] = useState(
+        story.thumbnail ? `/storage/${story.thumbnail}` : null
+    );
+    const [isDirty, setIsDirty] = useState(false);
     
     const {
         data: editData,
@@ -41,6 +43,7 @@ export default function StoryUpdate({ className, storyId, story }) {
             title: newTitle,
             slug: generateSlug(newTitle)
         }));
+        setIsDirty(true);
     };
 
     const handleImageChange = (e) => {
@@ -50,33 +53,48 @@ export default function StoryUpdate({ className, storyId, story }) {
             const reader = new FileReader();
             reader.onload = (e) => setImagePreview(e.target.result);
             reader.readAsDataURL(file);
+            setIsDirty(true);
         }
     };
+
 
     const handleSubmit = (e) => {
         e.preventDefault();
         
         const formData = new FormData();
-        // Add _method field for Laravel to recognize it as a PATCH request
+        // Ensure all fields are added to FormData
+        formData.append('title', editData.title);
+        formData.append('slug', editData.slug);
+        formData.append('content', editData.content);
+        formData.append('cancer_type', editData.cancer_type);
         formData.append('_method', 'PATCH');
         
-        Object.keys(editData).forEach(key => {
-            if (key === 'thumbnail' && editData[key] === null) {
-                return;
-            }
-            formData.append(key, editData[key]);
-        });
-    
-        // Use router.post with the correct route
+        // Handle thumbnail specifically
+        if (editData.thumbnail) {
+            formData.append('thumbnail', editData.thumbnail);
+        }
+        
         router.post(route('stories.update', story.id), formData, {
             forceFormData: true,
             onSuccess: () => {
                 document.getElementById(storyId).close();
                 reset();
-                router.reload();
+                setIsDirty(false);
             },
             preserveScroll: true,
+            onError: (errors) => {
+                console.error('Update errors:', errors);
+            }
         });
+    };
+
+    const handleClose = () => {
+        if (isDirty && !confirm('You have unsaved changes. Are you sure you want to close?')) {
+            return;
+        }
+        reset();
+        setImagePreview(story.thumbnail ? `/storage/${story.thumbnail}` : null);
+        setIsDirty(false);
     };
 
     return (
@@ -91,23 +109,20 @@ export default function StoryUpdate({ className, storyId, story }) {
 
             <dialog id={storyId} className="modal">
                 <div className="modal-box bg-slate-50 px-10 max-h-[90vh] overflow-y-auto">
-                    <div className="modal-header sticky top-0 bg-slate-50 py-2">
+                    <div className="modal-header sticky top-0 bg-slate-50 py-2 z-10">
                         <form method="dialog">
                             <button
                                 className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-                                onClick={() => reset()}
+                                onClick={handleClose}
                             >
                                 ✕
                             </button>
                         </form>
-                        <h3 className="font-bold text-lg">
-                            Edit Story
-                        </h3>
+                        <h3 className="font-bold text-lg">Edit Story</h3>
                     </div>
 
                     <div className="modal-body py-6">
                         <form onSubmit={handleSubmit} className="space-y-6">
-                            {/* Title & Cancer Type */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <InputLabel htmlFor="title" value="Title *" />
@@ -127,26 +142,28 @@ export default function StoryUpdate({ className, storyId, story }) {
                                         id="cancer_type"
                                         className="mt-1 block w-full"
                                         value={editData.cancer_type}
-                                        onChange={(e) => setEditData("cancer_type", e.target.value)}
+                                        onChange={(e) => {
+                                            setEditData("cancer_type", e.target.value);
+                                            setIsDirty(true);
+                                        }}
                                         required
                                     />
                                     <InputError className="mt-2" message={errors.cancer_type} />
                                 </div>
                             </div>
 
-                            {/* Content */}
                             <div>
                                 <InputLabel htmlFor="editor-content" value="Your Story *" />
-                                <div className="mt-1">
-                                    <RichTextEditor 
-                                        content={editData.content || ''}
-                                        onChange={(newContent) => setEditData("content", newContent)}
-                                    />
-                                </div>
+                                <RichTextEditor 
+                                    content={editData.content || ''}
+                                    onChange={(newContent) => {
+                                        setEditData("content", newContent);
+                                        setIsDirty(true);
+                                    }}
+                                />
                                 <InputError className="mt-2" message={errors.content} />
                             </div>
 
-                            {/* Thumbnail */}
                             <div>
                                 <InputLabel htmlFor="thumbnail" value="Photo" />
                                 {imagePreview && (
@@ -155,6 +172,10 @@ export default function StoryUpdate({ className, storyId, story }) {
                                             src={imagePreview}
                                             alt="Story thumbnail preview"
                                             className="max-w-xs rounded-lg shadow-md"
+                                            onError={(e) => {
+                                                e.target.src = '/images/default-thumbnail.jpg';
+                                                e.target.onerror = null;
+                                            }}
                                         />
                                     </div>
                                 )}
@@ -177,7 +198,6 @@ export default function StoryUpdate({ className, storyId, story }) {
                                 <InputError className="mt-2" message={errors.thumbnail} />
                             </div>
 
-                            {/* Submit Buttons */}
                             <div className="flex gap-4">
                                 <button
                                     type="submit"
@@ -201,7 +221,7 @@ export default function StoryUpdate({ className, storyId, story }) {
                     </div>
                 </div>
                 <form method="dialog" className="modal-backdrop">
-                    <button onClick={() => reset()}></button>
+                    <button onClick={handleClose}></button>
                 </form>
             </dialog>
         </>

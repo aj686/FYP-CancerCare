@@ -21,7 +21,7 @@ class DonationController extends Controller
         return Inertia::render('Donation/DonationPage');
     }
 
-    public function initiateDonation(Request $request)
+    public function initiate(Request $request)
     {
         $validated = $request->validate([
             'amount' => 'required|numeric|min:1',
@@ -91,10 +91,6 @@ class DonationController extends Controller
             $donation->update(['stripe_session_id' => $session->id]);
 
             DB::commit();
-            // return response()->json(['sessionId' => $session->id]);
-            // return response()->json([
-            //     'url' => $session->url // Stripe Session object includes a URL property
-            // ]);
 
             // Redirect to Stripe Checkout using Inertia::location()
             if ($session && isset($session->url)) {
@@ -112,9 +108,9 @@ class DonationController extends Controller
                 'user' => Auth::id() ?? 'guest'
             ]);
 
-             return Inertia::render('Donation/DonationPage', [
-            'error' => 'An error occurred while processing your donation. Please try again.'
-        ]);
+            return Inertia::render('Donation/DonationPage', [
+                'error' => 'An error occurred while processing your donation. Please try again.'
+            ]);
         }
     }
 
@@ -161,13 +157,11 @@ class DonationController extends Controller
                 config('services.stripe.webhook_secret')
             );
 
-            Log::info('Webhook received', ['type' => $event->type]); // Add logging
+            Log::info('Webhook received', ['type' => $event->type]);
 
-            // Handle the checkout.session.completed event
             if ($event->type === 'checkout.session.completed') {
                 $session = $event->data->object;
                 
-                // Log the session data
                 Log::info('Session data', ['session' => $session]);
 
                 $donation = Donation::where('stripe_session_id', $session->id)
@@ -175,30 +169,42 @@ class DonationController extends Controller
                     ->first();
 
                 if ($donation) {
-                    $donation->update([
-                        'payment_status' => 'completed',
-                        'payment_date' => now()
-                    ]);
+                    Log::info('Found donation', ['donation_id' => $donation->id]);
+                    
+                    try {
+                        $donation->update([
+                            'payment_status' => 'completed',
+                            'payment_date' => now()
+                        ]);
 
-                    // Send confirmation email
-                    Mail::to($donation->email)
-                        ->queue(new DonationConfirmation($donation));
+                        Log::info('Attempting to send email', [
+                            'to' => $donation->email,
+                            'donation_id' => $donation->id
+                        ]);
 
-                    Log::info('Donation updated successfully', ['donation_id' => $donation->id]);
+                        // Try sending email synchronously first for testing
+                        Mail::to($donation->email)->send(new DonationConfirmation($donation));
+                        
+                        Log::info('Email sent successfully');
+
+                    } catch (\Exception $e) {
+                        Log::error('Error in webhook processing', [
+                            'error' => $e->getMessage(),
+                            'trace' => $e->getTraceAsString()
+                        ]);
+                    }
+
                 } else {
-                    Log::warning('Donation not found for session', ['session_id' => $session->id]);
+                    Log::warning('Donation not found', ['session_id' => $session->id]);
                 }
             }
 
             return response()->json(['status' => 'success']);
-        } catch (\UnexpectedValueException $e) {
-            Log::error('Webhook signature verification failed', ['error' => $e->getMessage()]);
-            return response()->json(['error' => 'Invalid payload'], 400);
-        } catch (\Stripe\Exception\SignatureVerificationException $e) {
-            Log::error('Webhook signature verification failed', ['error' => $e->getMessage()]);
-            return response()->json(['error' => 'Invalid signature'], 400);
         } catch (\Exception $e) {
-            Log::error('Webhook Processing Error', ['error' => $e->getMessage()]);
+            Log::error('Webhook error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }

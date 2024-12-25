@@ -45,125 +45,124 @@ const scaleIn = {
     }
 };
 
-export default function Homepage({ blogs, plans }) {
+export default function Homepage({ blogs, plans, activeMembership, isGuest }) {
     const topics = [
         { title: 'About Cancer', href: '/cancer-information/about-cancer' },
         { title: 'Cancer Types', href: '/cancer-information/cancer-types' },
-        { title: 'Treatment', href: '/cancer-information/treatment' },
-        { title: 'Prevention', href: '/cancer-information/prevention' },
-        { title: 'Early Detection', href: '/cancer-information/early-detection' },
-        { title: 'Recovery', href: '/cancer-information/recovery' },
-        { title: 'Diagnosis', href: '/cancer-information/diagnosis' },
+        { title: 'Treatment', href: '/cancer-information/cancer-treatments' },
+        { title: 'Prevention', href: '/cancer-information/cancer-prevention' },
+        { title: 'Early Detection', href: '/cancer-information/cancer-detection' },
+        { title: 'Recovery', href: '/cancer-information/cancer-recovery' },
+        { title: 'Diagnosis', href: '/cancer-information/cancer-diagnosis' },
     ];
+
+    // // Add debug logging
+    // useEffect(() => {
+    //     console.log('Homepage Props:', {
+    //         hasPlans: Boolean(plans),
+    //         plansLength: plans?.length,
+    //         isGuest,
+    //         activeMembership
+    //     });
+    // }, [plans, isGuest, activeMembership]);
 
     return (
         <>
             <Head title="Homepage" />
             <DynamicNavbar />
 
-            {/* Hero Section */}
-            <div className="relative w-full min-h-screen overflow-hidden bg-gradient-to-br from-purpleMuda via-purpleMid to-purpleTua">
-                <div className="grid grid-cols-1 lg:grid-cols-2 min-h-screen">
-                    {/* Content Section */}
+            {/* Hero Section */} 
+            <div className="relative w-full h-[60vh] overflow-hidden bg-gradient-to-br from-purpleMuda via-purpleMid to-purpleTua">
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8 }}
+                    className="flex flex-col items-center justify-center h-full px-6 lg:px-12 py-12 relative z-10"
+                >
                     <motion.div 
                         initial="hidden"
                         animate="visible"
                         variants={fadeInUp}
-                        className="flex items-center px-6 lg:px-12 py-12 relative z-10"
+                        className="max-w-xl text-center"
                     >
-                        <div className="max-w-xl">
-                            <motion.h1 
-                                variants={fadeInUp}
-                                className="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl"
+                        <motion.h1 
+                            variants={fadeInUp}
+                            className="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl"
+                        >
+                            Together, We Fight Cancer, Uniting for a cure
+                        </motion.h1>
+                        <motion.p 
+                            variants={fadeInUp}
+                            className="mb-8 text-lg font-normal text-gray-200"
+                        >
+                            We focus on advancing cancer research and treatment, harnessing the power of innovation to improve lives and create a healthier future for all.
+                        </motion.p>
+                        <motion.div 
+                            variants={staggerContainer}
+                            className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 justify-center"
+                        >
+                            <motion.a 
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                href="/cancer-information" 
+                                className="inline-flex justify-center items-center py-3 px-6 text-base font-medium text-purpleTua rounded-full bg-yellow-300 hover:bg-yellow-400 transition-colors"
                             >
-                                Together, We Fight Cancer, Uniting for a cure
-                            </motion.h1>
-                            <motion.p 
-                                variants={fadeInUp}
-                                className="mb-8 text-lg font-normal text-gray-200"
+                                About Cancer
+                                <svg className="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+                                </svg>
+                            </motion.a>
+                            <motion.a 
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                href="/about" 
+                                className="inline-flex justify-center items-center py-3 px-6 sm:ms-4 text-base font-medium text-white rounded-full border-2 border-white hover:bg-white/10 transition-colors"
                             >
-                                We focus on advancing cancer research and treatment, harnessing the power of innovation to improve lives and create a healthier future for all.
-                            </motion.p>
-                            <motion.div 
-                                variants={staggerContainer}
-                                className="flex flex-col space-y-4 sm:flex-row sm:space-y-0"
+                                About Us
+                            </motion.a>
+                            <motion.a 
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                href="#" 
                             >
-                                <motion.a 
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    href="#" 
-                                    className="inline-flex justify-center items-center py-3 px-6 text-base font-medium text-purpleTua rounded-full bg-yellow-300 hover:bg-yellow-400 transition-colors"
-                                >
-                                    About Cancer
-                                    <svg className="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
-                                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
-                                    </svg>
-                                </motion.a>
-                                <motion.a 
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    href="#" 
-                                    className="inline-flex justify-center items-center py-3 px-6 sm:ms-4 text-base font-medium text-white rounded-full border-2 border-white hover:bg-white/10 transition-colors"
-                                >
-                                    About Us
-                                </motion.a>
-                                <motion.a 
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    href="#" 
-                                >
-                                    <DonateButton />
-                                </motion.a>
-                            </motion.div>
-                        </div>
+                                <DonateButton />
+                            </motion.a>
+                        </motion.div>
                     </motion.div>
+                </motion.div>
 
-                    {/* Image Section with Curve */}
-                    <motion.div 
-                        initial={{ x: 100, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ duration: 0.8 }}
-                        className="relative h-[400px] lg:h-auto overflow-hidden"
-                    >
-                        <div className="absolute inset-0">
-                            <svg className="absolute h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                                <defs>
-                                    <clipPath id="curveClipPath">
-                                        <path d="M20,0 Q0,50 20,100 L100,100 L100,0 Z" />
-                                    </clipPath>
-                                </defs>
-                                <foreignObject width="100" height="100" clipPath="url(#curveClipPath)">
-                                    <div className="w-full h-full">
-                                        <motion.img 
-                                            initial={{ scale: 1.2 }}
-                                            animate={{ scale: 1 }}
-                                            transition={{ duration: 20, repeat: Infinity, repeatType: "reverse" }}
-                                            src="https://img.freepik.com/free-photo/child-suffering-from-cancer_23-2149501388.jpg?t=st=1726590400~exp=1726594000~hmac=1e2097c5774a6f8fe97b9005842dd287f8a9467fc3f6ffe3e13282549213db73&w=996"
-                                            alt="Child with cancer"
-                                            className="w-full h-full object-cover"
-                                        />
-                                    </div>
-                                </foreignObject>
-                            </svg>
-                        </div>
-                    </motion.div>
-                </div>
-
-                {/* Decorative curves */}
-                <motion.svg 
+                {/* Decorative animated shapes */}
+                <motion.div
                     initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5, duration: 0.8 }}
-                    className="absolute bottom-0 left-0 w-full h-16" 
-                    viewBox="0 0 100 100" 
-                    preserveAspectRatio="none"
+                    animate={{ opacity: 0.1 }}
+                    transition={{ duration: 1 }}
+                    className="absolute inset-0 overflow-hidden"
                 >
-                    <path 
-                        d="M0,100 C30,90 70,90 100,100 L100,100 L0,100 Z" 
-                        fill="white" 
-                        fillOpacity="0.1"
-                    />
-                </motion.svg>
+                    <div className="absolute -top-4 -left-4 w-24 h-24 bg-white rounded-full opacity-20"></div>
+                    <motion.div
+                        animate={{
+                            scale: [1, 1.2, 1],
+                            rotate: [0, 180, 360],
+                        }}
+                        transition={{
+                            duration: 20,
+                            repeat: Infinity,
+                            ease: "linear"
+                        }}
+                        className="absolute top-1/4 right-1/4 w-16 h-16 bg-white rounded-full opacity-10"
+                    ></motion.div>
+                    <motion.div
+                        animate={{
+                            y: [0, 30, 0],
+                        }}
+                        transition={{
+                            duration: 5,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                        }}
+                        className="absolute bottom-1/4 left-1/3 w-20 h-20 bg-white rounded-full opacity-10"
+                    ></motion.div>
+                </motion.div>
             </div>
 
             {/* What We Do Section */}
@@ -286,7 +285,20 @@ export default function Homepage({ blogs, plans }) {
                         </p>
                     </motion.div>
                     <motion.div variants={scaleIn}>
-                        <SubscriptionPlan plans={plans} />
+                        {/* Add error boundary and loading state */}
+                        {plans ? (
+                            <div className="bg-white rounded-xl shadow-lg p-6">
+                                <SubscriptionPlan 
+                                    plans={plans || []}
+                                    isGuest={isGuest}
+                                    activeMembership={activeMembership}
+                                />
+                            </div>
+                        ) : (
+                            <div className="text-center py-8">
+                                <p className="text-gray-600">Loading subscription plans...</p>
+                            </div>
+                        )}
                     </motion.div>
                 </div>
             </motion.div>

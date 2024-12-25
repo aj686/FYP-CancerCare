@@ -12,6 +12,11 @@ export default function PlanAdd({ className = "", disabled }) {
         stripe_plan: "",
         price: "",
         description: "",
+        can_comment: false,
+        can_access_forum: false,
+        can_access_events: false,
+        can_share_stories: false,
+        billing_interval: "year"
     });
 
     const [isDirty, setIsDirty] = useState(false);
@@ -159,6 +164,82 @@ export default function PlanAdd({ className = "", disabled }) {
                                     />
                                     <InputError className="mt-2" message={errors.price} />
                                 </div>
+                            </div>
+
+                            {/* Features Section */}
+                            <div className="space-y-2">
+                                <InputLabel value="Plan Features" />
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <label className="flex items-center gap-2">
+                                        <input
+                                            type="checkbox"
+                                            checked={data.can_comment}
+                                            onChange={(e) => {
+                                                setData("can_comment", e.target.checked);
+                                                setIsDirty(true);
+                                            }}
+                                            className="checkbox"
+                                        />
+                                        <span className="text-sm text-gray-700">Can Comment on Stories</span>
+                                    </label>
+
+                                    <label className="flex items-center gap-2">
+                                        <input
+                                            type="checkbox"
+                                            checked={data.can_access_forum}
+                                            onChange={(e) => {
+                                                setData("can_access_forum", e.target.checked);
+                                                setIsDirty(true);
+                                            }}
+                                            className="checkbox"
+                                        />
+                                        <span className="text-sm text-gray-700">Access to Forum</span>
+                                    </label>
+
+                                    <label className="flex items-center gap-2">
+                                        <input
+                                            type="checkbox"
+                                            checked={data.can_access_events}
+                                            onChange={(e) => {
+                                                setData("can_access_events", e.target.checked);
+                                                setIsDirty(true);
+                                            }}
+                                            className="checkbox"
+                                        />
+                                        <span className="text-sm text-gray-700">Access to All Events</span>
+                                    </label>
+
+                                    <label className="flex items-center gap-2">
+                                        <input
+                                            type="checkbox"
+                                            checked={data.can_share_stories}
+                                            onChange={(e) => {
+                                                setData("can_share_stories", e.target.checked);
+                                                setIsDirty(true);
+                                            }}
+                                            className="checkbox"
+                                        />
+                                        <span className="text-sm text-gray-700">Share Journey Stories</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            {/* Billing Interval */}
+                            <div>
+                                <InputLabel htmlFor="billing_interval" value="Billing Interval" />
+                                <select
+                                    id="billing_interval"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+                                    value={data.billing_interval}
+                                    onChange={(e) => {
+                                        setData("billing_interval", e.target.value);
+                                        setIsDirty(true);
+                                    }}
+                                >
+                                    <option value="year">Yearly</option>
+                                    <option value="month">Monthly</option>
+                                </select>
+                                <InputError className="mt-2" message={errors.billing_interval} />
                             </div>
 
                             {/* Description */}

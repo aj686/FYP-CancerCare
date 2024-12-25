@@ -132,32 +132,6 @@ export default function ViewProduct({ product }) {
                                 <ShoppingCart className="h-5 w-5" />
                                 Add to Cart
                             </button>
-                            
-                            <button
-                                className="flex-1 inline-flex justify-center items-center gap-2 rounded-full bg-purpleMuda px-6 py-3 text-sm font-medium text-purpleTua hover:bg-purpleMid hover:text-white transition-colors"
-                            >
-                                <Heart className="h-5 w-5" />
-                                Add to Wishlist
-                            </button>
-                        </div>
-
-                        {/* Additional Info */}
-                        <div className="mt-8 border-t border-purpleMuda pt-8">
-                            <div className="space-y-4">
-                                <div className="flex items-start">
-                                    <div className="ml-3">
-                                        <p className="text-sm font-medium text-purpleTua">Free Delivery</p>
-                                        <p className="mt-1 text-sm text-gray-600">Enter your postal code for Delivery Availability</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-start">
-                                    <div className="ml-3">
-                                        <p className="text-sm font-medium text-purpleTua">Return Delivery</p>
-                                        <p className="mt-1 text-sm text-gray-600">Free 30 Days Delivery Returns. Details</p>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>

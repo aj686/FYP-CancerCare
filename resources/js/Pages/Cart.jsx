@@ -1,10 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import React from 'react';
-import Navbar from '@/Components/Navbar';
-import NavLink from '@/Components/NavLink';
-import PrimaryButton from '@/Components/PrimaryButton';
-import 'flowbite';
 import { Inertia } from '@inertiajs/inertia';
 import DynamicNavbar from '@/Components/My Components/AboutCancer/DynamicNavbar';
 import Footer from '@/Components/My Components/Footer';
@@ -12,9 +8,15 @@ import Footer from '@/Components/My Components/Footer';
 export default function Cart({ cart }) {
     const [initialCart, setCart] = useState(cart);
 
+    // Function to update cart count in navbar
+    const updateCartNotification = () => {
+        document.dispatchEvent(new CustomEvent('cartUpdated', { 
+            detail: { count: Object.keys(cart).length }
+        }));
+    };
+
     // Sub One 
     const handleDecrement = (key) => {
-        // Ensure quantity does not go below 1
         if (cart[key] && cart[key].quantity > 1) {
             setCart((prevCart) => {
                 const newCart = { ...prevCart };
@@ -22,6 +24,7 @@ export default function Cart({ cart }) {
                 updateCart(newCart);
                 return newCart;
             });
+            updateCartNotification();
         }
     };
 
@@ -34,6 +37,7 @@ export default function Cart({ cart }) {
                 updateCart(newCart);
                 return newCart;
             });
+            updateCartNotification();
         }
     };
 
@@ -45,6 +49,7 @@ export default function Cart({ cart }) {
                 updateCart(newCart);
                 return newCart;
             });
+            updateCartNotification();
         }
     }
 
@@ -63,16 +68,19 @@ export default function Cart({ cart }) {
     // Total Price including shipping
     const getTotalPriceAfterShipping = () => {
         const shippingPrice = 10;
-        const totalPrice = Object.keys(cart).reduce((total, key) => {
-            return total + (cart[key].price * cart[key].quantity);
-        }, 0);
+        const totalPrice = getTotalPrice();
         return totalPrice + shippingPrice;
     };
+
+    // Update notification when component mounts
+    useEffect(() => {
+        updateCartNotification();
+    }, [cart]);
 
     return (
         <div className="min-h-screen flex flex-col">
             <Head title="Cart" />
-            <DynamicNavbar />
+            <DynamicNavbar cartCount={Object.keys(cart).length} />
 
             {/* Cart Section */}
             <main className="flex-grow bg-gradient-to-b from-white to-purpleMuda">
@@ -96,6 +104,7 @@ export default function Cart({ cart }) {
                                 ))}
                             </ol>
                         </div>
+                        
                         <h2 className="text-2xl font-bold text-purpleTua mb-8">Shopping Cart</h2>
                         
                         <div className="grid lg:grid-cols-3 gap-8">
@@ -131,7 +140,7 @@ export default function Cart({ cart }) {
 
                                                         {/* Details */}
                                                         <div className="flex-1">
-                                                            <h3 className="text-lg font-medium text-purpleTua">{cart[key].name}</h3>
+                                                        <h3 className="text-lg font-medium text-purpleTua">{cart[key].name}</h3>
                                                             <div className="mt-4 flex items-center gap-4">
                                                                 {/* Quantity Controls */}
                                                                 <div className="flex items-center gap-2">

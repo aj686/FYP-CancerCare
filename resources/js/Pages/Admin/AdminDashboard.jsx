@@ -1,6 +1,9 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import Dashboard from '@/Components/My Components/Admin Comp/Dashboard';
+import GrafanaDashboard from '@/Components/My Components/Grafana/GrafanaDashboard';
+import DailyUserRegistration from '@/Components/My Components/Grafana/DailyUserRegistration';
+import ActiveUsersStats from '@/Components/My Components/Grafana/ActiveUsersStats';
 
 
 
@@ -19,6 +22,17 @@ export default function AdminDashboard({products, productCount,  events, eventCo
                         totalEvent = {eventCount}
                         totalUser = {userCount}
                     />
+
+                    {/* New Grafana Dashboard */}
+                    {/* <GrafanaDashboard 
+                        url="//localhost:3000/d-solo/ee727gleyhog0f/new-dashboard?orgId=1&from=1734305361143&to=1734326961143&timezone=browser&panelId=1&__feature.dashboardSceneSolo"
+                        title="Analytics Dashboard"
+                    />
+                    <br />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        <DailyUserRegistration />
+                        <ActiveUsersStats />
+                    </div> */}
                 </div>
             </div>
         </AuthenticatedLayout>

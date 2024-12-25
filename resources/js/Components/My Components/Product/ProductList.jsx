@@ -47,7 +47,7 @@ export default function ProductList( {all_products} ) {
                         </nav>
                         <h2 className="mt-3 text-2xl font-bold text-purpleTua sm:text-3xl">Merchandise</h2>
                     </div>
-                    <div className="flex items-center space-x-4">
+                    {/* <div className="flex items-center space-x-4">
                         <button 
                             data-modal-toggle="filterModal" 
                             data-modal-target="filterModal" 
@@ -66,7 +66,7 @@ export default function ProductList( {all_products} ) {
                             <SortAsc className="mr-2 h-4 w-4" />
                             Sort
                         </button>
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Product Grid */}
@@ -113,14 +113,14 @@ export default function ProductList( {all_products} ) {
                 </div>
 
                 {/* Show More Button */}
-                <div className="w-full text-center my-5">
+                {/* <div className="w-full text-center my-5">
                     <button 
                         type="button" 
                         className="rounded-full border-2 border-purpleTua bg-white px-6 py-2 text-sm font-medium text-purpleTua hover:bg-purpleMuda transition-colors"
                     >
                         Show more
                     </button>
-                </div>
+                </div> */}
             </div>
         </section>
 

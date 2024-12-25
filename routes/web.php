@@ -18,6 +18,8 @@ use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\UserStoryController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\CommunityController;
 
 
 
@@ -57,9 +59,11 @@ Route::get('/product/{products}', [ProductController::class, 'show'])->name('pro
 
 // CartController 
 Route::get('/cart', [CartController::class, 'showCart'])->name('cart.show');
-// Route to add a product to the cart
 Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
 Route::post('/cart/update', [CartController::class, 'updateCart'])->name('cart.update');
+Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.count');
+Route::post('/cart/remove', [CartController::class, 'removeProduct'])->name('cart.remove');
+Route::post('/cart/clear', [CartController::class, 'clearCart'])->name('cart.clear');
 
 // CheckController 
 Route::get('/checkout', [CheckoutController::class, 'showOrder'])->name('checkout.show');
@@ -75,27 +79,31 @@ Route::get('/payment/cancel/{order_id}', [PaymentController::class, 'paymentCanc
 // Plan routes
 Route::get('/plan', [PlanController::class, 'index'])->name('plan.index');
 
- // Membership
- Route::post('/stripe/webhook', [MembershipController::class, 'handleWebhook'])->name('stripe.webhook');
+ // Membership Webhook
+ Route::post('/stripe/webhook/subscription', [MembershipController::class, 'handleWebhook'])
+    ->name('stripe.webhook.subscription');
+
+// Checkout Product Webhook
+Route::post('/stripe/webhook/payment', [PaymentController::class, 'handleWebhook'])
+    ->name('stripe.webhook.payment');
+
+// Donate Webhook
+Route::post('/stripe/webhook/donation', [DonationController::class, 'handleWebhook'])
+    ->name('stripe.webhook.donation');
 
  // Donation
- // routes/web.php
-// Route::controller(DonationController::class)->group(function () {
-//     Route::get('/donate', 'show')->name('donate.show');
-//     Route::post('/donate/initiate', 'initiateDonation')->name('donation.initiate');
-//     // Remove donation_id parameter from success route
-//     Route::get('/donate/success', 'success')->name('donation.success');
-//     Route::get('/donate/cancel', 'cancel')->name('donation.cancel');
-//     Route::post('/stripe/webhook', 'handleWebhook')->name('donation.webhook');
-// });
-
 Route::get('/donate', [DonationController::class, 'show'])->name('donate.show');
-Route::get('/donate/initiate', [DonationController::class, 'initiateDonation'])->name('donation.initiate');
+Route::post('/donate/initiate', [DonationController::class, 'initiate'])->name('donation.initiate');
 Route::get('/donate/success', [DonationController::class, 'success'])->name('donation.success');
 Route::get('/donate/cancel', [DonationController::class, 'cancel'])->name('donation.cancel');
-Route::get('/stripe/webhook', [DonationController::class, 'handleWebhook'])->name('donation.webhook');
 
 
+// User Story
+Route::get('/stories', [UserStoryController::class, 'index'])->name('stories.index');
+Route::get('/stories/{slug}', [UserStoryController::class, 'showComment'])->name('stories.show');
+
+// Public comment routes - for viewing comments
+Route::get('/api/stories/{story}/comments', [CommentController::class, 'index'])->name('comments.index');
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -110,10 +118,15 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified', 'user'])->name('dashboard');
 
+
+
 Route::middleware(['auth', 'user'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
 
     // User-specific routes
     Route::get('/user/bookings', [UserController::class, 'bookings'])->name('user.bookings');
@@ -129,20 +142,20 @@ Route::middleware(['auth', 'user'])->group(function () {
     // Membership routes
     Route::post('membership/subscribe/{plan}', [MembershipController::class, 'subscribe'])->name('membership.subscribe');
     Route::get('membership/success', [MembershipController::class, 'success'])->name('membership.success');
-    Route::get('membership/cancel', [MembershipController::class, 'cancel'])->name('membership.cancel');
+    Route::post('/membership/cancel', [MembershipController::class, 'cancel'])->name('membership.cancel');
     
     // User Story
-    Route::get('/stories', [UserStoryController::class, 'index'])->name('stories.index');
-    Route::get('/stories/{slug}', [UserStoryController::class, 'show'])->name('stories.show');
-
-    // Routes that require membership
-    Route::middleware('membership')->group(function () {
+    Route::middleware(['auth', 'user', 'membership'])->group(function () {
         Route::get('/user/my-stories', [UserStoryController::class, 'myStories'])->name('stories.my-stories');
         Route::get('/stories/create/new', [UserStoryController::class, 'create'])->name('stories.create');
         Route::post('/stories', [UserStoryController::class, 'store'])->name('stories.store');
         Route::get('/stories/{story}/edit', [UserStoryController::class, 'edit'])->name('stories.edit');
         Route::patch('/stories/{story}', [UserStoryController::class, 'update'])->name('stories.update');
         Route::delete('/stories/{story}', [UserStoryController::class, 'destroy'])->name('stories.destroy');
+        Route::post('/api/stories/{story}/comments', [CommentController::class, 'store'])->name('comments.store');
+        Route::delete('/api/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+        Route::post('/api/comments/{comment}/toggle-like', [CommentController::class, 'toggleLike'])->name('comments.toggle-like');
+        Route::get('/community', [CommunityController::class, 'index'])->name('community.index');
     });
 
     // Plan routes
@@ -197,9 +210,10 @@ require __DIR__.'/auth.php';
 
  // Admin routes
     Route::middleware(['auth', 'admin'])->group(function () {
-        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+        Route::get('/admin/profile', [AdminController::class, 'editProfile'])->name('admin.profile');
+        Route::patch('/admin/profile', [AdminController::class, 'updateProfile'])->name('admin.profile.update');
+        Route::delete('/admin/profile', [AdminController::class, 'destroyProfile'])->name('admin.profile.destroy');
+        Route::put('/admin/password', [AdminController::class, 'updatePassword'])->name('admin.password.update');
 
         Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
         Route::get('/admin/products', [AdminController::class, 'products'])->name('admin.products');
@@ -218,9 +232,9 @@ require __DIR__.'/auth.php';
         Route::delete('/admin/destroy/{id}', [AdminController::class, 'destroy'])->name('admin.products.delete');
     
         // user CRUD
-        Route::post('/admin/create-user', [AdminController::class, 'createUser'])->name('admin.users.create');
-        Route::patch('/admin/update-user/{id}', [AdminController::class, 'updateUser'])->name('admin.users.update');
-        Route::delete('/admin/destroy-user/{id}', [AdminController::class, 'destroyUser'])->name('admin.users.delete');
+        Route::post('/admin/users/create', [AdminController::class, 'createUser'])->name('admin.users.create');
+        Route::patch('/admin/users/{id}', [AdminController::class, 'updateUser'])->name('admin.users.update');
+        Route::delete('/admin/users/{id}', [AdminController::class, 'destroyUser'])->name('admin.users.destroy');
 
         // program CRUD
         Route::post('/admin/create-event', [AdminController::class, 'createEvent'])->name('admin.events.create');
@@ -259,4 +273,3 @@ require __DIR__.'/auth.php';
         Route::patch('/admin/stories/{id}/status', [AdminController::class, 'updateStoryStatus'])->name('admin.stories.update-status');
         Route::delete('/admin/stories/{id}', [AdminController::class, 'destroyStory'])->name('admin.stories.destroy');
     });
-    

@@ -13,7 +13,7 @@ use HasActiveMembership;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, Billable;
+    use HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -25,7 +25,28 @@ class User extends Authenticatable
         'email',
         'usertype',
         'password',
+        'age',
+        'phone',
+        'address_1',
+        'address_2',
+        'city',
+        'state',
+        'postcode',
+        'country',
+        'profile_photo_path'
     ];
+
+    // Add this to append the photo URL to the model
+    protected $appends = ['profile_photo_url'];
+
+    // Add this method to get the photo URL
+    public function getProfilePhotoUrlAttribute()
+    {
+        if ($this->profile_photo_path) {
+            return url('storage/' . $this->profile_photo_path);
+        }
+        return null;
+    }
 
     /**
      * The attributes that should be hidden for serialization.
@@ -120,5 +141,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(Membership::class);
     }
+
+    
 
 }

@@ -6,6 +6,7 @@ import NavLink from '@/Components/NavLink';
 import PrimaryButton from '@/Components/PrimaryButton';
 import CardDetailCancer from '@/Components/My Components/AboutCancer/CardDetailCancer';
 import DynamicNavbar from '@/Components/My Components/AboutCancer/DynamicNavbar';
+import Footer from '@/Components/My Components/Footer';
 
 export default function AboutCancer() {
     return (
@@ -60,14 +61,17 @@ export default function AboutCancer() {
                     <CardDetailCancer 
                         title="What is Cancer?"
                         href="https://www.cancer.ie/cancer-information-and-support/cancer-information/about-cancer/what-is-cancer"
+                        image="https://mobilephysiotherapyclinic.in/wp-content/uploads/2023/02/cancer.webp"
                     />
                     <CardDetailCancer 
                         title="What cause cancer?"
                         href="https://www.cancer.ie/cancer-information-and-support/cancer-information/about-cancer/causes-of-cancer"
+                        image="https://www.singaporecancersociety.org.sg/images/contents/learn-about-cancer-what-is-cancer/cancer-cell.png"
                     />
                     <CardDetailCancer 
                         title="How many people get cancer in Malaysia?"
                         href="https://www.pantai.com.my/medical-specialties/oncology/cancer-statistics-malaysia"
+                        image="https://www.waroncancer.org.my/aeimages/Image/materials/logo400.png"
                     />
                 </div>
             </div>
@@ -82,17 +86,22 @@ export default function AboutCancer() {
                     <CardDetailCancer 
                         title="Spot cancer early"
                         href="https://www.cancer.ie/cancer-information-and-support/cancer-prevention/early-detection"
+                        image="https://www.cancer.ie/sites/default/files/styles/square/public/2022-12/Spot%20anything%201%20Twitter.png?h=bd907a81&itok=SkfXKUlf"
                     />
                     <CardDetailCancer 
                         title="About cancer screening"
                         href="https://www.cancer.ie/cancer-information-and-support/cancer-information/early-detection/cancer-screening"
+                        image="https://www.cancer.ie/sites/default/files/styles/hero_large_1x/public/2019-12/mammogram.JPG?h=30f1d14f&itok=df1kXuXG"
                     />
                     <CardDetailCancer 
                         title="Diagnosing Cancer"
                         href="https://www.cancer.ie/cancer-information-and-support/cancer-information/early-detection/diagnosing-cancer"
+                        image="https://www.cancer.ie/sites/default/files/styles/hero_large_1x/public/2019-08/download.jpeg?h=c2b54b8e&itok=h5-kU5IN"
                     />
                 </div>
             </div>
+
+            <Footer />
         </>
     );
 }

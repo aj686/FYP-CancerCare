@@ -6,6 +6,7 @@ import NavLink from '@/Components/NavLink';
 import PrimaryButton from '@/Components/PrimaryButton';
 import CardDetailCancer from '@/Components/My Components/AboutCancer/CardDetailCancer';
 import DynamicNavbar from '@/Components/My Components/AboutCancer/DynamicNavbar';
+import Footer from '@/Components/My Components/Footer';
 
 export default function CancerTypes() {
     return (
@@ -65,17 +66,22 @@ export default function CancerTypes() {
                     <CardDetailCancer 
                         title="Breast Cancer"
                         href="https://www.cancer.ie/cancer-information-and-support/cancer-types/breast-cancer"
+                        image="https://www.wellwomen.co.za/wp-content/uploads/2022/10/Breast-Cancer-Ribbon-Held-in-Hands.webp"
                     />
                     <CardDetailCancer 
                         title="Lung Cancer"
                         href="https://www.cancer.ie/cancer-information-and-support/cancer-types/lung-cancer"
+                         image="https://assets.roche.com/f/176343/6700x3750/9f01cb5bf8/overarching-lung-cancer-article-asset.jpg/m/1672x0/filters:format(webp):quality(90)/"
                     />
                     <CardDetailCancer 
                         title="Liver Cancer"
                         href="https://www.cancer.ie/cancer-information-and-support/cancer-types/liver-cancer"
+                        image="https://www.asvinshospitals.com/wp-content/uploads/2023/08/liver-cancer-symptoms-1024x1024.jpg"
                     />
                 </div>
             </div>
+
+            <Footer />
         </>
     );
 }

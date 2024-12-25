@@ -25,7 +25,8 @@ class Order extends Model
     protected $fillable = [
         'user_id',
         'ordernumber',
-        'email',            // Add email here
+        'stripe_session_id',
+        'email',            
         'firstname',
         'lastname',
         'address_1',

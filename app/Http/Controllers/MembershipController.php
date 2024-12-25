@@ -54,7 +54,7 @@ class MembershipController extends Controller
                 'user_id' => $user->id,
                 'plan_id' => $plan->id,
                 'start_date' => now(),
-                'end_date' => now()->addMonth(),
+                'end_date' => now()->addYear(),
                 'status' => 'pending',
                 'amount' => $plan->price,
                 'stripe_session_id' => $session->id
@@ -124,10 +124,10 @@ class MembershipController extends Controller
                     $membership->update([
                         'status' => 'active',
                         'start_date' => now(),
-                        'end_date' => now()->addMonth(),
+                        'end_date' => now()->addYear(), // Changed from addMonth() to addYear()
                         'stripe_invoice_id' => $session->invoice,
                         'stripe_invoice_url' => $invoice->hosted_invoice_url
-                ]);
+                    ]);
                 break;
 
                 case 'invoice.payment_succeeded':
@@ -135,7 +135,7 @@ class MembershipController extends Controller
                     $membership = Membership::where('stripe_invoice_id', $invoice->id)->first();
                     if ($membership) {
                         $membership->update([
-                            'end_date' => Carbon::parse($membership->end_date)->addMonth(),
+                            'end_date' => Carbon::parse($membership->end_date)->addYear(), // Changed from addMonth() to addYear()
                             'amount' => $invoice->amount_paid / 100
                         ]);
                     }

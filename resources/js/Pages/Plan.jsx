@@ -3,7 +3,7 @@ import React from 'react';
 import DynamicNavbar from '@/Components/My Components/AboutCancer/DynamicNavbar';
 import SubscriptionPlan from '@/Components/My Components/Plan/SubscriptionPlan';
 
-export default function Plan({ plans }) {
+export default function Plan({ plans, activeMembership, isGuest }) {
     return (
         <>
             <Head title="Plan" />
@@ -41,12 +41,17 @@ export default function Plan({ plans }) {
                         </p>
                     </div>
                     
-                    {/* Subscription Plans */}
+                    {/* Update SubscriptionPlan component props */}
                     <div className="bg-white rounded-xl shadow-lg p-6">
-                        <SubscriptionPlan plans={plans} />
+                        <SubscriptionPlan 
+                            plans={plans} 
+                            isGuest={isGuest} 
+                            activeMembership={activeMembership} 
+                        />
                     </div>
                 </div>
             </div>
+
 
             {/* Footer with Purple Gradient */}
             <footer className="bg-gradient-to-br from-purpleMuda via-purpleMid to-purpleTua">

@@ -15,6 +15,19 @@ class Plan extends Model
         'stripe_plan',
         'price',
         'description',
+        'can_comment',
+        'can_access_forum',
+        'can_access_events',
+        'can_share_stories',
+        'billing_interval',
+    ];
+
+    protected $casts = [
+        'can_comment' => 'boolean',
+        'can_access_forum' => 'boolean',
+        'can_access_events' => 'boolean',
+        'can_share_stories' => 'boolean',
+        'price' => 'decimal:2'
     ];
 
     public function getRouteKeyName() {

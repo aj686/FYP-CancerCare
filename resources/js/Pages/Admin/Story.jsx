@@ -1,5 +1,6 @@
+import React, { useState, useEffect } from 'react'; // Add missing imports
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, router } from '@inertiajs/react'; // Add missing import for router
 import { PencilIcon, TrashIcon, CheckCircleIcon, XCircleIcon, Eye } from 'lucide-react';
 import { Dialog } from '@headlessui/react';
 
@@ -31,8 +32,11 @@ export default function Story({ auth, stories, count }) {
     };
 
     const handleView = (story) => {
-        setSelectedStory(story);
-        setViewModal(true);
+        // setSelectedStory(story);
+        // setViewModal(true);
+
+        // this line to navigate to StoryView
+        router.visit(route('admin.stories.view', story.id));
     };
 
     const handleApproveClick = (story) => {
@@ -171,7 +175,7 @@ export default function Story({ auth, stories, count }) {
             </div>
 
             {/* View Modal */}
-            <Dialog open={viewModal} onClose={() => setViewModal(false)} className="relative z-50">
+            {/* <Dialog open={viewModal} onClose={() => setViewModal(false)} className="relative z-50">
                 <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
                 <div className="fixed inset-0 flex items-center justify-center p-4">
                     <Dialog.Panel className="mx-auto max-w-3xl rounded bg-white p-6 w-full">
@@ -204,7 +208,7 @@ export default function Story({ auth, stories, count }) {
                         )}
                     </Dialog.Panel>
                 </div>
-            </Dialog>
+            </Dialog> */}
 
             {/* Approve Modal */}
             <Dialog open={approveModal} onClose={() => setApproveModal(false)} className="relative z-50">
