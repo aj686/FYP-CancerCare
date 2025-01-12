@@ -1,16 +1,19 @@
 import React, { useEffect } from 'react';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import DynamicNavbar from '@/Components/My Components/AboutCancer/DynamicNavbar';
 import Footer from '@/Components/My Components/Footer';
 import CommentSection from '@/Components/My Components/CommentSection';
 import StorySidebar from '@/Components/My Components/StorySidebar';
 
-export default function StoryShow({ story, otherStories, auth }) {
+export default function StoryShow({ story, otherStories = [], auth }) {
+    // Add debugging console log
     useEffect(() => {
-        console.log('Story data:', story);
-        console.log('Auth data:', auth);
-        console.log('Other stories:', otherStories);
-    }, [story, auth, otherStories]);
+        console.log('StoryShow Data:', {
+            currentStory: story,
+            otherStoriesData: otherStories,
+            otherStoriesCount: otherStories?.length
+        });
+    }, [story, otherStories]);
 
     if (!story) {
         return (
@@ -25,12 +28,21 @@ export default function StoryShow({ story, otherStories, auth }) {
     }
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
+        try {
+            return new Date(dateString).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        } catch (error) {
+            return 'Date unavailable';
+        }
     };
+
+    // Ensure otherStories excludes the current story
+    const filteredOtherStories = Array.isArray(otherStories) 
+        ? otherStories.filter(s => s.id !== story.id)
+        : [];
 
     return (
         <>
@@ -48,12 +60,15 @@ export default function StoryShow({ story, otherStories, auth }) {
                                         src={`/storage/${story.thumbnail}`}
                                         alt={story.title}
                                         className="w-full h-[400px] object-cover rounded-2xl shadow-lg"
+                                        onError={(e) => {
+                                            e.target.src = '/images/default-thumbnail.jpg';
+                                        }}
                                     />
                                 </div>
                             )}
                             <h1 className="text-4xl font-bold text-gray-900 mb-4">{story.title}</h1>
                             <div className="flex items-center gap-4 text-gray-600">
-                                <div>By {story.user?.name}</div>
+                                <div>By {story.user?.name || 'Anonymous'}</div>
                                 <div>•</div>
                                 <div>{story.cancer_type}</div>
                                 <div>•</div>
@@ -66,12 +81,12 @@ export default function StoryShow({ story, otherStories, auth }) {
                         </div>
 
                         <footer className="mt-12 pt-8 border-t border-gray-200">
-                            <a 
+                            <Link 
                                 href={route('stories.index')} 
                                 className="text-purple-600 hover:text-purple-800 font-semibold"
                             >
                                 ← Back to All Stories
-                            </a>
+                            </Link>
                         </footer>
 
                         {story && (
@@ -85,8 +100,8 @@ export default function StoryShow({ story, otherStories, auth }) {
 
                     {/* Sidebar */}
                     <StorySidebar 
-                        otherStories={otherStories} 
-                        currentStory={story}
+                        otherStories={filteredOtherStories} 
+                        currentStory={story} 
                     />
                 </div>
             </main>

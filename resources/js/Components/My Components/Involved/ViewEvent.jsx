@@ -1,11 +1,20 @@
 import React from 'react';
-import { Calendar, MapPin, Clock, Tag, Share2, ArrowLeft } from 'lucide-react';
+import { Calendar, MapPin, Clock, Tag, Share2, ArrowLeft, CreditCard } from 'lucide-react';
 import { Link, useForm } from '@inertiajs/react';
 import RegistrationProgress from './RegistrationProgress';
 
 export default function ViewEvent({ event, isRegistered: initialIsRegistered, hasMembership, auth }) {
     const [isRegistered, setIsRegistered] = React.useState(initialIsRegistered);
     const { post, delete: destroy, processing } = useForm();
+
+    React.useEffect(() => {
+        console.log('Event data in ViewEvent:', event);
+        
+        // Debug log to see full event structure
+        if (event) {
+            console.log('Event structure:', JSON.stringify(event, null, 2));
+        }
+    }, [event]);
 
     const handleRegister = () => {
         if (!auth?.user) return;
@@ -48,86 +57,75 @@ export default function ViewEvent({ event, isRegistered: initialIsRegistered, ha
     };
 
     const renderActionButton = () => {
-        if (!auth?.user) {
-            return (
-                <Link
-                    href={route('login')}
-                    className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-gradient-to-r from-purpleMid to-purpleTua rounded-full hover:shadow-lg transition-all duration-300"
-                >
-                    Login to Register
-                </Link>
-            );
-        }
+        const donateButton = (
+            <Link
+                href={route('events.donate', event.id)}
+                className="w-full px-6 py-3 text-base font-medium text-purpleTua bg-yellow-400 rounded-full hover:bg-yellow-500 transition-all duration-300 flex items-center justify-center mb-4"
+            >
+                <CreditCard className="w-5 h-5 mr-2" />
+                Support This Event
+            </Link>
+        );
 
-        if (isRegistered) {
-            return (
-                <button
-                    onClick={handleCancel}
-                    disabled={processing}
-                    className="w-full px-6 py-3 text-base font-medium text-white bg-red-500 rounded-full hover:bg-red-600 disabled:opacity-50 transition-colors duration-300"
-                >
-                    Cancel Registration
-                </button>
-            );
-        }
-
-        const registeredCount = event.registrations?.filter(reg => reg.status === 'registered').length || 0;
-        const isFull = registeredCount >= event.participant_count;
-
-        if (isFull) {
-            return (
-                <button 
-                    disabled 
-                    className="w-full px-6 py-3 text-base font-medium text-white bg-gray-400 rounded-full cursor-not-allowed"
-                >
-                    Event Full
-                </button>
-            );
-        }
-
-        if (event.price > 0 && !hasMembership) {
-            return (
-                <div className="space-y-4">
-                    <button 
-                        onClick={handleRegister}
-                        disabled={processing}
-                        className="w-full px-6 py-3 text-base font-medium text-white bg-gradient-to-r from-purpleMid to-purpleTua rounded-full hover:shadow-lg disabled:opacity-50 transition-all duration-300"
+        const actionButtons = (
+            <div className="space-y-4">
+                {!auth?.user ? (
+                    <Link
+                        href={route('login')}
+                        className="inline-flex w-full items-center justify-center px-6 py-3 text-base font-medium text-white bg-gradient-to-r from-purpleMid to-purpleTua rounded-full hover:shadow-lg transition-all duration-300"
                     >
-                        Register for Event
+                        Login to Register
+                    </Link>
+                ) : isRegistered ? (
+                    <button
+                        onClick={handleCancel}
+                        disabled={processing}
+                        className="w-full px-6 py-3 text-base font-medium text-white bg-red-500 rounded-full hover:bg-red-600 disabled:opacity-50 transition-colors duration-300"
+                    >
+                        Cancel Registration
                     </button>
-                    
-                    <div className="border border-purpleMuda rounded-xl p-4 space-y-4 bg-purpleMuda/10">
-                        <p className="text-sm text-purpleTua">
-                            Note: This is a premium event. You'll need to subscribe to our membership to complete registration.
-                        </p>
-                        <div className="space-y-2">
-                            <h4 className="font-semibold text-purpleTua">Membership Benefits:</h4>
-                            <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
-                                <li>Access to all premium events</li>
-                                <li>Priority registration</li>
-                                <li>Exclusive content and resources</li>
-                                <li>Only RM25/month</li>
-                            </ul>
-                        </div>
-                        <Link
-                            href={route('membership.subscribe')}
-                            className="inline-flex w-full items-center justify-center px-6 py-3 text-base font-medium text-purpleTua bg-yellow-300 rounded-full hover:bg-yellow-400 transition-colors duration-300"
+                ) : (
+                    <div className="space-y-4">
+                        <button 
+                            onClick={handleRegister}
+                            disabled={processing}
+                            className="w-full px-6 py-3 text-base font-medium text-white bg-gradient-to-r from-purpleMid to-purpleTua rounded-full hover:shadow-lg disabled:opacity-50 transition-all duration-300"
                         >
-                            Subscribe Now (RM25/month)
-                        </Link>
+                            Register for Event
+                        </button>
+                        
+                        {event.price > 0 && !hasMembership && (
+                            <div className="border border-purpleMuda rounded-xl p-4 space-y-4 bg-purpleMuda/10">
+                                <p className="text-sm text-purpleTua">
+                                    Note: This is a premium event. You'll need to subscribe to our membership to complete registration.
+                                </p>
+                                <div className="space-y-2">
+                                    <h4 className="font-semibold text-purpleTua">Membership Benefits:</h4>
+                                    <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
+                                        <li>Access to all premium events</li>
+                                        <li>Priority registration</li>
+                                        <li>Exclusive content and resources</li>
+                                        <li>Only RM25/month</li>
+                                    </ul>
+                                </div>
+                                <Link
+                                    href={route('membership.subscribe')}
+                                    className="inline-flex w-full items-center justify-center px-6 py-3 text-base font-medium text-purpleTua bg-yellow-300 rounded-full hover:bg-yellow-400 transition-colors duration-300"
+                                >
+                                    Subscribe Now (RM25/month)
+                                </Link>
+                            </div>
+                        )}
                     </div>
-                </div>
-            );
-        }
+                )}
+            </div>
+        );
 
         return (
-            <button 
-                onClick={handleRegister}
-                disabled={processing}
-                className="w-full px-6 py-3 text-base font-medium text-white bg-gradient-to-r from-purpleMid to-purpleTua rounded-full hover:shadow-lg disabled:opacity-50 transition-all duration-300"
-            >
-                Register Now
-            </button>
+            <div className="space-y-4">
+                {donateButton}
+                {actionButtons}
+            </div>
         );
     };
 
@@ -161,8 +159,8 @@ export default function ViewEvent({ event, isRegistered: initialIsRegistered, ha
 
             <div className="mb-8">
                 <RegistrationProgress 
-                    registrations={event.registrations}
-                    participantCount={event.participant_count}
+                    registrations={[]} 
+                    participantCount={event?.participant_count || 0}
                 />
             </div>
 

@@ -29,4 +29,16 @@ class EventRegistration extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function feedback()
+    {
+        return $this->hasOne(EventFeedback::class);
+    }
+
+    public function canLeaveFeedback()
+    {
+        return $this->status === 'registered' && 
+            $this->event->status === 'completed' && 
+            !$this->feedback()->exists();
+    }
 }

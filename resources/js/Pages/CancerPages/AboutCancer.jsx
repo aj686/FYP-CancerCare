@@ -15,21 +15,21 @@ export default function AboutCancer() {
             <DynamicNavbar />
 
             {/* Hero Section */}
-            <section className="relative h-screen">
+            <section className="relative h-[50vh]">
                 {/* Background Image Container */}
                 <div className="absolute inset-0">
                     <img 
-                        src="https://img.freepik.com/free-photo/child-suffering-from-cancer_23-2149501388.jpg?t=st=1726590400~exp=1726594000~hmac=1e2097c5774a6f8fe97b9005842dd287f8a9467fc3f6ffe3e13282549213db73&w=996"
-                        alt="Background"
-                        className="w-full h-full object-cover"
+                        src="https://images.unsplash.com/photo-1631049127288-f2ef4b664b58?q=80&w=1790&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        alt="Cancer Care Background"
+                        className="w-full h-full object-cover blur-[2px]"
                     />
                     {/* Dark Overlay */}
-                    <div className="absolute inset-0 bg-gray-900/60"></div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-purpleMuda via-purpleMid to-purpleTua opacity-90"></div>
                 </div>
 
-                {/* Content */}
+                {/* Content with adjusted padding */}
                 <div className="relative h-full">
-                    <div className="px-4 mx-auto max-w-screen-xl text-center py-24 lg:py-56">
+                    <div className="px-4 mx-auto max-w-screen-xl text-center py-12 lg:py-24">  {/* Reduced padding */}
                         <h1 className="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl">
                             About Cancer
                         </h1>

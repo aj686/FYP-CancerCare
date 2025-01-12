@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\Membership;
 use Laravel\Cashier\Billable;
 use HasActiveMembership;
+use App\Notifications\ResetPassword;
 
 class User extends Authenticatable
 {
@@ -33,20 +34,22 @@ class User extends Authenticatable
         'state',
         'postcode',
         'country',
-        'profile_photo_path'
+        'profile_photo_path',
+        'remember_token',
+        'email_verified_at'
     ];
 
-    // Add this to append the photo URL to the model
-    protected $appends = ['profile_photo_url'];
+    // // Add this to append the photo URL to the model
+    // protected $appends = ['profile_photo_url'];
 
-    // Add this method to get the photo URL
-    public function getProfilePhotoUrlAttribute()
-    {
-        if ($this->profile_photo_path) {
-            return url('storage/' . $this->profile_photo_path);
-        }
-        return null;
-    }
+    // // Add this method to get the photo URL
+    // public function getProfilePhotoUrlAttribute()
+    // {
+    //     if ($this->profile_photo_path) {
+    //         return url('storage/' . $this->profile_photo_path);
+    //     }
+    //     return null;
+    // }
 
     /**
      * The attributes that should be hidden for serialization.
@@ -142,6 +145,22 @@ class User extends Authenticatable
         return $this->hasMany(Membership::class);
     }
 
-    
+    public function eventFeedbacks()
+    {
+        return $this->hasMany(EventFeedback::class);
+    }
+
+    public function hasGivenFeedbackForEvent($eventId)
+    {
+        return $this->eventFeedbacks()
+                    ->where('events_id', $eventId)
+                    ->exists();
+    }
+
+    // Add this method
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPassword($token));
+    }
 
 }

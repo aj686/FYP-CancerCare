@@ -1,6 +1,24 @@
 import { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
-import { Menu, X, LayoutDashboard, Package, Users, ShoppingCart, CreditCard, FileText, Calendar, Ticket, Home, CalendarDays,  } from 'lucide-react';
+import { 
+    Menu, 
+    X, 
+    LayoutGrid,
+    Box,
+    UserCircle2,
+    ShoppingBag,
+    Wallet,
+    BookOpen,
+    Newspaper,
+    CalendarCheck,
+    MessageSquare,
+    Award,
+    Clipboard,
+    HeartHandshake,
+    HomeIcon,
+    CalendarDays,
+    BookmarkCheck
+} from 'lucide-react';
 import Dropdown from '@/Components/Dropdown';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 
@@ -73,57 +91,63 @@ export default function AuthenticatedLayout({ children }) {
                 <nav className="p-4 overflow-y-auto h-full">
                     {auth.user.usertype === 'admin' ? (
                         <div className="space-y-1">
-                            <SidebarLink href={route('admin.dashboard')} icon={LayoutDashboard}>
+                            <SidebarLink href={route('admin.dashboard')} icon={LayoutGrid}>
                                 Dashboard
                             </SidebarLink>
-                            <SidebarLink href={route('admin.products')} icon={Package}>
+                            <SidebarLink href={route('admin.products')} icon={Box}>
                                 Products
                             </SidebarLink>
                             <SidebarLink href={route('admin.programs')} icon={CalendarDays}>
                                 Events
                             </SidebarLink>
-                            <SidebarLink href={route('admin.users')} icon={Users}>
+                            <SidebarLink href={route('admin.users')} icon={UserCircle2}>
                                 Users
                             </SidebarLink>
-                            <SidebarLink href={route('admin.orders')} icon={ShoppingCart}>
+                            <SidebarLink href={route('admin.orders')} icon={ShoppingBag}>
                                 Orders
                             </SidebarLink>
-                            <SidebarLink href={route('admin.payments')} icon={CreditCard}>
+                            <SidebarLink href={route('admin.payments')} icon={Wallet}>
                                 Payments
                             </SidebarLink>
-                            <SidebarLink href={route('admin.blogs')} icon={FileText}>
+                            <SidebarLink href={route('admin.blogs')} icon={BookOpen}>
                                 Blog
                             </SidebarLink>
-                            <SidebarLink href={route('admin.stories')} icon={FileText}>
+                            <SidebarLink href={route('admin.stories')} icon={Newspaper}>
                                 Stories
                             </SidebarLink>
-                            <SidebarLink href={route('admin.registration')} icon={Calendar}>
+                            <SidebarLink href={route('admin.registration')} icon={CalendarCheck}>
                                 Event Registration
                             </SidebarLink>
-                            <SidebarLink href={route('admin.membership')} icon={Ticket}>
+                            <SidebarLink href={route('admin.event-feedbacks')} icon={MessageSquare}>
+                                Event Feedback
+                            </SidebarLink>
+                            <SidebarLink href={route('admin.membership')} icon={Award}>
                                 Membership
                             </SidebarLink>
-                            <SidebarLink href={route('admin.plans')} icon={Ticket}>
+                            <SidebarLink href={route('admin.plans')} icon={Clipboard}>
                                 Plan
+                            </SidebarLink>
+                            <SidebarLink href={route('admin.donate')} icon={HeartHandshake}>
+                                Donate
                             </SidebarLink>
                         </div>
                     ) : (
                         <div className="space-y-1">
-                            <SidebarLink href={route('dashboard')} icon={LayoutDashboard}>
+                            <SidebarLink href={route('dashboard')} icon={LayoutGrid}>
                                 Dashboard
                             </SidebarLink>
-                            <SidebarLink href={route('user.bookings')} icon={Calendar}>
+                            <SidebarLink href={route('user.bookings')} icon={BookmarkCheck}>
                                 Bookings
                             </SidebarLink>
-                            <SidebarLink href={route('user.orders')} icon={ShoppingCart}>
+                            <SidebarLink href={route('user.orders')} icon={ShoppingBag}>
                                 Orders
                             </SidebarLink>
                             {user.has_active_membership && (
-                                <SidebarLink href={route('stories.my-stories')} icon={FileText}>
+                                <SidebarLink href={route('stories.my-stories')} icon={Newspaper}>
                                     Your Stories
                                 </SidebarLink>
                             )}
-                            <SidebarLink href={route('home-page')} icon={Home}>
+                            <SidebarLink href={route('home-page')} icon={HomeIcon}>
                                 Homepage
                             </SidebarLink>
                         </div>
@@ -141,21 +165,23 @@ export default function AuthenticatedLayout({ children }) {
     );
 }
 
-// SidebarLink Component
+// Enhanced SidebarLink Component with new styling
 function SidebarLink({ href, icon: Icon, children }) {
     const isActive = route().current(href.split('.').slice(-1)[0]);
     
     return (
         <Link
             href={href}
-            className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+            className={`flex items-center px-4 py-2 text-sm font-medium transition-all duration-200 relative group ${
                 isActive
-                    ? 'bg-gray-100 text-gray-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-blue-50 text-blue-600 border-l-4 border-blue-600 pl-3'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 border-l-4 border-transparent pl-3 hover:border-gray-300'
             }`}
         >
-            <Icon className="w-5 h-5 mr-3" />
-            {children}
+            <Icon className={`w-5 h-5 mr-3 transition-colors ${
+                isActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-500'
+            }`} />
+            <span className="truncate">{children}</span>
         </Link>
     );
 }

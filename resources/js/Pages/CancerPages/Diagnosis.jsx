@@ -14,22 +14,22 @@ export default function Diagnosis() {
             <Head title="Cancer Diagnosis" />
             <DynamicNavbar />
 
-            {/* Hero Section */}
-            <section className="relative h-screen">
+            {/* Cancer Diagnosis Hero Section */}
+            <section className="relative h-[50vh]">
                 {/* Background Image Container */}
                 <div className="absolute inset-0">
                     <img 
-                        src="https://img.freepik.com/free-photo/child-suffering-from-cancer_23-2149501388.jpg?t=st=1726590400~exp=1726594000~hmac=1e2097c5774a6f8fe97b9005842dd287f8a9467fc3f6ffe3e13282549213db73&w=996"
-                        alt="Background"
-                        className="w-full h-full object-cover"
+                        src="https://plus.unsplash.com/premium_photo-1726768945604-63642968ec52?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8Y2FuY2VyJTIwZGlhZ25vc3xlbnwwfHwwfHx8MA%3D%3D"
+                        alt="Cancer Diagnosis Background"
+                        className="w-full h-full object-cover blur-[2px]"
                     />
-                    {/* Dark Overlay */}
-                    <div className="absolute inset-0 bg-gray-900/60"></div>
+                    {/* Enhanced Overlay with Gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-purpleMuda via-purpleMid to-purpleTua opacity-90"></div>
                 </div>
 
-                {/* Content */}
+                {/* Content with adjusted padding */}
                 <div className="relative h-full">
-                    <div className="px-4 mx-auto max-w-screen-xl text-center py-24 lg:py-56">
+                    <div className="px-4 mx-auto max-w-screen-xl text-center py-12 lg:py-24">
                         <h1 className="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl">
                             Cancer Diagnosis Process
                         </h1>

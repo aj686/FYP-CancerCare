@@ -21,7 +21,7 @@ class DonationController extends Controller
         return Inertia::render('Donation/DonationPage');
     }
 
-    public function initiate(Request $request)
+    public function preview(Request $request)
     {
         $validated = $request->validate([
             'amount' => 'required|numeric|min:1',
@@ -41,10 +41,33 @@ class DonationController extends Controller
             'newsletterOptIn' => 'boolean'
         ]);
 
+        return Inertia::render('Donation/DonatePreview', [
+            'donationData' => $validated
+        ]);
+    }
+
+    public function initiate(Request $request)
+    {
+        $validated = $request->validate([
+            'amount' => 'required|numeric|min:1',
+            'firstName' => 'required|string|max:255',
+            'lastName' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
+            'identityNumber' => 'required|string|max:50',
+            'race' => 'nullable|string|max:50',
+            'streetAddress' => 'nullable|string|max:255',
+            'addressLine2' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:100',
+            'state' => 'nullable|string|max:100',
+            'postalCode' => 'nullable|string|max:20',
+            'country' => 'required|string|max:100',
+            'newsletterOptIn' => 'boolean'
+        ]);
+
         try {
             DB::beginTransaction();
 
-            // Create donation record first
             $donation = Donation::create([
                 'user_id' => Auth::id(),
                 'amount' => $validated['amount'],
@@ -64,7 +87,6 @@ class DonationController extends Controller
                 'newsletter_opt_in' => $validated['newsletterOptIn'] ?? false,
             ]);
 
-            // Create Stripe checkout session
             $session = Session::create([
                 'payment_method_types' => ['card'],
                 'customer_email' => $validated['email'],
@@ -87,19 +109,15 @@ class DonationController extends Controller
                 'cancel_url' => route('donation.cancel')
             ]);
 
-            // Update donation with session ID
             $donation->update(['stripe_session_id' => $session->id]);
 
             DB::commit();
 
-            // Redirect to Stripe Checkout using Inertia::location()
             if ($session && isset($session->url)) {
-                return Inertia::location($session->url);
+                return response()->json(['url' => $session->url]);
             }
 
-            return Inertia::render('Donation/DonationPage', [
-                'error' => 'Unable to create payment session'
-            ]);
+            return back()->with('error', 'Unable to create payment session');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -108,9 +126,7 @@ class DonationController extends Controller
                 'user' => Auth::id() ?? 'guest'
             ]);
 
-            return Inertia::render('Donation/DonationPage', [
-                'error' => 'An error occurred while processing your donation. Please try again.'
-            ]);
+            return back()->with('error', 'An error occurred while processing your donation.');
         }
     }
 

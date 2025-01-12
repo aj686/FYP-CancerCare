@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Users, Stethoscope, User, UserCog } from 'lucide-react';
+import { ShieldCheck, Users, CreditCard, User } from 'lucide-react';
 
 export default function Role({ activeFilter, onFilterChange }) {
     return (
@@ -29,6 +29,19 @@ export default function Role({ activeFilter, onFilterChange }) {
                 >
                     <User className="w-4 h-4 mr-2" />
                     User
+                </button>
+
+                <button
+                    type="button"
+                    onClick={() => onFilterChange('subscribed')}
+                    className={`inline-flex items-center text-sm px-5 py-2.5 rounded-full font-medium transition-all ${
+                        activeFilter === 'subscribed'
+                        ? 'bg-green-700 text-white hover:bg-green-800'
+                        : 'bg-green-100 text-green-700 hover:bg-green-200'
+                    }`}
+                >
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Subscribed
                 </button>
             </div>
         </div>

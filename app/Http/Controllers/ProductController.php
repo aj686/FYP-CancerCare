@@ -6,30 +6,41 @@ use App\Models\Products;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-
 class ProductController extends Controller
 {
+    public function index(Request $request)
+    {
+        $query = Products::query();
+        
+        if ($request->has('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('description', 'like', '%' . $request->search . '%');
+        }
 
-    // Display the shop page (all products)
-    public function index() {
+        $allProducts = $query->paginate(4);
+        $allProducts->appends(request()->query());
 
-        // fetch all products
-        $allProducts = Products::all(); 
-        return Inertia::render("Product/Product", ['all_products' => $allProducts]);
+        return Inertia::render("Product/Product", [
+            'all_products' => $allProducts,
+            'flash' => [
+                'success' => session('success'),
+                'error' => session('error'),
+                'warning' => session('warning'),
+                'message' => session('message'),
+            ]
+        ]);
     }
 
-    // Show a single product detail
-    // public function show($id) {
-        
-    //     $product = Products::find($id);
-    //     if(!$product) {
-    //         return redirect()->route('product.index')->with('error', 'Product not found.');
-    //     }
-    //     // Logic to fetch product details goes here
-    //     return Inertia::render("Product/ProductDetails", ['product' => $product]);
-    // }
-
-    public function show(Products $products) {
-        return Inertia::render("Product/ProductDetails", ['product' => $products]);
+    public function show(Products $products) 
+    {
+        return Inertia::render("Product/ProductDetails", [
+            'product' => $products,
+            'flash' => [
+                'success' => session('success'),
+                'error' => session('error'),
+                'warning' => session('warning'),
+                'message' => session('message'),
+            ]
+        ]);
     }
 }

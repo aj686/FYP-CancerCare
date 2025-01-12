@@ -19,6 +19,8 @@ class Payment extends Model
         'ordernumber',
         'user_id',
         'stripe_session_id',
+        'billplz_bill_id',   
+        'billplz_url',
         'payment_method',
         'amount',
         'payment_status',

@@ -41,4 +41,12 @@ return [
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
 
+    'billplz' => [
+        'key' => env('BILLPLZ_API_KEY'),
+        'version' => env('BILLPLZ_VERSION', 'v4'),
+        'x-signature' => env('BILLPLZ_X_SIGNATURE'),
+        'collection_id' => env('BILLPLZ_COLLECTION_ID'),
+        'sandbox' => env('BILLPLZ_SANDBOX', false),
+    ],
+
 ];

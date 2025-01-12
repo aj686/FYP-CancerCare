@@ -4,11 +4,12 @@ import Dashboard from '@/Components/My Components/Admin Comp/Dashboard';
 import GrafanaDashboard from '@/Components/My Components/Grafana/GrafanaDashboard';
 import DailyUserRegistration from '@/Components/My Components/Grafana/DailyUserRegistration';
 import ActiveUsersStats from '@/Components/My Components/Grafana/ActiveUsersStats';
+import SalesDashboard from '@/Components/My Components/Admin Comp/Order/SalesDashboard';
 
 
 
 
-export default function AdminDashboard({products, productCount,  events, eventCount, users, userCount}) {
+export default function AdminDashboard({products, productCount,  events, eventCount, users, userCount, orders}) {
     return (
         <AuthenticatedLayout
             header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Admin Dashboard</h2>}
@@ -22,6 +23,14 @@ export default function AdminDashboard({products, productCount,  events, eventCo
                         totalEvent = {eventCount}
                         totalUser = {userCount}
                     />
+
+                    {/* Sales Analytics Dashboard */}
+                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                        <div className="p-6">
+                            <h2 className="text-xl font-semibold text-gray-900 mb-6">Sales Analytics</h2>
+                            <SalesDashboard orders={orders} />
+                        </div>
+                    </div>
 
                     {/* New Grafana Dashboard */}
                     {/* <GrafanaDashboard 

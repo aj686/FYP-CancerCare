@@ -1,11 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import 'flowbite';
 import { ShoppingCart, Heart, ChevronRight } from 'lucide-react'; // Added ChevronRight import
 import { Inertia } from '@inertiajs/inertia';
 import Footer from '../Footer';
 
-export default function ViewProduct({ product }) {
+export default function ViewProduct({ product, flash }) {
     const [quantity, setQuantity] = useState(1);
+
+    // Add the FlashMessage component
+    const FlashMessage = ({ message, type }) => {
+        const [isVisible, setIsVisible] = useState(true);
+
+        useEffect(() => {
+            const timer = setTimeout(() => {
+                setIsVisible(false);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }, []);
+
+        if (!message || !isVisible) return null;
+
+        const styles = {
+            success: 'bg-green-50 border-green-400 text-green-800',
+            error: 'bg-red-50 border-red-400 text-red-800',
+            warning: 'bg-yellow-50 border-yellow-400 text-yellow-800',
+            message: 'bg-blue-50 border-blue-400 text-blue-800'
+        };
+
+        return (
+            <div className={`fixed top-4 right-4 z-50 flex items-center p-4 rounded-lg shadow-lg border ${styles[type]}`}>
+                <div className="flex-shrink-0">
+                    {type === 'success' && (
+                        <svg className="w-5 h-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
+                        </svg>
+                    )}
+                </div>
+                <p className="ml-3 text-sm font-medium">{message}</p>
+                <button
+                    onClick={() => setIsVisible(false)}
+                    className="ml-4 inline-flex text-gray-400 hover:text-gray-500 focus:outline-none"
+                >
+                    <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" />
+                    </svg>
+                </button>
+            </div>
+        );
+    };
 
     if (!product) {
         return (
@@ -23,9 +65,7 @@ export default function ViewProduct({ product }) {
             slug: product.slug,
             quantity: quantity
         }, {
-            onSuccess: () => {
-                alert('Product added to cart successfully!');
-            },
+            preserveScroll: true,
         });
     };
 
@@ -35,6 +75,12 @@ export default function ViewProduct({ product }) {
 
     return (
         <section className="bg-gradient-to-br from-white to-purpleMuda py-12">
+            {/* Flash Messages */}
+            {flash?.success && <FlashMessage message={flash.success} type="success" />}
+            {flash?.error && <FlashMessage message={flash.error} type="error" />}
+            {flash?.warning && <FlashMessage message={flash.warning} type="warning" />}
+            {flash?.message && <FlashMessage message={flash.message} type="message" />}
+
             <div className="max-w-screen-xl px-4 mx-auto">
                 <div className="grid gap-8 lg:grid-cols-2">
                     {/* Product Image */}

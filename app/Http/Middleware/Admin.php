@@ -14,12 +14,16 @@ class Admin
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next,): Response
+    public function handle(Request $request, Closure $next): Response
     {   
+        // Check if user is authenticated first
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
 
-        // First check if user is authenticated
+        // Then check if user is admin
         if (Auth::user()->usertype !== 'admin') {
-            return redirect()->route('dashboard');
+            return redirect()->route('dashboard')->with('error', 'Unauthorized access.');
         }
 
         return $next($request);

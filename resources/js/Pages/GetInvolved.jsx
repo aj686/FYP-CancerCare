@@ -1,10 +1,17 @@
 import { Head } from '@inertiajs/react';
-import React from 'react';
+import React, { useState } from 'react';
 import DynamicNavbar from '@/Components/My Components/AboutCancer/DynamicNavbar';
-import EventList from '@/Components/My Components/Involved/EventLists';
+import EventLists from '@/Components/My Components/Involved/EventLists';
+import PastEventList from '@/Components/My Components/Involved/PastEventList';
 import Footer from '@/Components/My Components/Footer';
 
-export default function GetInvolved({ events }) {
+export default function GetInvolved({ events, auth, plan }) {
+    const [activeTab, setActiveTab] = useState('active');
+    
+    // Split events into active and past
+    const activeEvents = events?.filter(event => event.status === 'active') || [];
+    const pastEvents = events?.filter(event => event.status === 'completed') || [];
+
     return (
         <>
             <Head title="Get Involved" />
@@ -42,9 +49,49 @@ export default function GetInvolved({ events }) {
                         </p>
                     </div>
                     
-                    {/* Event List Component with enhanced styling */}
+                    {/* Event Tabs and List */}
                     <div className="bg-white rounded-xl shadow-lg p-6">
-                        <EventList events={events} />
+                        <div className="w-full">
+                            {/* Tab Headers */}
+                            <div className="flex border-b mb-6">
+                                <button 
+                                    className={`flex-1 py-4 px-6 text-center font-semibold ${
+                                        activeTab === 'active' 
+                                            ? 'text-purpleTua border-b-2 border-purpleTua' 
+                                            : 'text-gray-500 hover:text-purpleMid'
+                                    }`}
+                                    onClick={() => setActiveTab('active')}
+                                >
+                                    Upcoming Events
+                                </button>
+                                <button 
+                                    className={`flex-1 py-4 px-6 text-center font-semibold ${
+                                        activeTab === 'past' 
+                                            ? 'text-purpleTua border-b-2 border-purpleTua' 
+                                            : 'text-gray-500 hover:text-purpleMid'
+                                    }`}
+                                    onClick={() => setActiveTab('past')}
+                                >
+                                    Past Events
+                                </button>
+                            </div>
+
+                            {/* Tab Content */}
+                            <div>
+                                {activeTab === 'active' ? (
+                                    <EventLists 
+                                        events={activeEvents} 
+                                        auth={auth} 
+                                        plan={plan}
+                                    />
+                                ) : (
+                                    <PastEventList 
+                                        events={pastEvents} 
+                                        auth={auth}
+                                    />
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

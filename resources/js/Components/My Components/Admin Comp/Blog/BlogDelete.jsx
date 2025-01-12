@@ -1,83 +1,98 @@
 import { useForm } from "@inertiajs/react";
+import { Inertia } from "@inertiajs/inertia";
 import { TrashIcon } from "lucide-react";
 
-export default function BlogDelete({ className, blogId, blog }) {
-    const { data, processing, reset, delete: destroy } = useForm({  // Add delete: destroy
+export default function BlogDelete({ children, className, blogId, blog }) {
+    const {
+        data: deleteData,
+        setData: setDeleteData,
+        processing,
+        reset,
+    } = useForm({
         blog_id: blog.id,
-        title: blog.title
+        title: blog.title,
+        slug: blog.slug,
+        header: blog.header,
+        thumbnail: blog.thumbnail,
+        content: blog.content,
+        tags: blog.tags,
+        author: blog.author,
+        date: blog.date,
+        active: blog.active,
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        destroy(route('admin.blogs.delete', blog.id), {  // Change to match route name
-            preserveScroll: true,
-            onSuccess: () => {
-                document.getElementById(blogId).close();
-                reset();
-            },
+
+        Inertia.post(`/admin/destroy-blog/${blog.id}`, {
+            _method: "delete",
+            ...deleteData,
         });
     };
 
     return (
         <>
             <button
-                onClick={() => document.getElementById(blogId).showModal()}
-                className={`inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 focus:bg-red-800 active:bg-red-900 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150 ${className}`}
+                onClick={() => document.getElementById(`my_modal_4${blog.id}`).showModal()}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-offset-2 transition ease-in-out duration-150"
             >
                 <TrashIcon className="w-4 h-4" />
                 Delete
             </button>
 
             <dialog id={blogId} className="modal">
-                <div className="modal-box bg-slate-50 px-6 py-4">
-                    <div className="modal-header">
-                        <form method="dialog">
-                            <button
-                                className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-                                onClick={() => reset()}
-                            >
-                                ✕
-                            </button>
-                        </form>
-                    </div>
-                    <div className="modal-body">
-                        <h3 className="font-bold text-lg text-red-600 mb-4">
-                            Delete Confirmation
-                        </h3>
-                        <p className="text-gray-700 mb-2">
-                            Are you sure you want to delete the blog post:
-                        </p>
-                        <p className="font-semibold text-gray-900 mb-4">
-                            "{data.title}"?
-                        </p>
-                        <p className="text-sm text-gray-500 mb-6">
-                            This action cannot be undone.
-                        </p>
+                <div className="fixed inset-0 z-10 overflow-y-auto">
+                    <div className="flex min-h-full items-center justify-center p-4">
+                        <div className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                            {/* Modal Header */}
+                            <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                <div className="flex items-start">
+                                    <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                                        <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                                        </svg>
+                                    </div>
+                                    <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                        <h3 className="text-lg font-semibold text-gray-900">
+                                            Delete Blog Post
+                                            <small className="block text-sm text-gray-500">
+                                                ID: {deleteData.blog_id}
+                                            </small>
+                                        </h3>
+                                        <div className="mt-2">
+                                            <p className="text-gray-600 break-words">
+                                                Are you sure you want to delete <span className="font-semibold">{deleteData.title}</span>?
+                                            </p>
+                                            <p className="mt-2 text-sm text-gray-500 break-words">
+                                                This action cannot be undone. This will permanently delete the blog post
+                                                and all associated data.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <button
-                                type="submit"
-                                className={`w-full text-center items-center px-4 py-2 bg-red-600 hover:bg-red-700 focus:bg-red-800 active:bg-red-900 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150 ${
-                                    processing && "opacity-25"
-                                }`}
-                                disabled={processing}
-                            >
-                                {processing ? "Deleting..." : "Confirm Delete"}
-                            </button>
-
-                            <button
-                                type="button"
-                                onClick={() => document.getElementById(blogId).close()}
-                                className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-md font-semibold text-xs uppercase"
-                            >
-                                Cancel
-                            </button>
-                        </form>
+                                {/* Action Buttons */}
+                                <div className="mt-6 flex justify-end gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => document.getElementById(blogId).close()}
+                                        className="px-6 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 whitespace-nowrap"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleSubmit}
+                                        disabled={processing}
+                                        className="px-6 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 whitespace-nowrap"
+                                    >
+                                        {processing ? 'Deleting...' : 'Delete Blog'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <form method="dialog" className="modal-backdrop">
-                    <button onClick={() => reset()}></button>
-                </form>
             </dialog>
         </>
     );

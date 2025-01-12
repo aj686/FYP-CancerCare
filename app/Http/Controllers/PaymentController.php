@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 use Stripe\{Stripe, Webhook, Checkout\Session};
 
 
@@ -269,4 +270,6 @@ class PaymentController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+    
 }

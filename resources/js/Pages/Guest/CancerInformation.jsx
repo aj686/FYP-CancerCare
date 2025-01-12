@@ -11,7 +11,7 @@ export default function CancerInformation() {
             <DynamicNavbar />
 
             {/* Hero Section */}
-            <section className="relative bg-center bg-no-repeat bg-cover bg-[url('https://img.freepik.com/free-photo/3d-render-medical-background-with-floating-abstract-virus-cells_1048-14145.jpg?t=st=1726592033~exp=1726595633~hmac=0ce854184cd9570b489caa33d99609f5625bcc01ba092f09d83f5948f706ffb4&w=900')]">
+            <section className="relative bg-center bg-no-repeat bg-cover bg-[url('https://images.unsplash.com/photo-1630959299388-6e983fed7b98?q=80&w=1844&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')]">
                 <div className="absolute inset-0 bg-gradient-to-br from-purpleMuda via-purpleMid to-purpleTua opacity-90"></div>
                 <div className="relative px-4 mx-auto max-w-screen-xl text-center py-24 lg:py-56">
                     <h1 className="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl">Cancer Information</h1>

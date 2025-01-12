@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Calendar, MapPin, Clock, Tag, ChevronDown, ChevronUp } from 'lucide-react';
+import { Calendar, MapPin, Clock, Tag, ChevronDown, ChevronUp, CreditCard, Lock } from 'lucide-react';
 import { Link, useForm } from '@inertiajs/react';
 import RegistrationProgress from './RegistrationProgress';
 
-export default function EventLists({ events, auth = null }) {
+export default function EventLists({ events, auth, plan }) {
     const [expandedEvents, setExpandedEvents] = useState({});
     const [hoveredEvent, setHoveredEvent] = useState(null);
     const { delete: destroy } = useForm();
@@ -35,9 +35,29 @@ export default function EventLists({ events, auth = null }) {
     };
 
     const renderActionButtons = (event) => {
-        if (!auth || !auth.user) {
+        const donateButton = (
+            <Link
+                href={route('events.donate', event.id)}
+                className="w-full sm:w-auto bg-yellow-400 text-purpleTua px-6 py-2 rounded-full hover:bg-yellow-500 focus:outline-none transition-colors duration-200 flex items-center justify-center font-medium"
+            >
+                <CreditCard className="w-4 h-4 mr-2" />
+                Support This Event
+            </Link>
+        );
+
+        // Check user status
+        const isLoggedIn = auth?.user !== null && auth?.user !== undefined;
+        const isMember = isLoggedIn && auth.user.membership_status === 'active';
+        const isRegistered = event.registered_users?.includes(auth?.user?.id);
+        const registeredCount = event.registrations?.filter(reg => reg.status === 'registered').length || 0;
+        const isFull = registeredCount >= event.participant_count;
+        const isPaidEvent = event.price > 0;
+
+        // Guest User
+        if (!isLoggedIn) {
             return (
                 <div className="mt-6 space-y-3 sm:space-y-0 sm:flex sm:space-x-3">
+                    {donateButton}
                     <Link
                         href={route('events.show.event', event.id)}
                         className="w-full sm:w-auto bg-purpleMuda text-purpleTua px-6 py-2 rounded-full hover:bg-purpleMuda/80 focus:outline-none transition-colors duration-200 flex items-center justify-center font-medium"
@@ -54,15 +74,11 @@ export default function EventLists({ events, auth = null }) {
             );
         }
 
-        const isMember = auth.user.membership_status === 'active';
-        const isRegistered = event.registered_users?.includes(auth.user.id);
-        const showMembershipRequired = event.price > 0 && !isMember;
-        const registeredCount = event.registrations?.filter(reg => reg.status === 'registered').length || 0;
-        const isFull = registeredCount >= event.participant_count;
-
+        // Authenticated User (Member and Non-Member)
         return (
             <div className="mt-6">
                 <div className="space-y-3 sm:space-y-0 sm:flex sm:space-x-3">
+                    {donateButton}
                     <Link
                         href={route('events.show.event', event.id)}
                         className="w-full sm:w-auto bg-purpleMuda text-purpleTua px-6 py-2 rounded-full hover:bg-purpleMuda/80 focus:outline-none transition-colors duration-200 flex items-center justify-center font-medium"
@@ -76,13 +92,12 @@ export default function EventLists({ events, auth = null }) {
                         >
                             Cancel Registration
                         </button>
-                    ) : showMembershipRequired ? (
+                    ) : isPaidEvent && !isMember ? (
                         <Link
-                            href={route('membership.subscribe')}
-                            method="post"
+                            href={route('plan.index')}
                             className="w-full sm:w-auto bg-gradient-to-r from-yellow-300 to-yellow-400 text-purpleTua px-6 py-2 rounded-full hover:shadow-lg focus:outline-none transition-all duration-200 flex items-center justify-center font-medium"
                         >
-                            Subscribe to Register (RM 25/month)
+                            Subscribe Now
                         </Link>
                     ) : isFull ? (
                         <button
@@ -101,7 +116,7 @@ export default function EventLists({ events, auth = null }) {
                         </Link>
                     )}
                 </div>
-                {showMembershipRequired && (
+                {isPaidEvent && !isMember && (
                     <div className="mt-2 text-sm text-gray-600">
                         This event requires membership. Members can join all events including advanced ones!
                     </div>
@@ -150,11 +165,11 @@ export default function EventLists({ events, auth = null }) {
                                 {event.title}
                             </div>
 
-                            <div>
-                                <p className={`text-gray-700 ${expandedEvents[event.id] ? '' : 'line-clamp-2'}`}>
+                            <div className="relative">
+                                <p className={`text-gray-700 ${expandedEvents[event.id] ? 'max-h-full' : 'max-h-12 overflow-hidden'}`}>
                                     {event.description}
                                 </p>
-                                {event.description.length > 100 && (
+                                {event.description.length > 150 && (
                                     <button
                                         onClick={(e) => toggleEventExpansion(event.id, e)}
                                         className="text-purpleMid hover:text-purpleTua text-sm mt-2 flex items-center transition-colors duration-200"
@@ -174,29 +189,31 @@ export default function EventLists({ events, auth = null }) {
                                 )}
                             </div>
 
-                            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="flex items-center text-gray-600">
-                                    <MapPin className="w-4 h-4 mr-2 text-purpleMid" />
-                                    <span>{event.location}</span>
+                                    <MapPin className="w-4 h-4 mr-2 text-purpleMid flex-shrink-0" />
+                                    <span className="truncate">{event.location}</span>
                                 </div>
                                 <div className="flex items-center text-gray-600">
-                                    <Calendar className="w-4 h-4 mr-2 text-purpleMid" />
-                                    <span>{formatDate(event.start_date)}</span>
+                                    <Calendar className="w-4 h-4 mr-2 text-purpleMid flex-shrink-0" />
+                                    <span className="truncate">{formatDate(event.start_date)}</span>
                                 </div>
                                 <div className="flex items-center text-gray-600">
-                                    <Clock className="w-4 h-4 mr-2 text-purpleMid" />
-                                    <span>{event.event_time}</span>
+                                    <Clock className="w-4 h-4 mr-2 text-purpleMid flex-shrink-0" />
+                                    <span className="truncate">{event.event_time}</span>
                                 </div>
                                 <div className="flex items-center text-gray-600">
-                                    <Tag className="w-4 h-4 mr-2 text-purpleMid" />
-                                    <span>{formatPrice(event.price)}</span>
+                                    <Tag className="w-4 h-4 mr-2 text-purpleMid flex-shrink-0" />
+                                    <span className="truncate">{formatPrice(event.price)}</span>
                                 </div>
                             </div>
 
-                            <RegistrationProgress 
-                                registrations={event.registrations}
-                                participantCount={event.participant_count}
-                            />
+                            <div className="mt-6">
+                                <RegistrationProgress 
+                                    registrations={event.registrations}
+                                    participantCount={event.participant_count}
+                                />
+                            </div>
                             
                             {renderActionButtons(event)}
                         </div>

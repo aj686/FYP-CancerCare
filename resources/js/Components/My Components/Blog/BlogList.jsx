@@ -1,15 +1,52 @@
-import React from 'react';
-import 'flowbite';
-import { Link } from '@inertiajs/react';
+import React, { useState } from 'react';
+import { Link, router } from '@inertiajs/react';
+import { Search } from 'lucide-react';
 
-export default function BlogList({ blogs }) {
+export default function BlogList({ blogs, isHomepage = false }) {
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+    router.get('/our-research', 
+      { search: value, page: 1 },
+      { preserveState: true, preserveScroll: true }
+    );
+  };
+
+  const handlePageChange = (page) => {
+    router.get('/our-research',
+      { search: searchTerm, page: page },
+      { preserveState: true, preserveScroll: true }
+    );
+  };
+
+  // Only show search bar if not on homepage
+  const displayedBlogs = isHomepage ? blogs.slice(0, 3) : blogs.data;
+
   return (
     <div className="container mx-auto py-12 px-4">
-      {/* <h1 className="text-4xl font-bold text-center text-purpleTua mb-4">Latest Research & News</h1>
-      <div className="w-24 h-1 bg-purpleMid mx-auto rounded-full mb-12"></div> */}
+      {/* Only show search on research page */}
+      {!isHomepage && (
+        <div className="mb-8 mx-auto max-w-4xl px-4">
+          <div className="relative">
+            <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+              <svg className="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+              </svg>
+            </div>
+            <input
+              type="text"
+              placeholder="Search articles..."
+              value={searchTerm}
+              onChange={(e) => handleSearch(e.target.value)}
+              className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {blogs?.map((blog) => (
+        {displayedBlogs?.map((blog) => (
           <Link 
             href={route('events.show.blog', blog.title.toLowerCase().replace(/ /g, '-'))} 
             key={blog.id}
@@ -74,6 +111,56 @@ export default function BlogList({ blogs }) {
           </Link>
         ))}
       </div>
+      
+      {/* Show pagination only on research page */}
+      {!isHomepage && blogs.last_page > 1 && (
+        <div className="flex justify-center space-x-2 mt-8">
+          <button
+            onClick={() => handlePageChange(blogs.current_page - 1)}
+            disabled={blogs.current_page === 1}
+            className="rounded-lg border border-purpleTua px-4 py-2 text-purpleTua disabled:opacity-50"
+          >
+            Previous
+          </button>
+          
+          {Array.from({ length: blogs.last_page }, (_, i) => i + 1).map(pageNum => (
+            <button
+              key={pageNum}
+              onClick={() => handlePageChange(pageNum)}
+              className={`rounded-lg px-4 py-2 ${
+                blogs.current_page === pageNum
+                  ? 'bg-purpleTua text-white'
+                  : 'border border-purpleTua text-purpleTua'
+              }`}
+            >
+              {pageNum}
+            </button>
+          ))}
+          
+          <button
+            onClick={() => handlePageChange(blogs.current_page + 1)}
+            disabled={blogs.current_page === blogs.last_page}
+            className="rounded-lg border border-purpleTua px-4 py-2 text-purpleTua disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      )}
+
+      {/* Show See More button on homepage */}
+      {isHomepage && (
+        <div className="flex justify-center mt-8">
+          <Link
+            href="/our-research"
+            className="inline-flex items-center px-6 py-3 rounded-full bg-purpleTua text-white hover:bg-purpleMid transition-colors duration-300"
+          >
+            See More Research
+            <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

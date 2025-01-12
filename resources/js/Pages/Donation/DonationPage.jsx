@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, useForm, Link } from '@inertiajs/react';
+import { Head, useForm, Link,  router } from '@inertiajs/react';
 import { loadStripe } from '@stripe/stripe-js';
 import Card from '@/Components/ui/Card';
 import CardTitle from '@/Components/ui/CardTitle';
@@ -51,21 +51,32 @@ export default function DonationPage() {
         setData('amount', value);
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError(null);
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
+    //     setError(null);
         
-        post('/donate/initiate', {  // Direct URL path instead of route helper
-            onSuccess: async (response) => {
-                if (response?.error) {
-                    setError(response.error);
-                }
-            },
+    //     post('/donate/initiate', {  // Direct URL path instead of route helper
+    //         onSuccess: async (response) => {
+    //             if (response?.error) {
+    //                 setError(response.error);
+    //             }
+    //         },
+    //         onError: (errors) => {
+    //             setError('Failed to process donation. Please check your details and try again.');
+    //         }
+    //     });
+    // };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        post(route('donation.preview'), {
+            preserveScroll: true,
             onError: (errors) => {
                 setError('Failed to process donation. Please check your details and try again.');
             }
         });
     };
+    
 
     return (
         <>
@@ -321,7 +332,7 @@ export default function DonationPage() {
                                     disabled={processing}
                                     className="w-full bg-purpleTua text-white py-4 px-8 rounded-full hover:bg-purpleMid disabled:bg-gray-300 transition-colors duration-300 font-medium text-lg"
                                 >
-                                    {processing ? 'Processing...' : 'Submit Donation'}
+                                    {processing ? 'Processing...' : 'Next'}
                                 </button>
                             </form>
                         </CardContent>

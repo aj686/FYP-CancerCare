@@ -130,12 +130,9 @@ export default function Register() {
                                     className="mt-1 block w-full rounded-lg border-purpleMuda focus:border-purpleTua focus:ring-purpleTua"
                                     onChange={(e) => {
                                         const value = e.target.value;
-                                        // Only allow digits
-                                        const sanitizedValue = value.replace(/\D/g, '');
-                                        // Validate Malaysian phone number format (01X-XXXXXXXX)
-                                        if (!sanitizedValue || /^01[0-9]{8,9}$/.test(sanitizedValue)) {
-                                            setData('phone', sanitizedValue);
-                                        }
+                                        // Only allow digits and limit to 11 characters
+                                        const sanitizedValue = value.replace(/\D/g, '').slice(0, 11);
+                                        setData('phone', sanitizedValue);
                                     }}
                                     placeholder="e.g., 01791313121"
                                     pattern="01[0-9]{8,9}"
@@ -188,14 +185,31 @@ export default function Register() {
 
                                 <div>
                                     <InputLabel htmlFor="state" value="State" className="text-purpleTua" />
-                                    <TextInput
+                                    <select
                                         id="state"
-                                        type="text"
                                         name="state"
                                         value={data.state}
                                         className="mt-1 block w-full rounded-lg border-purpleMuda focus:border-purpleTua focus:ring-purpleTua"
                                         onChange={(e) => setData('state', e.target.value)}
-                                    />
+                                    >
+                                        <option value="">Select a state</option>
+                                        <option value="Johor">Johor</option>
+                                        <option value="Kedah">Kedah</option>
+                                        <option value="Kelantan">Kelantan</option>
+                                        <option value="Melaka">Melaka</option>
+                                        <option value="Negeri Sembilan">Negeri Sembilan</option>
+                                        <option value="Pahang">Pahang</option>
+                                        <option value="Perak">Perak</option>
+                                        <option value="Perlis">Perlis</option>
+                                        <option value="Pulau Pinang">Pulau Pinang</option>
+                                        <option value="Sabah">Sabah</option>
+                                        <option value="Sarawak">Sarawak</option>
+                                        <option value="Selangor">Selangor</option>
+                                        <option value="Terengganu">Terengganu</option>
+                                        <option value="Kuala Lumpur">Kuala Lumpur</option>
+                                        <option value="Labuan">Labuan</option>
+                                        <option value="Putrajaya">Putrajaya</option>
+                                    </select>
                                     <InputError message={errors.state} className="mt-2" />
                                 </div>
                             </div>

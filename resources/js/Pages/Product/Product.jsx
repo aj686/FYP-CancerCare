@@ -8,7 +8,7 @@ import ProductList from '@/Components/My Components/Product/ProductList';
 import DynamicNavbar from '@/Components/My Components/AboutCancer/DynamicNavbar';
 import Footer from '@/Components/My Components/Footer';
 
-export default function Products({ all_products }) {
+export default function Products({ all_products, flash }) {
     return (
         <>
             <Head title="Products" />
@@ -42,7 +42,7 @@ export default function Products({ all_products }) {
 
             {/* Products List Section with Light Purple Background */}
             <div className="bg-gradient-to-b from-white to-purpleMuda">
-                <ProductList all_products={all_products} />
+                <ProductList all_products={all_products} flash={flash} />
             </div>
             <Footer />
         </>

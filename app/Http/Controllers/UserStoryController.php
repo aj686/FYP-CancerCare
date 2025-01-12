@@ -91,35 +91,55 @@ class UserStoryController extends Controller
     // In UserStoryController.php
     public function show($slug)
     {
-        $story = UserStory::with('user')
-            ->where('slug', $slug)
-            ->firstOrFail();
+        try {
+            // Get current story
+            $story = UserStory::with('user')
+                ->where('slug', $slug)
+                ->firstOrFail();
 
-        // Check if story is not approved and user is not the owner or admin
-        if ($story->status !== 'approved' && 
-            $story->user_id !== Auth::user()->id && 
-            Auth::user()->usertype !== 'admin') {
-            abort(403);
+            // Log current story
+            Log::info('Current story:', [
+                'id' => $story->id,
+                'status' => $story->status,
+                'title' => $story->title
+            ]);
+
+            // Get other approved stories (excluding current one)
+            $otherStories = UserStory::with('user')
+                ->where('status', 'approved')
+                ->where('id', '!=', $story->id)
+                ->latest()
+                ->take(5)
+                ->get();
+
+            // Log other stories for debugging
+            Log::info('Other stories found:', [
+                'count' => $otherStories->count(),
+                'stories' => $otherStories->map(fn($s) => [
+                    'id' => $s->id,
+                    'title' => $s->title,
+                    'status' => $s->status
+                ])->toArray()
+            ]);
+
+            return Inertia::render('StoryShow', [
+                'story' => $story,
+                'otherStories' => $otherStories,
+                'auth' => [
+                    'user' => Auth::check() ? [
+                        'id' => Auth::id(),
+                        'usertype' => Auth::user()->usertype
+                    ] : null
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error in story show:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            abort(500, 'Error loading story');
         }
-
-        // Get other stories (excluding current one)
-        $otherStories = UserStory::with('user')
-            ->where('status', 'approved')
-            ->where('id', '!=', $story->id)
-            ->latest()
-            ->take(5)
-            ->get();
-
-        return Inertia::render('StoryShow', [
-            'story' => $story,
-            'otherStories' => $otherStories,
-            'auth' => [
-                'user' => Auth::check() ? [
-                    'id' => Auth::id(),
-                    'usertype' => Auth::user()->usertype
-                ] : null
-            ]
-        ]);
     }
 
 

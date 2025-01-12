@@ -123,4 +123,25 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | BillPlz
+    |--------------------------------------------------------------------------
+    |
+    |
+    */
+
+    // 'providers' => [
+
+    //     Billplz\Laravel\BillplzServiceProvider::class,
+
+    // ],
+
+    // 'aliases' => [
+
+    //     'Billplz' => Billplz\Laravel\Billplz::class,
+
+    // ],
+
 ];

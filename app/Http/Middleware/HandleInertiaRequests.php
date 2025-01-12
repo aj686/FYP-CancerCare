@@ -41,12 +41,24 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user() 
-                    ? array_merge(
-                        $request->user()->only('id', 'name', 'email', 'usertype'),
-                        ['has_active_membership' => $request->user()->hasActiveMembership()]
-                    ) 
-                    : null,
+                'user' => $request->user() ? $request->user()->only(
+                    'id',
+                    'name',
+                    'email',
+                    'usertype',
+                    'age',
+                    'phone',
+                    'address_1',
+                    'address_2',
+                    'city',
+                    'state',
+                    'postcode',
+                    'profile_photo_path',
+                    'has_active_membership'
+                ) : null,
+            ],
+            'ziggy' => fn () => [
+                'location' => $request->url(),
             ],
         ];
     }

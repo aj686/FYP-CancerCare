@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Str;
 
 class RegisteredUserController extends Controller
 {
@@ -50,7 +51,7 @@ class RegisteredUserController extends Controller
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
-                'usertype' => 'user', // default usertype
+                'usertype' => 'user',
                 'age' => $validated['age'] ?? null,
                 'phone' => $validated['phone'] ?? null,
                 'address_1' => $validated['address_1'] ?? null,
@@ -59,6 +60,8 @@ class RegisteredUserController extends Controller
                 'state' => $validated['state'] ?? null,
                 'postcode' => $validated['postcode'] ?? null,
                 'country' => $validated['country'] ?? 'Malaysia',
+                'remember_token' => Str::random(60),
+                'email_verified_at' => null  // This will be updated when user verifies email
             ]);
 
             event(new Registered($user));

@@ -7,18 +7,46 @@ use Illuminate\Http\Request;
 use App\Models\EventRegistration;
 use App\Models\Order;
 use App\Models\Membership;
+use App\Models\EventFeedback;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\UserStory;
 
 class UserController extends Controller
-{
+
+{   
+    public function submitEventFeedback(Request $request, EventRegistration $eventRegistration)
+    {
+        // Validate user owns the registration
+        if ($eventRegistration->user_id !== Auth::id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        // Validate event is completed and feedback hasn't been given
+        if (!$eventRegistration->canLeaveFeedback()) {
+            return response()->json(['message' => 'Feedback cannot be submitted for this event'], 400);
+        }
+
+        $validated = $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string|max:1000',
+            'anonymous' => 'boolean'
+        ]);
+
+        // Add event and user IDs to the feedback data
+        $validated['events_id'] = $eventRegistration->events_id;
+        $validated['user_id'] = Auth::id();
+        $validated['event_registration_id'] = $eventRegistration->id;
+
+        EventFeedback::create($validated);
+
+        return back()->with('success', 'Thank you for your feedback!');
+    }
+
     public function bookings() {
-        
         $user = Auth::user();
-    
-        // Get the latest registration status for each event
-        $bookings = EventRegistration::with(['event', 'user'])
+
+        $bookings = EventRegistration::with(['event', 'user', 'feedback'])
             ->where('user_id', $user->id)
             ->whereIn('id', function($query) use ($user) {
                 $query->select(DB::raw('MAX(id)'))
@@ -166,4 +194,7 @@ class UserController extends Controller
 
         return back()->with('error', 'No active membership found.');
     }
+
+    
+    
 }

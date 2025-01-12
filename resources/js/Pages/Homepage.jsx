@@ -260,7 +260,7 @@ export default function Homepage({ blogs, plans, activeMembership, isGuest }) {
                         whileInView="visible"
                         viewport={{ once: true }}
                     >
-                        <BlogList blogs={blogs?.slice(0, 3) || []} />
+                        <BlogList blogs={blogs} isHomepage={true} />
                     </motion.div>
                 </div>
             </motion.div>

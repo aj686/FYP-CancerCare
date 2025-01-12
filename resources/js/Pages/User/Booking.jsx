@@ -1,10 +1,16 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
-import { TrashIcon } from 'lucide-react';
+import { TrashIcon, MessageSquareIcon } from 'lucide-react';
 import { useState } from 'react';
+import EventFeedbackModal from './UserComp/EventFeedbackModal';
+import { router } from '@inertiajs/react';
 
 export default function Booking({ auth, bookings, count, flash }) {
     const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertType, setAlertType] = useState('success');
+    const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
+    const [selectedBooking, setSelectedBooking] = useState(null);
     const { post, processing } = useForm();
 
     const handleCancel = (bookingId) => {
@@ -12,11 +18,50 @@ export default function Booking({ auth, bookings, count, flash }) {
             post(`/bookings/${bookingId}/cancel`, {
                 preserveScroll: true,
                 onSuccess: () => {
-                    setShowAlert(true);
-                    setTimeout(() => setShowAlert(false), 3000);
+                    showAlertMessage('Booking cancelled successfully', 'success');
                 },
             });
         }
+    };
+
+    const showAlertMessage = (message, type = 'success') => {
+        setAlertMessage(message);
+        setAlertType(type);
+        setShowAlert(true);
+        setTimeout(() => setShowAlert(false), 3000);
+    };
+
+    const handleFeedbackClick = (booking) => {
+        setSelectedBooking(booking);
+        setFeedbackModalOpen(true);
+    };
+
+    const handleFeedbackSubmit = async (feedbackData) => {
+        router.post(`/event-registrations/${feedbackData.eventRegistrationId}/feedback`, {
+            rating: feedbackData.rating,
+            comment: feedbackData.comment,
+            anonymous: feedbackData.anonymous
+        }, {
+            preserveScroll: true,
+            onSuccess: () => {
+                showAlertMessage('Thank you for your feedback!', 'success');
+                setFeedbackModalOpen(false);
+            },
+            onError: () => {
+                showAlertMessage('Failed to submit feedback. Please try again.', 'error');
+            }
+        });
+    };
+
+    const canLeaveFeedback = (booking) => {
+        return booking.status === 'registered' && 
+               booking.event.status === 'completed' && 
+               !booking.feedback;
+    };
+
+    const isEventExpired = (event) => {
+        const currentDate = new Date().toISOString().split('T')[0];
+        return event.end_date < currentDate || event.status === 'completed';
     };
 
     return (
@@ -28,8 +73,12 @@ export default function Booking({ auth, bookings, count, flash }) {
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     {showAlert && (
-                        <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
-                            Booking cancelled successfully
+                        <div className={`mb-4 p-4 border rounded ${
+                            alertType === 'success' 
+                                ? 'bg-green-100 border-green-400 text-green-700' 
+                                : 'bg-red-100 border-red-400 text-red-700'
+                        }`}>
+                            {alertMessage}
                         </div>
                     )}
 
@@ -78,16 +127,35 @@ export default function Booking({ auth, bookings, count, flash }) {
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                    <div className="flex space-x-2">
-                                                        {booking.status !== 'cancelled' && (
+                                                    <div className="flex space-x-3">
+                                                        {booking.status !== 'cancelled' && !isEventExpired(booking.event) && (
                                                             <button 
                                                                 onClick={() => handleCancel(booking.id)}
                                                                 disabled={processing}
                                                                 className="flex items-center space-x-1 text-red-600 hover:text-red-900 disabled:opacity-50 disabled:cursor-not-allowed"
                                                             >
                                                                 <TrashIcon className="h-5 w-5" />
-                                                                <span>Cancel Booking</span>
+                                                                <span>Cancel</span>
                                                             </button>
+                                                        )}
+                                                        {canLeaveFeedback(booking) && (
+                                                            <button 
+                                                                onClick={() => handleFeedbackClick(booking)}
+                                                                className="flex items-center space-x-1 text-blue-600 hover:text-blue-900"
+                                                            >
+                                                                <MessageSquareIcon className="h-5 w-5" />
+                                                                <span>Feedback</span>
+                                                            </button>
+                                                        )}
+                                                        {booking.feedback && (
+                                                            <span className="text-green-600 flex items-center">
+                                                                <span className="ml-1">Feedback submitted</span>
+                                                            </span>
+                                                        )}
+                                                        {isEventExpired(booking.event) && !booking.feedback && (
+                                                            <span className="text-gray-500 flex items-center">
+                                                                <span className="ml-1">Event completed</span>
+                                                            </span>
                                                         )}
                                                     </div>
                                                 </td>
@@ -100,6 +168,13 @@ export default function Booking({ auth, bookings, count, flash }) {
                     </div>
                 </div>
             </div>
+
+            <EventFeedbackModal
+                isOpen={feedbackModalOpen}
+                onClose={() => setFeedbackModalOpen(false)}
+                onSubmit={handleFeedbackSubmit}
+                eventRegistration={selectedBooking}
+            />
         </AuthenticatedLayout>
     );
 }

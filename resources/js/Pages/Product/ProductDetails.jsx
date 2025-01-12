@@ -8,7 +8,7 @@ import ViewProduct from '@/Components/My Components/Product/ViewProduct';
 import DynamicNavbar from '@/Components/My Components/AboutCancer/DynamicNavbar';
 import Footer from '@/Components/My Components/Footer';
 
-export default function ProductDetails({ product }) {
+export default function ProductDetails({ product, flash }) {
     console.log('Product data:', product);
     
     return (
@@ -19,7 +19,7 @@ export default function ProductDetails({ product }) {
 
                 {/* Wrapper with top padding to prevent content from going under navbar */}
                 <main className="pt-16">
-                    <ViewProduct product={product} />
+                    <ViewProduct product={product} flash={flash} />
                 </main>
             </div>
 

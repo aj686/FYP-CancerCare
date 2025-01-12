@@ -2,12 +2,10 @@ import React, { useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 
 export default function SubscriptionPlan({ plans = [], isGuest = true, activeMembership = null }) {
-    // Debug logging
     useEffect(() => {
         console.log('SubscriptionPlan Props:', { plans, isGuest, activeMembership });
     }, [plans, isGuest, activeMembership]);
 
-    // Safeguard against undefined plans
     if (!Array.isArray(plans)) {
         console.error('Plans is not an array:', plans);
         return (
@@ -73,7 +71,6 @@ export default function SubscriptionPlan({ plans = [], isGuest = true, activeMem
     );
 
     const getSubscriptionStatus = (plan) => {
-        // Add null check for plan
         if (!plan) {
             console.error('Invalid plan object');
             return {
@@ -129,7 +126,7 @@ export default function SubscriptionPlan({ plans = [], isGuest = true, activeMem
                         <h3 className="text-2xl font-bold text-purpleTua mb-2">Free Plan</h3>
                         <div className="mt-4 flex items-baseline text-purpleTua">
                             <span className="text-5xl font-bold tracking-tight">RM 0</span>
-                            <span className="text-lg text-purpleMid ml-2">/month</span>
+                            <span className="text-lg text-purpleMid ml-2">/year</span>
                         </div>
                     </div>
                     <ul className="mt-6 space-y-4 flex-1">
@@ -168,14 +165,16 @@ export default function SubscriptionPlan({ plans = [], isGuest = true, activeMem
                                     <span className="text-5xl font-bold tracking-tight">
                                         RM {plan.price || 0}
                                     </span>
-                                    <span className="text-lg text-purpleMid ml-2">/month</span>
+                                    <span className="text-lg text-purpleMid ml-2">/year</span>
                                 </div>
                             </div>
 
                             <ul className="mt-6 space-y-4 flex-1">
                                 <BenefitItem text="All Free Plan benefits" />
-                                <BenefitItem text="Access to all premium events" />
-                                <BenefitItem text="Share your personal cancer journey stories" />
+                                {plan.can_access_events && <BenefitItem text="Access to all premium events" />}
+                                {plan.can_share_stories && <BenefitItem text="Share your personal cancer journey stories" />}
+                                {plan.can_access_forum && <BenefitItem text="Access to community forum" />}
+                                {plan.can_comment && <BenefitItem text="Comment on articles and stories" />}
                             </ul>
 
                             <button 

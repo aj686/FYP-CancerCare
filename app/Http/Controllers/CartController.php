@@ -27,7 +27,13 @@ class CartController extends Controller
                 'id' => Auth::user()->id,
                 'name' => Auth::user()->name,
                 'email' => Auth::user()->email,
-            ] : null
+            ] : null,
+            'flash' => [
+                'message' => Session::get('message'),
+                'error' => Session::get('error'),
+                'success' => Session::get('success'),
+                'warning' => Session::get('warning')
+            ]
         ]);
     }
 
@@ -48,6 +54,7 @@ class CartController extends Controller
         if (isset($cart[$product->id])) {
             // Increase the quantity if the product already exists
             $cart[$product->id]['quantity']++;
+            $message = 'Product quantity updated in cart.';
         } else {
             // Add new product to cart
             $cart[$product->id] = [
@@ -59,6 +66,7 @@ class CartController extends Controller
                 'added_by_user' => Auth::check() ? Auth::id() : null,
                 'added_at' => now()->toDateTimeString()
             ];
+            $message = 'Product added to cart.';
         }
 
         // Store the updated cart back into session
@@ -71,75 +79,116 @@ class CartController extends Controller
             'cart_contents' => $cart
         ]);
 
-        return redirect()->route('product.index', $product->slug)
-            ->with('success', 'Product added to cart.');
+        // Change this line to redirect back to the same page instead of cart.show
+        return redirect()->back()->with('success', $message);
     }
 
     // Update quantity and price
     public function updateCart(Request $request) 
     {
-        // Get the updated cart from the request
-        $updatedCart = $request->input('cart');
+        try {
+            // Get the updated cart from the request
+            $updatedCart = $request->input('cart');
 
-        // Preserve user information if it exists
-        $currentCart = Session::get('cart', []);
-        foreach ($updatedCart as $productId => $item) {
-            if (isset($currentCart[$productId])) {
-                $updatedCart[$productId]['added_by_user'] = $currentCart[$productId]['added_by_user'] ?? null;
-                $updatedCart[$productId]['added_at'] = $currentCart[$productId]['added_at'] ?? now()->toDateTimeString();
+            // Validate the cart data
+            if (!is_array($updatedCart)) {
+                throw new \Exception('Invalid cart data');
             }
+
+            // Preserve user information if it exists
+            $currentCart = Session::get('cart', []);
+            foreach ($updatedCart as $productId => $item) {
+                if (isset($currentCart[$productId])) {
+                    $updatedCart[$productId]['added_by_user'] = $currentCart[$productId]['added_by_user'] ?? null;
+                    $updatedCart[$productId]['added_at'] = $currentCart[$productId]['added_at'] ?? now()->toDateTimeString();
+                }
+            }
+
+            // Save the updated cart to the session
+            Session::put('cart', $updatedCart);
+
+            // Log the update for debugging
+            Debugbar::info('Cart updated:', [
+                'user_id' => Auth::id(),
+                'updated_cart' => $updatedCart
+            ]);
+
+            return redirect()->back()->with('success', 'Cart updated successfully');
+        } catch (\Exception $e) {
+            Log::error('Cart update failed', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id()
+            ]);
+            return redirect()->back()->with('error', 'Failed to update cart');
         }
-
-        // Save the updated cart to the session
-        Session::put('cart', $updatedCart);
-
-        // Log the update for debugging
-        Debugbar::info('Cart updated:', [
-            'user_id' => Auth::id(),
-            'updated_cart' => $updatedCart
-        ]);
-
-        return redirect()->back();
     }
 
     // Remove product from cart
     public function removeProduct(Request $request) 
     {
-        $productId = $request->input('product_id');
-        $cart = Session::get('cart', []);
+        try {
+            $productId = $request->input('product_id');
+            $cart = Session::get('cart', []);
 
-        if (isset($cart[$productId])) {
-            // Log removal for debugging
-            Debugbar::info('Removing product from cart:', [
-                'product_id' => $productId,
-                'user_id' => Auth::id()
+            if (isset($cart[$productId])) {
+                // Log removal for debugging
+                Debugbar::info('Removing product from cart:', [
+                    'product_id' => $productId,
+                    'user_id' => Auth::id()
+                ]);
+
+                unset($cart[$productId]);
+                Session::put('cart', $cart);
+
+                return redirect()->back()->with('success', 'Product removed from cart.');
+            }
+
+            return redirect()->back()->with('error', 'Product not found in cart.');
+        } catch (\Exception $e) {
+            Log::error('Remove product failed', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+                'product_id' => $request->input('product_id')
             ]);
-
-            unset($cart[$productId]);
-            Session::put('cart', $cart);
+            return redirect()->back()->with('error', 'Failed to remove product');
         }
-
-        return redirect()->back()
-            ->with('success', 'Product removed from cart.');
     }
 
     // Clear cart
     public function clearCart() 
     {
-        Session::forget('cart');
-        
-        return redirect()->back()
-            ->with('success', 'Cart cleared successfully.');
+        try {
+            Session::forget('cart');
+            return redirect()->back()->with('success', 'Cart cleared successfully.');
+        } catch (\Exception $e) {
+            Log::error('Clear cart failed', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id()
+            ]);
+            return redirect()->back()->with('error', 'Failed to clear cart');
+        }
     }
 
     // Get cart count for nav badge
     public function getCartCount() 
     {
-        $cart = Session::get('cart', []);
-        return response()->json([
-            'count' => count($cart),
-            'total' => $this->calculateTotal($cart)
-        ]);
+        try {
+            $cart = Session::get('cart', []);
+            return response()->json([
+                'success' => true,
+                'count' => count($cart),
+                'total' => $this->calculateTotal($cart)
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Get cart count failed', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id()
+            ]);
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to get cart count'
+            ], 500);
+        }
     }
 
     // Calculate cart total

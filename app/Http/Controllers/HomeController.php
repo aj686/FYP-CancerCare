@@ -57,43 +57,115 @@ class HomeController extends Controller
     }
 
     // Pass events to GetInvolved component then pass to EvenList component
-    public function getInvolved() {
+   public function getInvolved() {
+        // First, get events with necessary relationships
+        $events = Events::with([
+            'registrations', 
+            'registrations.user',
+            'registrations.feedback' => function($query) {
+                $query->with('user'); // Make sure we have user data for feedbacks
+            }
+        ])
+        ->withCount(['registrations as registered_count' => function($query) {
+            $query->where('status', 'registered');
+        }])
+        ->get()
+        ->map(function ($event) {
+            // Get registered users
+            $registeredUsers = $event->registrations
+                ->where('status', 'registered')
+                ->pluck('user_id')
+                ->toArray();
 
-        if(Auth::check()) {
-            $user = Auth::user();
-            return Inertia::render('GetInvolved',[
-                'events' => Events::where('status', 'active')
-                ->orderBy('start_date', 'asc')
-                ->get()
-            ]);
-            } else {
-                return Inertia::render("Guest/GetInvolved",[
-                    'events' => Events::where('status', 'active')
-                    ->orderBy('start_date', 'asc')
-                    ->get()
-                ]);
-            } 
+            // Calculate average rating safely
+            $feedbacks = $event->registrations
+                ->pluck('feedback')
+                ->filter() // Remove null values
+                ->values(); // Reindex array
+
+            $average_rating = $feedbacks->avg('rating');
+
+            // Map event data
+            return [
+                'id' => $event->id,
+                'title' => $event->title,
+                'description' => $event->description,
+                'start_date' => $event->start_date,
+                'end_date' => $event->end_date,
+                'event_time' => $event->event_time,
+                'price' => $event->price,
+                'location' => $event->location,
+                'image' => $event->image,
+                'participant_count' => $event->participant_count,
+                'status' => $event->status,
+                'created_at' => $event->created_at,
+                'updated_at' => $event->updated_at,
+                'registered_count' => $event->registered_count,
+                'registered_users' => $registeredUsers,
+                'is_full' => $event->registered_count >= $event->participant_count,
+                'average_rating' => $average_rating ? round($average_rating, 1) : null,
+                // Safely map feedbacks
+                'feedbacks' => $feedbacks->map(function ($feedback) {
+                    return [
+                        'id' => $feedback->id,
+                        'rating' => $feedback->rating,
+                        'anonymous' => $feedback->anonymous,
+                        // Only include user_id if feedback exists and isn't anonymous
+                        'user_id' => $feedback->anonymous ? null : $feedback->user_id
+                    ];
+                })->values()->all()
+            ];
+        });
+
+        $plan = Plan::where('slug', 'yearly-membership')->first();
+
+        return Inertia::render(Auth::check() ? 'GetInvolved' : 'Guest/GetInvolved', [
+            'events' => $events,
+            'auth' => [
+                'user' => Auth::user()
+            ],
+            'plan' => $plan
+        ]);
     }
 
     // View each detail event
     public function showEvent(Request $request, Events $event) {
         $user = $request->user();
         
+        // Load the event with registrations
+        $event = Events::with(['registrations' => function($query) {
+            $query->where('status', 'registered');
+        }])
+        ->withCount(['registrations as registered_count' => function($query) {
+            $query->where('status', 'registered');
+        }])
+        ->findOrFail($event->id);
+    
         $isRegistered = false;
         $hasMembership = false;
-
-        $isRegistered = false;
+    
         if ($user) {
             $isRegistered = EventRegistration::where('events_id', $event->id)
                 ->where('user_id', $user->id)
                 ->where('status', 'registered')
                 ->exists();
+            
+            $hasMembership = $user->hasActiveMembership();
         }
-
-        $hasMembership = $user ? $user->hasActiveMembership() : false;
-
+    
+        // Add registered_users array like in getInvolved method
+        $registeredUsers = $event->registrations
+            ->where('status', 'registered')
+            ->pluck('user_id')
+            ->toArray();
+    
+        $eventData = array_merge($event->toArray(), [
+            'registered_users' => $registeredUsers,
+            'is_full' => $event->registered_count >= $event->participant_count
+        ]);
+    
         return Inertia::render('EventDetails', [
-            'event' => $event,
+            'event' => $eventData,
             'isRegistered' => $isRegistered,
             'hasMembership' => $hasMembership,
             'auth' => [
@@ -108,9 +180,17 @@ class HomeController extends Controller
     //     ]);
     // }
 
-    public function ourResearch() {
-        return Inertia::render("OurResearch" ,[
-            'blogs' => Blogs::all()
+    public function ourResearch(Request $request) {
+        $query = Blogs::query();
+        
+        if ($request->has('search')) {
+            $query->where('title', 'like', '%' . $request->search . '%')
+                  ->orWhere('content', 'like', '%' . $request->search . '%')
+                  ->orWhere('tags', 'like', '%' . $request->search . '%');
+        }
+    
+        return Inertia::render("OurResearch", [
+            'blogs' => $query->paginate(3)
         ]);
     }
 

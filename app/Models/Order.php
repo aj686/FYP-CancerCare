@@ -22,6 +22,14 @@ class Order extends Model
     const SHIPPING_STATUS_SHIPPED = 'shipped';
     const SHIPPING_STATUS_DELIVERED = 'delivered';
 
+    const COURIER_JANDT = 'J&T Express';
+    const COURIER_POSLAJU = 'Pos Laju';
+    const COURIER_DHL = 'DHL';
+    const COURIER_FEDEX = 'FedEx';
+
+    const PAYMENT_METHOD_STRIPE = 'stripe';
+    const PAYMENT_METHOD_BILLPLZ = 'billplz';
+
     protected $fillable = [
         'user_id',
         'ordernumber',
@@ -39,6 +47,8 @@ class Order extends Model
         'total_price',
         'status',
         'shipping_status',
+        'tracking_number',
+        'courier_name',
         'payment_method'
     ];
 
@@ -91,5 +101,13 @@ class Order extends Model
     public function isCancelled()
     {
         return $this->status === self::STATUS_CANCELLED;
+    }
+
+    public static function getValidPaymentMethods()
+    {
+        return [
+            self::PAYMENT_METHOD_STRIPE,
+            self::PAYMENT_METHOD_BILLPLZ
+        ];
     }
 }

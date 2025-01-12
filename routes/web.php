@@ -20,6 +20,9 @@ use App\Http\Controllers\DonationController;
 use App\Http\Controllers\UserStoryController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CommunityController;
+use App\Http\Controllers\EventDonationController;
+use App\Http\Controllers\EventFeedbackController;
+use App\Http\Controllers\BillplzPaymentController;
 
 
 
@@ -54,6 +57,7 @@ Route::prefix('/cancer-information')->group(function () {
 
 // ProductController route
 Route::get('/product', [ProductController::class, 'index'])->name('product.index');
+Route::get('/products/search', [ProductController::class, 'index'])->name('products.search');
 // {products} is a slug route declare in Products model
 Route::get('/product/{products}', [ProductController::class, 'show'])->name('product.show');
 
@@ -76,6 +80,11 @@ Route::get('/payment/cancel/{order_id}', [PaymentController::class, 'paymentCanc
 // Route::get('/payment/{payment}/invoice', [PaymentController::class, 'getInvoice'])->name('payment.invoice');
 // Route::post('/webhook/stripe/payment', [PaymentController::class, 'handleWebhook'])->name('payment.webhook');
 
+// Billplz routes
+Route::post('/pay-order-billplz/{order}', [BillplzPaymentController::class, 'createBill'])->name('billplz.pay');
+Route::post('/billplz/callback', [BillplzPaymentController::class, 'callback'])->name('billplz.callback');
+Route::get('/billplz/redirect/{order_id}', [BillplzPaymentController::class, 'redirect'])->name('billplz.redirect');
+
 // Plan routes
 Route::get('/plan', [PlanController::class, 'index'])->name('plan.index');
 
@@ -91,12 +100,30 @@ Route::post('/stripe/webhook/payment', [PaymentController::class, 'handleWebhook
 Route::post('/stripe/webhook/donation', [DonationController::class, 'handleWebhook'])
     ->name('stripe.webhook.donation');
 
+// Event Donation Webhook
+Route::post('/stripe/webhook/eventdonation', [EventDonationController::class, 'handleWebhook'])
+    ->name('stripe.webhook.eventdonation');
+
  // Donation
 Route::get('/donate', [DonationController::class, 'show'])->name('donate.show');
+Route::post('/donate/preview', [DonationController::class, 'preview'])->name('donation.preview');
 Route::post('/donate/initiate', [DonationController::class, 'initiate'])->name('donation.initiate');
 Route::get('/donate/success', [DonationController::class, 'success'])->name('donation.success');
 Route::get('/donate/cancel', [DonationController::class, 'cancel'])->name('donation.cancel');
 
+
+
+// Event Donation routes
+Route::get('/events/{event}/donate', [EventDonationController::class, 'show'])
+    ->name('events.donate');
+Route::get('/events/{event}/donate/preview', [EventDonationController::class, 'preview'])
+    ->name('events.donate.preview');
+Route::post('/events/{event}/donate/initiate', [EventDonationController::class, 'initiate'])
+    ->name('events.donate.initiate');
+Route::get('/events/{event}/donate/success', [EventDonationController::class, 'success'])
+    ->name('events.donate.success');
+Route::get('/events/{event}/donate/cancel', [EventDonationController::class, 'cancel'])
+    ->name('events.donate.cancel');
 
 // User Story
 Route::get('/stories', [UserStoryController::class, 'index'])->name('stories.index');
@@ -121,10 +148,14 @@ Route::get('/dashboard', function () {
 
 
 Route::middleware(['auth', 'user'])->group(function () {
+    // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Add this new route for deleting profile photo
+    Route::delete('/profile-photo', [ProfileController::class, 'destroyProfilePhoto'])->name('profile.photo.destroy');
 
     Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
 
@@ -157,6 +188,10 @@ Route::middleware(['auth', 'user'])->group(function () {
         Route::post('/api/comments/{comment}/toggle-like', [CommentController::class, 'toggleLike'])->name('comments.toggle-like');
         Route::get('/community', [CommunityController::class, 'index'])->name('community.index');
     });
+
+    // Event feedback routes
+    Route::post('/event-registrations/{eventRegistration}/feedback', [UserController::class, 'submitEventFeedback'])
+        ->name('event-registrations.feedback');
 
     // Plan routes
     // Route::get('/plan', [PlanController::class, 'index'])->name('plan.index');
@@ -210,10 +245,14 @@ require __DIR__.'/auth.php';
 
  // Admin routes
     Route::middleware(['auth', 'admin'])->group(function () {
+        // Admin Profile routes
         Route::get('/admin/profile', [AdminController::class, 'editProfile'])->name('admin.profile');
         Route::patch('/admin/profile', [AdminController::class, 'updateProfile'])->name('admin.profile.update');
         Route::delete('/admin/profile', [AdminController::class, 'destroyProfile'])->name('admin.profile.destroy');
         Route::put('/admin/password', [AdminController::class, 'updatePassword'])->name('admin.password.update');
+        
+        // Add this new route for deleting admin profile photo
+        Route::delete('/admin/profile-photo', [AdminController::class, 'destroyProfilePhoto'])->name('admin.profile.photo.destroy');
 
         Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
         Route::get('/admin/products', [AdminController::class, 'products'])->name('admin.products');
@@ -225,6 +264,8 @@ require __DIR__.'/auth.php';
         Route::get('/admin/registration', [AdminController::class, 'eventRegistration'])->name('admin.registration');
         Route::get('/admin/membership', [AdminController::class, 'membership'])->name('admin.membership');
         Route::get('/admin/plans', [AdminController::class, 'plans'])->name('admin.plans');
+        Route::get('/admin/donate', [AdminController::class, 'donate'])->name('admin.donate');
+        Route::get('/admin/event-feedbacks', [AdminController::class, 'eventFeedbacks'])->name('admin.event-feedbacks');
         
         // product CRUD 
         Route::post('/admin/create', [AdminController::class, 'create'])->name('admin.products.create');
@@ -244,8 +285,14 @@ require __DIR__.'/auth.php';
         
         // order 
         Route::get('/admin/view-order/{id}', [AdminController::class, 'orderView'])->name('admin.orders.view');
-        Route::post('/admin/orders/{id}/update-status', [PaymentController::class, 'updateStatus'])->name('admin.orders.updateStatus');
         
+        // this route should in admincontroller 
+        Route::post('/admin/orders/{id}/update-status', [CheckoutController::class, 'updateStatus'])->name('admin.orders.updateStatus');
+        // Route::post('/admin/orders/{id}/update-status', [CheckoutController::class, 'updateStatus'])
+        //     ->name('admin.orders.updateStatus');
+        Route::post('/admin/orders/{id}/update-shipping', [CheckoutController::class, 'updateShippingStatus'])
+            ->name('admin.orders.updateShippingStatus');
+
         // payment
         Route::get('/admin/view-payment/{id}', [AdminController::class, 'paymentView'])->name('admin.payments.view');
 
@@ -272,4 +319,7 @@ require __DIR__.'/auth.php';
         Route::get('/admin/stories/{id}', [AdminController::class, 'viewStory'])->name('admin.stories.view');
         Route::patch('/admin/stories/{id}/status', [AdminController::class, 'updateStoryStatus'])->name('admin.stories.update-status');
         Route::delete('/admin/stories/{id}', [AdminController::class, 'destroyStory'])->name('admin.stories.destroy');
+
+        // Feedback
+        Route::get('/event-feedbacks/export', [AdminController::class, 'exportEventFeedbacks'])->name('admin.event-feedbacks.export');
     });

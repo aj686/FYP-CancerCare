@@ -12,10 +12,13 @@ use App\Models\Events;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Blogs;
+use App\Models\Donation;
+use App\Models\EventDonation;
 use App\Models\EventRegistration;
 use App\Models\Membership;
 use App\Models\Plan;
 use App\Models\UserStory;
+use App\Models\EventFeedback;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB; // Add this import
@@ -41,13 +44,17 @@ class AdminController extends Controller
         $users = User::all();
         $userCount = $users->count();
 
-        return Inertia::render('Admin/AdminDashboard' ,[
+        // Add this to get orders with their items
+        $orders = Order::with('orderItems')->get();
+
+        return Inertia::render('Admin/AdminDashboard', [
             'products' => $products,
             'productCount' => $productCount,
             'events' => $events,
             'eventCount' => $eventCount,
             'users' => $users,
             'userCount' => $userCount,
+            'orders' => $orders, // Add this
         ]);
     }
 
@@ -142,9 +149,128 @@ class AdminController extends Controller
     // ----------------------------------------------------------------------------------------------
 
     // PROGRAM 
-    public function programs() {
-        $events = Events::all(); // or Product::paginate(10) for pagination
+    // public function programs() {
+    //     $events = Events::all(); // or Product::paginate(10) for pagination
+    //     $count = $events->count();
+
+    //     return Inertia::render('Admin/Program', [
+    //         'events' => $events,
+    //         'count' => $count,
+    //     ]);
+    // }
+
+    // // PROGRAM - CREATE
+    // public function createEvent(Request $request, Events $events) {
+    //     $validated = $request->validate([
+    //         'title' => 'required|max:255',
+    //         'description' => 'required|min:10',
+    //         'start_date' => 'required|date',
+    //         'end_date' => 'required|date|after_or_equal:start_date',
+    //         'event_time' => 'required|date_format:H:i',
+    //         'price' => 'required|numeric|min:0',
+    //         'location' => 'required|max:255',
+    //         'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+    //         'participant_count' => 'required|integer|min:1',
+    //         'status' => 'required|in:active,canceled,completed',
+    //     ]);
+
+    //     // Convert the event_time string to a time object
+    //     $validated['event_time'] = date('H:i:s', strtotime($validated['event_time']));
+
+    //     if ($request->hasFile('image')) {
+    //         $image = $request->file('image');
+    //         $imageName = time() . '.' . $image->getClientOriginalExtension();
+    //         $image->move(public_path('storage/events'), $imageName);
+    //         $validated['image'] = 'events/' . $imageName;
+    //     }
+    
+    //     // Create a new event with the validated data
+    //     $events->create($validated);
+    
+    //     // Redirect back with a success message
+    //     return back()->with('message', 'Event created successfully!');
+    // }
+
+    // // PROGRAM - UPDATE
+    // public function updateEvent(Request $request, $event_id) {
+    //     Log::info('Update request received for event ID: ' . $event_id);
+    //     Log::info('Request Data:', $request->all());
+
+    //     $event = Events::findOrFail($event_id);
+
+    //     $validated = $request->validate([
+    //         'title' => 'required|max:255',
+    //         'description' => 'required|min:10',
+    //         'start_date' => 'required|date',
+    //         'end_date' => 'required|date|after_or_equal:start_date',
+    //         'event_time' => 'required', // Removed date_format validation temporarily for debugging
+    //         'price' => 'required|numeric|min:0',
+    //         'location' => 'required|max:255',
+    //         'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+    //         'participant_count' => 'required|integer|min:1',
+    //         'status' => 'required|in:active,canceled,completed',
+    //     ]);
+
+    //     try {
+    //         DB::beginTransaction();
+
+    //         // Handle image upload
+    //         if ($request->hasFile('image')) {
+    //             // Delete old image
+    //             if ($event->image) {
+    //                 Storage::disk('public')->delete($event->image);
+    //             }
+                
+    //             // Store new image
+    //             $imagePath = $request->file('image')->store('events', 'public');
+    //             $validated['image'] = $imagePath;
+    //         }
+
+    //         // Format event time
+    //         if (isset($validated['event_time'])) {
+    //             $validated['event_time'] = date('H:i:s', strtotime($validated['event_time']));
+    //         }
+
+    //         $event->update($validated);
+            
+    //         DB::commit();
+            
+    //         return back()->with('message', 'Event updated successfully');
+    //         } catch (\Exception $e) {
+    //             DB::rollBack();
+    //             Log::error('Error updating event: ' . $e->getMessage());
+    //             return back()->withErrors(['error' => 'Failed to update event. ' . $e->getMessage()]);
+    //         }   
+        
+    // }
+
+    // // PROGRAM - DELETE
+    // public function destroyEvent(Events $events, $event_id) {
+    //     $event = $events->findOrFail($event_id);
+    //     $event->delete();
+    //     return back()->with('message', 'Student deleted successfully');
+    // }
+
+    //  // PROGRAM - VIEW 
+    //  public function viewEvent($id) {
+    //     $event = Events::findOrFail($id);
+
+    //     return Inertia::render('AdminComp/EventView', [
+    //         'event' => $event,
+    //     ]);
+    // }
+
+    public function programs()
+    {
+        // Fetch all events and count
+        $events = Events::all(); // or Events::paginate(10) for pagination
         $count = $events->count();
+
+        // Automatically update status for events where end_date has passed
+        $today = now()->toDateString();
+        Events::where('end_date', '<', $today)
+            ->where('status', 'active')
+            ->update(['status' => 'completed']);
 
         return Inertia::render('Admin/Program', [
             'events' => $events,
@@ -153,7 +279,8 @@ class AdminController extends Controller
     }
 
     // PROGRAM - CREATE
-    public function createEvent(Request $request, Events $events) {
+    public function createEvent(Request $request, Events $events)
+    {
         $validated = $request->validate([
             'title' => 'required|max:255',
             'description' => 'required|min:10',
@@ -164,28 +291,30 @@ class AdminController extends Controller
             'location' => 'required|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'participant_count' => 'required|integer|min:1',
-            'status' => 'required|in:active,inactive',
+            'status' => 'required|in:active,canceled,completed',
         ]);
 
         // Convert the event_time string to a time object
         $validated['event_time'] = date('H:i:s', strtotime($validated['event_time']));
 
+        // Handle image upload
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
             $image->move(public_path('storage/events'), $imageName);
             $validated['image'] = 'events/' . $imageName;
         }
-    
+
         // Create a new event with the validated data
         $events->create($validated);
-    
+
         // Redirect back with a success message
         return back()->with('message', 'Event created successfully!');
     }
 
     // PROGRAM - UPDATE
-    public function updateEvent(Request $request, $event_id) {
+    public function updateEvent(Request $request, $event_id)
+    {
         Log::info('Update request received for event ID: ' . $event_id);
         Log::info('Request Data:', $request->all());
 
@@ -201,7 +330,7 @@ class AdminController extends Controller
             'location' => 'required|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'participant_count' => 'required|integer|min:1',
-            'status' => 'required|in:active,inactive',
+            'status' => 'required|in:active,canceled,completed',
         ]);
 
         try {
@@ -213,7 +342,7 @@ class AdminController extends Controller
                 if ($event->image) {
                     Storage::disk('public')->delete($event->image);
                 }
-                
+
                 // Store new image
                 $imagePath = $request->file('image')->store('events', 'public');
                 $validated['image'] = $imagePath;
@@ -224,29 +353,56 @@ class AdminController extends Controller
                 $validated['event_time'] = date('H:i:s', strtotime($validated['event_time']));
             }
 
+            // Automatically update status if end_date has passed
+            $today = now()->toDateString();
+            if ($event->end_date < $today && $validated['status'] !== 'completed') {
+                $validated['status'] = 'completed';
+            }
+
+            // Update the event
             $event->update($validated);
-            
+
             DB::commit();
-            
+
             return back()->with('message', 'Event updated successfully');
-            } catch (\Exception $e) {
-                DB::rollBack();
-                Log::error('Error updating event: ' . $e->getMessage());
-                return back()->withErrors(['error' => 'Failed to update event. ' . $e->getMessage()]);
-            }   
-        
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error updating event: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Failed to update event. ' . $e->getMessage()]);
+        }
     }
 
     // PROGRAM - DELETE
-    public function destroyEvent(Events $events, $event_id) {
+    public function destroyEvent(Events $events, $event_id)
+    {
         $event = $events->findOrFail($event_id);
-        $event->delete();
-        return back()->with('message', 'Student deleted successfully');
+
+        try {
+            // Delete the event image if it exists
+            if ($event->image) {
+                Storage::disk('public')->delete($event->image);
+            }
+
+            // Delete the event
+            $event->delete();
+
+            return back()->with('message', 'Event deleted successfully');
+        } catch (\Exception $e) {
+            Log::error('Error deleting event: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Failed to delete event. Please try again.']);
+        }
     }
 
-     // PROGRAM - VIEW 
-     public function viewEvent($id) {
+    // PROGRAM - VIEW
+    public function viewEvent($id)
+    {
         $event = Events::findOrFail($id);
+
+        // Automatically update status if end_date has passed
+        $today = now()->toDateString();
+        if ($event->end_date < $today && $event->status !== 'completed') {
+            $event->update(['status' => 'completed']);
+        }
 
         return Inertia::render('AdminComp/EventView', [
             'event' => $event,
@@ -257,13 +413,25 @@ class AdminController extends Controller
 
     // USER 
     public function users() {
-
-        $users = User::all(); // or Product::paginate(10) for pagination
+        // Get users with their active memberships
+        $users = User::with(['memberships' => function($query) {
+            $query->where('status', 'active')
+                  ->where('end_date', '>', now());
+        }])->get();
+    
+        // Add hasActiveMembership flag to each user
+        $users = $users->map(function($user) {
+            $user->hasActiveMembership = $user->memberships->isNotEmpty();
+            return $user;
+        });
+    
         $count = $users->count();
-
+        $subscribedCount = $users->filter->hasActiveMembership->count();
+    
         return Inertia::render('Admin/User', [
             'users' => $users,
             'count' => $count,
+            'subscribedCount' => $subscribedCount
         ]);
     }
 
@@ -452,11 +620,6 @@ class AdminController extends Controller
     // RESEARCH BLOG - UPDATE
     public function updateBlogs(Request $request, $blog_id)
     {
-        Log::info('Blog update request received', [
-            'blog_id' => $blog_id,
-            'request_data' => $request->except('thumbnail')
-        ]);
-
         try {
             $blog = Blogs::findOrFail($blog_id);
 
@@ -475,18 +638,21 @@ class AdminController extends Controller
             if ($request->hasFile('thumbnail')) {
                 // Delete old thumbnail if it exists
                 if ($blog->thumbnail) {
-                    Storage::delete('public/' . $blog->thumbnail);
+                    $oldPath = public_path('storage/' . $blog->thumbnail);
+                    if (file_exists($oldPath)) {
+                        unlink($oldPath);
+                    }
                 }
                 
-                // Store new thumbnail
-                $path = $request->file('thumbnail')->store('public/thumbnail');
-                $validated['thumbnail'] = str_replace('public/', '', $path);
+                // Store new thumbnail consistently with create method
+                $image = $request->file('thumbnail');
+                $imageName = time() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('storage/thumbnail'), $imageName);
+                $validated['thumbnail'] = 'thumbnail/' . $imageName;
             }
 
             $blog->update($validated);
-
-            Log::info('Blog updated successfully', ['blog_id' => $blog_id]);
-
+            
             return redirect()->back()->with('success', 'Blog updated successfully!');
 
         } catch (\Exception $e) {
@@ -499,7 +665,7 @@ class AdminController extends Controller
             return redirect()->back()
                 ->withErrors(['error' => 'Failed to update blog: ' . $e->getMessage()])
                 ->withInput();
-        } 
+        }
     }
     
     // RESEARCH BLOG - DELETE
@@ -518,12 +684,40 @@ class AdminController extends Controller
 
     // Event Registrations
     public function eventRegistration() {
-        $eventRegistration = EventRegistration::all();
-        $count = $eventRegistration->count();
+        // Get event registrations with relationships
+        $eventRegistrations = EventRegistration::with(['event', 'user'])
+        ->latest()
+        ->get();
 
-        return Inertia::render('Admin/EventRegister',[
-            'events_register' => $eventRegistration,
-            'count' => $count,
+        // Get all events with proper registration counts
+        $events = Events::all()->map(function ($event) {
+            $registeredCount = EventRegistration::where('events_id', $event->id)
+                ->where('status', 'registered')
+                ->count();
+                
+            return [
+                'id' => $event->id,
+                'title' => $event->title,
+                'total_spots' => $event->participant_count,
+                'registered_count' => $registeredCount,
+                'available_spots' => $event->participant_count - $registeredCount,
+                'registration_percentage' => ($registeredCount / $event->participant_count) * 100
+            ];
+        });
+
+        // Calculate overall statistics
+        $statistics = [
+            'total_events' => $events->count(),
+            'total_registrations' => EventRegistration::where('status', 'registered')->count(),
+            'total_cancelled' => EventRegistration::where('status', 'cancelled')->count(),
+            'active_events' => $events->where('available_spots', '>', 0)->count(),
+        ];
+
+        return Inertia::render('Admin/EventRegister', [
+            'events_register' => $eventRegistrations,
+            'events_analytics' => $events,
+            'statistics' => $statistics,
+            'count' => $eventRegistrations->count(),
         ]);
     }
     public function updateEventRegistration(Request $request) {}
@@ -612,10 +806,35 @@ class AdminController extends Controller
             return back()->withErrors(['error' => 'Failed to update plan. ' . $e->getMessage()]);
         }
     }
-    public function destroyPlans(Plan $plan, $plan_id) {
-        $planId = $plan->findOrFail($plan_id);
-        $planId->delete();
-        return back()->with('message', 'Plan deleted successfully');
+    public function destroyPlans($plan_id) 
+    {
+        try {
+            DB::beginTransaction();
+            
+            // Find the plan
+            $plan = Plan::findOrFail($plan_id);
+            
+            // Optional: Check for active subscriptions
+            if ($plan->memberships()->where('status', 'active')->exists()) {
+                return back()->withErrors([
+                    'error' => 'Cannot delete plan with active subscriptions.'
+                ]);
+            }
+            
+            // Delete the plan
+            $plan->delete();
+            
+            DB::commit();
+            
+            return back()->with('message', 'Plan deleted successfully');
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error deleting plan: ' . $e->getMessage());
+            return back()->withErrors([
+                'error' => 'Failed to delete plan. ' . $e->getMessage()
+            ]);
+        }
     }
 
     // User Story for membership user
@@ -711,6 +930,20 @@ class AdminController extends Controller
         return Inertia::render('Profile/Edit', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
+            'user' => $request->user()->only([
+                'id',
+                'name',
+                'email',
+                'age',
+                'phone',
+                'address_1',
+                'address_2',
+                'city',
+                'state',
+                'postcode',
+                'profile_photo_url',
+                'email_verified_at'
+            ])
         ]);
     }
 
@@ -722,64 +955,47 @@ class AdminController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $request->user()->id],
-            'photo' => ['nullable', 'image', 'max:2048'],
+            'age' => ['nullable', 'numeric', 'min:0', 'max:150'],
+            'phone' => ['nullable', 'string', 'regex:/^01[0-9]{8,9}$/'],
+            'address_1' => ['nullable', 'string', 'max:255'],
+            'address_2' => ['nullable', 'string', 'max:255'],
+            'city' => ['nullable', 'string', 'max:255'],
+            'state' => ['nullable', 'string', 'max:255'],
+            'postcode' => ['nullable', 'string', 'max:5'],
+            'profile_photo_path' => ['nullable', 'image', 'max:1024'],
         ]);
-    
+
         try {
             DB::beginTransaction();
-    
-            if ($request->hasFile('photo')) {
-                // Log for debugging
-                Log::info('Processing photo upload', [
-                    'mime' => $request->file('photo')->getMimeType(),
-                    'size' => $request->file('photo')->getSize(),
-                    'original_name' => $request->file('photo')->getClientOriginalName()
-                ]);
-    
-                // Delete old photo if exists
-                if ($request->user()->profile_photo_path) {
-                    $oldPhotoPath = public_path('storage/' . $request->user()->profile_photo_path);
-                    if (file_exists($oldPhotoPath)) {
-                        unlink($oldPhotoPath);
-                    }
-                }
-    
-                // Generate unique filename
-                $fileName = time() . '_' . $request->file('photo')->getClientOriginalName();
-                
-                // Ensure directory exists
-                $path = public_path('storage/profile-photos');
-                if (!file_exists($path)) {
-                    mkdir($path, 0777, true);
-                }
-    
-                // Move the uploaded file
-                $request->file('photo')->move($path, $fileName);
-                
-                // Save path to validated data
-                $validated['profile_photo_path'] = 'profile-photos/' . $fileName;
-    
-                Log::info('Photo saved', [
-                    'path' => $validated['profile_photo_path']
-                ]);
-            }
-    
+
             $user = $request->user();
+
+            if ($request->hasFile('profile_photo_path')) {
+                // Delete old photo if exists
+                if ($user->profile_photo_path) {
+                    Storage::disk('public')->delete($user->profile_photo_path);
+                }
+                
+                $path = $request->file('profile_photo_path')->store('profile-photos', 'public');
+                $validated['profile_photo_path'] = $path;
+            }
+
             $user->fill($validated);
+
+            if ($user->isDirty('email')) {
+                $user->email_verified_at = null;
+            }
+
             $user->save();
-    
+
             DB::commit();
-    
-            return back()->with('message', 'Profile updated successfully');
-    
+
+            return Redirect::back()->with('message', 'Profile updated successfully.');
+
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Profile update failed', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            
-            return back()->withErrors(['error' => 'Failed to update profile: ' . $e->getMessage()]);
+            Log::error('Admin profile update error: ' . $e->getMessage());
+            return Redirect::back()->withErrors(['error' => 'Failed to update profile.']);
         }
     }
 
@@ -824,5 +1040,152 @@ class AdminController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/homepage');
+    }
+
+    // Donate 
+    public function donate()
+    {
+        // Get regular donations with user info
+        $donations = Donation::with('user')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($donation) {
+                return [
+                    'id' => $donation->id,
+                    'type' => 'regular',
+                    'donor_name' => $donation->user_id ? $donation->user->name : $donation->first_name . ' ' . $donation->last_name,
+                    'email' => $donation->email,
+                    'amount' => $donation->amount,
+                    'status' => $donation->payment_status,
+                    'date' => $donation->payment_date,
+                    'is_anonymous' => false
+                ];
+            });
+
+        // Get event donations with user and event info
+        $eventDonations = EventDonation::with(['user', 'event'])
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($donation) {
+                return [
+                    'id' => $donation->id,
+                    'type' => 'event',
+                    'donor_name' => $donation->is_anonymous ? 'Anonymous' : ($donation->user ? $donation->user->name : 'Unknown'),
+                    'email' => $donation->user ? $donation->user->email : '',
+                    'amount' => $donation->amount,
+                    'status' => $donation->status,
+                    'date' => $donation->created_at,
+                    'event_name' => $donation->event->title,
+                    'is_anonymous' => $donation->is_anonymous
+                ];
+            });
+
+        // Combine and sort all donations by date
+        $allDonations = $donations->concat($eventDonations)
+            ->sortByDesc('date')
+            ->values();
+
+        // Calculate statistics
+        $statistics = [
+            'total_donations' => $allDonations->count(),
+            'total_amount' => $allDonations->sum('amount'),
+            'regular_donations_count' => $donations->count(),
+            'event_donations_count' => $eventDonations->count(),
+            'completed_donations' => $allDonations->where('status', 'completed')->count(),
+            'pending_donations' => $allDonations->where('status', 'pending')->count()
+        ];
+
+        // Group donations by type for analysis
+        $donationsByType = [
+            'regular' => [
+                'count' => $donations->count(),
+                'amount' => $donations->sum('amount')
+            ],
+            'event' => [
+                'count' => $eventDonations->count(),
+                'amount' => $eventDonations->sum('amount')
+            ]
+        ];
+
+        return Inertia::render('Admin/Donate', [
+            'donations' => $allDonations,
+            'statistics' => $statistics,
+            'donationsByType' => $donationsByType
+        ]);
+    }
+
+    // In AdminController.php
+
+    public function eventFeedbacks()
+    {
+        $feedbacks = EventFeedback::with(['event', 'user', 'registration'])
+            ->latest()
+            ->get();
+        
+        // Initialize feedback distribution array with zeros for all ratings
+        $feedback_distribution = array_fill(1, 5, 0);
+        foreach ($feedbacks as $feedback) {
+            if (isset($feedback_distribution[$feedback->rating])) {
+                $feedback_distribution[$feedback->rating]++;
+            }
+        }
+
+        // Calculate statistics
+        $statistics = [
+            'total_feedbacks' => $feedbacks->count(),
+            'average_rating' => round($feedbacks->avg('rating'), 1),
+            'total_events_with_feedback' => $feedbacks->unique('events_id')->count(),
+            'feedback_distribution' => $feedback_distribution,
+            'anonymous_feedback_count' => $feedbacks->where('anonymous', true)->count()
+        ];
+
+        return Inertia::render('Admin/EventFeedbacks', [
+            'feedbacks' => $feedbacks->map(function ($feedback) {
+                return [
+                    'id' => $feedback->id,
+                    'event' => [
+                        'id' => $feedback->event->id,
+                        'title' => $feedback->event->title,
+                        'end_date' => $feedback->event->end_date,
+                    ],
+                    'user' => $feedback->anonymous ? null : [
+                        'id' => $feedback->user->id,
+                        'name' => $feedback->user->name,
+                    ],
+                    'rating' => $feedback->rating,
+                    'comment' => $feedback->comment,
+                    'anonymous' => $feedback->anonymous,
+                    'created_at' => $feedback->created_at->format('Y-m-d H:i:s'),
+                ];
+            }),
+            'statistics' => $statistics
+        ]);
+    }
+
+    public function exportEventFeedbacks()
+    {
+        $feedbacks = EventFeedback::with(['event', 'user'])
+            ->get()
+            ->map(function ($feedback) {
+                return [
+                    'Event ID' => $feedback->events_id,
+                    'Event Title' => $feedback->event->title,
+                    'User' => $feedback->anonymous ? 'Anonymous' : $feedback->user->name,
+                    'Rating' => $feedback->rating,
+                    'Comment' => $feedback->comment,
+                    'Submitted At' => $feedback->created_at->format('Y-m-d H:i:s'),
+                ];
+            });
+
+        return response()->streamDownload(function () use ($feedbacks) {
+            $csv = fopen('php://output', 'w');
+            fputcsv($csv, array_keys($feedbacks->first()));
+            
+            foreach ($feedbacks as $row) {
+                fputcsv($csv, $row);
+            }
+            
+            fclose($csv);
+        }, 'event_feedbacks.csv');
     }
 }

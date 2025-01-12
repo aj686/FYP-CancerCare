@@ -22,7 +22,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             '/stripe/webhook/subscription',
             '/stripe/webhook/payment',
-            '/stripe/webhook/donation'
+            '/stripe/webhook/donation',
+            '/stripe/webhook/eventdonation',
+            '/stripe/webhook/*',
+            '/billplz/callback'
         ]);
 
 

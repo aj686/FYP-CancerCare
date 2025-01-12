@@ -69,33 +69,33 @@ export default function Dashboard({totalProduct, totalEvent, totalUser}) {
                         value={stats.totalUsers}
                         icon={Users}
                         color="bg-blue-500"
-                        trend="12"
+                        // trend="12"
                     />
                     <StatCard
                         title="Total Events"
                         value={stats.totalEvents}
                         icon={Calendar}
                         color="bg-green-500"
-                        trend="8"
+                        // trend="8"
                     />
                     <StatCard
                         title="Total Products"
                         value={stats.totalProducts}
                         icon={ShoppingBag}
                         color="bg-purple-500"
-                        trend="15"
+                        // trend="15"
                     />
-                    <StatCard
+                    {/* <StatCard
                         title="Pending Requests"
                         value={stats.pendingRequests}
                         icon={AlertCircle}
                         color="bg-orange-500"
                         trend="5"
-                    />
+                    /> */}
                 </div>
 
                 {/* Analytics Section */}
-                <div className="mb-8">
+                {/* <div className="mb-8">
                     <h2 className="text-2xl font-bold mb-6 text-gray-800">Analytics Overview</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <AnalyticsCard
@@ -127,7 +127,7 @@ export default function Dashboard({totalProduct, totalEvent, totalUser}) {
                             color="bg-yellow-500"
                         />
                     </div>
-                </div>
+                </div> */}
 
                 {/* Action Cards */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -160,7 +160,7 @@ export default function Dashboard({totalProduct, totalEvent, totalUser}) {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+                    {/* <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                         <div className="p-6">
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-xl font-bold text-gray-800">Recent Activities</h2>
@@ -193,7 +193,7 @@ export default function Dashboard({totalProduct, totalEvent, totalUser}) {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>
